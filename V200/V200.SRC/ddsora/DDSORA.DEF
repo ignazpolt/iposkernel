@@ -1,0 +1,18 @@
+; NAME      DBDLL
+EXETYPE   WINDOWS
+CODE      PRELOAD MOVEABLE DISCARDABLE
+DATA      PRELOAD FIXED SINGLE
+HEAPSIZE  4096
+
+EXPORTS
+;    ===List your explicitly exported functions here===
+  WEP                                                                           @1 	RESIDENTNAME
+  DBCALL                   = ?DBCall@@ZCHGHPEUDBRequest@@PEPEXPEURecBuffer@@@Z  @2
+  DBRESET                  = ?DBReset@@ZCXXZ                                    @3
+  DATADICT_NEWTABLEDEF     = ?DataDict_NewTableDef@@ZCPEXPEXPEDPEHPEK@Z         @4
+  DATADICT_GETSQLPART      = ?DataDict_GetSqlPart@@ZCPEDGPEDPEXGG0G@Z           @40
+  DOBEGINTRANSACTION       = ?DoBeginTransaction@@ZCXH@Z                        @41
+  DOENDTRANSACTION         = ?DoEndTransaction@@ZCXXZ                           @42
+  DOABORTTRANSACTION       = ?DoAbortTransaction@@ZCXXZ                         @43
+  DBALTER                  = ?DBAlter@@ZCHPEUTableDef@@0HPEUDefVal@@P7CXK@Z@Z   @44
+  DBIGNOREERROR            = ?DBIgnoreError@@ZCHHH@Z                            @45

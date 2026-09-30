@@ -1,0 +1,7 @@
+ddsseq opseq
+user32.lib ..\ddsmem.lib ..\compile.lib ..\dmwapi.lib ..\dbhelp.lib
+ddsseq.res
+/DEF:ddsseq32.def
+/OUT:ddsseq.dll
+/MAP:ddsseq.map
+

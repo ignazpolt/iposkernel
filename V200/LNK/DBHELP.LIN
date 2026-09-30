@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DBHELP\DBH.DEF
+COPY ..\..\%ACTVERS%.SRC\DBHELP\DBH1.DEF
+
+COPY ..\..\%ACTVERS%.SRC\DBHELP\DBHELP.LNK
+COPY ..\..\%ACTVERS%.SRC\DBHELP\DBHELP1.LNK
+
+link /nod /noe /co /li /map @dbhelp.lnk
+rc -r -v -z -fodbhelp.res ..\..\%ACTVERS%.SRC\DBHELP\dbhelp.rc
+rc -T -K dbhelp.res dbhelp.dll
+copy dbhelp.dll ..\*.*
+implib dbhelp.lib dbhelp.dll
+copy dbhelp.lib ..\*.*
+
+link /nod /noe /co /li /map @dbhelp1.lnk
+rc -T -K dbhelp.res dbhelp1.dll
+implib dbhelp1.lib dbhelp1.dll
+copy dbhelp1.lib ..\restool
+copy dbhelp1.dll ..\restool

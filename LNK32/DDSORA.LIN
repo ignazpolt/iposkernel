@@ -1,0 +1,10 @@
+COPY ..\..\%ACTVERS%.SRC\DDSORA\ddsora.L32
+COPY ..\..\%ACTVERS%.SRC\DDSORA\ddsora32.def
+
+rc -r -v -dWIN32 -foddsora.res ..\..\%ACTVERS%.SRC\DDSORA\ddsora.rc
+
+link /DLL /DEBUG @ddsora.l32
+copy ddsora.dll ..
+copy ddsora.lib ..
+copy ddsora.exp ..
+copy ddsora.dll ..\restool\*.*

@@ -1,0 +1,319 @@
+;-----------------------------------------------------
+;       $Header:   P:/marille/clinicum/dbhelp/rev/dbhelp.dev   1.30   28 Jul 1998 11:12:12   Hannes  $ 
+;       $Log:   P:/marille/clinicum/dbhelp/rev/dbhelp.dev  $
+;  
+;     Rev 1.30   28 Jul 1998 11:12:12   Hannes
+;  CALCTABLEID explizit exportiert
+;  
+;     Rev 1.29   30 Jan 1996 11:15:06   MARTIN
+;  InTransaction, ResetTransactionDLL
+;  
+;     Rev 1.28   20 Nov 1995 12:32:32   HANNES
+;  
+;     Rev 1.27   24 Aug 1995 00:14:38   HANNES
+;  
+;     Rev 1.26   14 Aug 1995 08:24:30   HANNES
+;  
+;     Rev 1.25   14 Jul 1995 16:56:46   HANNES
+;  
+;     Rev 1.24   02 Jul 1995 18:18:40   HANNES
+;  
+;     Rev 1.23   09 Jun 1995 00:26:48   HANNES
+;  
+;     Rev 1.22   15 May 1995 08:23:50   HANNES
+;  
+;     Rev 1.21   27 Apr 1995 15:50:46   HANNES
+;  
+;     Rev 1.20   21 Mar 1995 16:23:48   HANNES
+;  
+;     Rev 1.19   20 Mar 1995 12:09:24   HANNES
+;  
+;     Rev 1.18   08 Mar 1995 09:12:24   HANNES
+;  
+;     Rev 1.17   24 Feb 1995 11:09:58   HANNES
+;  
+;     Rev 1.16   16 Feb 1995 12:49:06   HANNES
+;   
+;  
+;     Rev 1.15   29 Jan 1995 11:46:08   HANNES
+;  
+;     Rev 1.14   24 Jan 1995 10:59:34   HANNES
+;  
+;     Rev 1.13   13 Jan 1995 16:55:34   HANNES
+;  Variablen-Breakpoints
+;  
+;     Rev 1.12   10 Jan 1995 15:00:44   HANNES
+;  
+;     Rev 1.11   09 Jan 1995 12:09:46   HANNES
+;  Debugger eingebaut
+;  
+;     Rev 1.10   15 Dec 1994 10:43:22   HANNES
+;  
+;     Rev 1.9   07 Dec 1994 18:30:10   HANNES
+;  
+;     Rev 1.8   05 Dec 1994 17:40:08   HANNES
+;  
+;     Rev 1.7   31 Oct 1994 10:40:12   hannes
+;  
+;     Rev 1.6   19 Oct 1994 22:31:42   hannes
+;  
+;     Rev 1.5   05 Aug 1994 17:10:12   HANNES
+;  
+;     Rev 1.4   17 Jul 1994 14:35:36   HANNES
+;  
+;     Rev 1.3   13 Jul 1994 21:23:58   HANNES
+;  
+;     Rev 1.2   11 Jul 1994 21:31:46   HANNES
+;  
+;     Rev 1.1   04 Jul 1994 14:46:48   HANNES
+;  
+;     Rev 1.0   24 Jun 1994 16:44:40   HANNES
+;  Neuuebernahme clinicum
+;  
+;     Rev 1.0   19 Apr 1994 10:48:04   HANNES
+;  Initial revision.
+;  
+;-----------------------------------------------------
+EXETYPE WINDOWS
+
+DESCRIPTION 'Datenbankanbindung Marille - Hilfsteile'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   4096
+
+EXPORTS
+  WEP                                                                      @1 	RESIDENTNAME
+  ??0DBHelpRecord@@REC@GK@Z                                                @2
+  ??0DBList@@REC@PEUTableDef@@KPEDHHPEUParamBlock@@H@Z                     @3
+  ??0DBLocalRecord@@REC@GK@Z                                               @4
+  ??0DBRecord@@REC@G@Z                                                     @5
+  ??0DBRecord@@REC@PEUDBRequest@@@Z                                        @6
+  ??0DBRecord@@REC@PEUTableDef@@@Z                                         @7
+  ??0RecordList@@REC@PEUTableDef@@KHH@Z                                    @8
+  ??1DBHelpRecord@@VEC@XZ                                                  @9
+  ??1DBList@@VEC@XZ                                                        @10
+  ??1DBLocalRecord@@VEC@XZ                                                 @11
+  ??1DBRecord@@VEC@XZ                                                      @12
+  ??1FncCompiler@@VEC@XZ                                                   @13
+  ??1RecordList@@VEC@XZ                                                    @14
+  ??4PrimKey@@RECAEV0@AEV0@@Z                                              @15
+  ??8PrimKey@@RECHAEV0@@Z                                                  @16
+  ?AbortTransaction@@ZCXXZ                                                 @17
+  ?AddElemsToGet@DBList@@RECXPEGH@Z                                        @18
+  ?AddForeign@TableDef@@RECXPEUClientRIDef@@@Z                             @19
+  ?AddKey@TableDef@@RECXPEUClientKeyDef@@@Z                                @20
+  ?AddLine@RecBuffer@@RECXGG@Z                                             @21
+  ?AddRecAtHead@RecordList@@RECXPEVDBRecord@@H@Z                           @22
+  ?AddRecAtTail@RecordList@@RECXPEVDBRecord@@H@Z                           @23
+  ?AddRecBehind@RecordList@@RECXPEVDBRecord@@0H@Z                          @24
+  ?AddTableDef@DBRequest@@RECXGH@Z                                         @25
+  ?AddTableDef@DBRequest@@RECXPEUTableDef@@H@Z                             @26
+  ?AddTablePart@@ZCHPEPEUInternTable@@PEDHH@Z                              @27
+  ?AddVar@InternTable@@RECHPEDG@Z                                          @28
+  ?AddVar@TableDef@@RECPEU1@PEUVarDef@@@Z                                  @29
+  ?BeginTransaction@@ZCXXZ                                                 @30
+  ?BuildForeign@DBRequest@@RECPEUReqElem@@XZ                               @31
+  ?CalcPrimKey@DBRecord@@RECXHPEVPrimKey@@@Z                               @32
+  ?CheckDataDictContent@TableAdmin@@RECHPED@Z                              @33
+  ?CheckPrimKeySegs@DBRequest@@RECXXZ                                      @34
+  ?Clear@@ZCXPEUInternTable@@@Z                                            @35
+  ?Clear@RecBuffer@@RECXXZ                                                 @36
+  ?Clear@TableDef@@RECXXZ                                                  @37
+  ?ClearCachedScript@@ZCXPED@Z                                             @38
+  ?ClearConnection@DBHelpRecord@@VECXGKPEXH0H@Z                            @39
+  ?ClearConnection@DBRecord@@VECXGKPEXH0H@Z                                @40
+  ?ClearConnection@VarElem@@RECXKPEXH0H@Z                                  @41
+  ?ClearForeign@DBRequest@@RECXXZ                                          @42
+  ?Compare@@ZCHPEUcmdcount@@0@Z                                            @43
+  ?ConnectToSQL@@ZCXIPED@Z                                                 @44
+  ?ConnectToSQL@@ZCXPEUTableDef@@HPED@Z                                    @45
+  ?Copy@cmdcount@@RECPEU1@XZ                                               @46
+  ?CreateDataDictContent@@ZCXXZ                                            @47
+  ?CreateEmptyInternTable@@ZCXPEPEUInternTable@@@Z                         @48
+  ?CreateFullTable@@ZCXPED0G@Z                                             @49
+  ?CreateResContent@@ZCXXZ                                                 @50
+  ?CreateScriptContent@@ZCXPED@Z                                           @51
+  ?CreateTableList@TableAdmin@@RECPEUTableEntry@@XZ                        @52
+  ?Del@DBRecord@@RECXGPEXHH0H@Z                                            @53
+  ?DelCommandFifoEntry@fifo@@RECXKPEX@Z                                    @54
+  ?DelCommandFifoEntry@fifo@@RECXKPEXH0@Z                                  @55
+  ?DelDocumentEntrys@fifo@@RECXK@Z                                         @56
+  ?DeleteRecRoot@@ZCXPEURecRoot@@K@Z                                       @57
+  ?DelJoins@DBRecord@@RECXG@Z                                              @58
+  ?DelTableDef@TableAdmin@@RECHPED@Z                                       @59
+  ?DestroyTableList@TableAdmin@@RECXPEUTableEntry@@@Z                      @60
+  ?DocumentIsDestroyed@@ZCXK@Z                                             @61
+  ?EndTransaction@@ZCXXZ                                                   @62
+  ?ExtUpdate@DBList@@VECHXZ                                                @63
+  ?ExtUpdate@RecordList@@VECHXZ                                            @64
+  ?FillColumnDlg@TableDef@@RECXIG@Z                                        @65
+  ?FillResDlg@@ZCXIG@Z                                                     @66
+  ?FillScriptDlg@@ZCXIG@Z                                                  @67
+  ?FillTableDlg@TableAdmin@@RECXIG@Z                                       @68
+  ?Find@DBRecordAdmin@@RECPEVDBRecord@@PEVPrimKey@@G@Z                     @69
+  ?FindRec@RecordList@@RECPEVDBRecord@@PEVPrimKey@@@Z                      @70
+  ?First@DataDictCont@@RECPEUContEntry@@XZ                                 @71
+  ?FormatOutTxt@@ZCXPEDPEXG@Z                                              @72
+  ?FreeFifoEntry@fifo@@RECXPEUCmdFifoEntry@@@Z                             @73
+  ?FreeMem@VarElem@@RECXXZ                                                 @74
+  ?FreeRequest@@ZCXPEUDBRequest@@@Z                                        @75
+  ?FreeTable@TableAdmin@@RECXG@Z                                           @76
+  ?FreeTableDef@@ZCXPEUTableDef@@@Z                                        @77
+  ?FreeTableDefs@DBRequest@@RECXXZ                                         @78
+  ?FreeTemporaryTable@TableAdmin@@RECXG@Z                                  @79
+  ?GenerateScript@@ZCHIPED@Z                                               @80
+  ?Get@DBList@@RECPEVDBRecord@@PEUParamBlock@@@Z                           @81
+  ?GetAsync_cmdfifo@@ZCPEVfifo@@XZ                                         @82
+  ?GetBitmapID@@ZCKPED@Z                                                   @83
+  ?GetCmdFifoInfo@@ZCHHPEUDebFifoInfo@@@Z                                  @84
+  ?GetCmdMoreInfo@@ZCHEEPEUDebFifoInfo@@@Z                                 @85
+  ?GetCommandFifo@fifo@@RECPEUCmdFifoEntry@@XZ                             @86
+  ?GetCount@@ZCPEUcmdcount@@G@Z                                            @87
+  ?GetDBRecordAdmin@@ZCPEVDBRecordAdmin@@XZ                                @88
+  ?GetDLLAdmin@@ZCPEVDLLAdmin@@XZ                                          @89
+  ?GetDLLForTable@@ZCXPED0@Z                                               @90
+  ?GetElemsOf@DBRequest@@RECPEUReqElem@@G@Z                                @91
+  ?GetEmptyTable@@ZCPEUTableDef@@PED0@Z                                    @92
+  ?GetFirst@DBList@@VECPEVDBRecord@@XZ                                     @93
+  ?GetFirst@RecordList@@VECPEVDBRecord@@XZ                                 @94
+  ?GetFirstActive@RecordList@@RECPEVDBRecord@@XZ                           @95
+  ?GetFirstResourceInfo@@ZCPEURes_CEntry@@XZ                               @96
+  ?GetFirstTableDef@TableAdmin@@RECPEUTableDef@@PEPEX@Z                    @97
+  ?GetLast@DBList@@VECPEVDBRecord@@XZ                                      @98
+  ?GetLast@RecordList@@VECPEVDBRecord@@XZ                                  @99
+  ?GetLastActive@RecordList@@RECPEVDBRecord@@XZ                            @100
+  ?GetMTypeName@@ZCPEDG@Z                                                  @101
+  ?GetNext@DBList@@VECPEVDBRecord@@PEV2@@Z                                 @102
+  ?GetNext@RecordList@@VECPEVDBRecord@@PEV2@@Z                             @103
+  ?GetNextActive@RecordList@@RECPEVDBRecord@@PEV2@@Z                       @104
+  ?GetNextResourceInfo@@ZCPEURes_CEntry@@PEU1@G@Z                          @105
+  ?GetNextTableDef@TableAdmin@@RECPEUTableDef@@PEPEX@Z                     @106
+  ?GetOutTxt@DBRecord@@RECXPEDG@Z                                          @107
+  ?GetPrev@DBList@@VECPEVDBRecord@@PEV2@@Z                                 @108
+  ?GetPrev@RecordList@@VECPEVDBRecord@@PEV2@@Z                             @109
+  ?GetPrimKeySegs@TableDef@@RECHPEG@Z                                      @110
+  ?GetRealMTypeName@@ZCPEDG@Z                                              @111
+  ?GetReqElem@InternTable@@RECXPEUReqElem@@G@Z                             @112
+  ?GetReqElem@TableDef@@RECXPEUReqElem@@G@Z                                @113
+  ?GetResource@@ZCIKPEGPEK@Z                                               @114
+  ?GetResourceInfo@@ZCXHPED0PEK@Z                                          @115
+  ?GetScriptData@ScriptContent_Entry@@RECXPEI0@Z                           @116
+  ?GetScriptEntry@@ZCPEUScriptContent_Entry@@PED@Z                         @117
+  ?GetScriptFName@@ZCHPEDH@Z                                               @118
+  ?GetSync_cmdfifo@@ZCPEVfifo@@XZ                                          @119
+  ?GetTableAdmin@@ZCPEVTableAdmin@@XZ                                      @120
+  ?GetTableDef@TableAdmin@@RECPEUTableDef@@G@Z                             @121
+  ?GetTableDefByNr@TableAdmin@@RECPEUTableDef@@H@Z                         @122
+  ?GetTableID@TableAdmin@@RECGPEDPEH@Z                                     @123
+  ?GetTemporaryTable@TableAdmin@@RECPEUTableDef@@HPEPEDH0@Z                @124
+  ?GetTransactionDLL@@ZCHXZ                                                @125
+  ?GetUpdateExtraData@@ZCPEXPEH@Z                                          @126
+  ?GetVarID@TableDef@@RECGPEDPEGPEH@Z                                      @127
+  ?GetVarNumber@DBRequest@@RECGGGPEH@Z                                     @128
+  ?GetVarNumberByNum@DBRequest@@RECGGGPEH@Z                                @129
+  ?GetVarSize@DBRecord@@RECHG@Z                                            @130
+  ?GetWMFID@@ZCKPED@Z                                                      @131
+  ?HasForeignKeysFor@TableDef@@RECHPEU1@PEGP7CHGGPEX@Z2PED4@Z              @132
+  ?Initialize@DBRecord@@RECXGPEXG@Z                                        @133
+  ?Initialize@TableAdmin@@RECXXZ                                           @134
+  ?InitializeRecRoot@@ZCPEURecRoot@@G@Z                                    @135
+  ?InitializeRequest@@ZCPEUDBRequest@@PEDHHK@Z                             @136
+  ?InitializeTable@@ZCPEUTableDef@@I@Z                                     @137
+  ?InitializeTableID@TableDef@@RECXPEDGG@Z                                 @138
+  ?Intern_DATADICT_FREETABLEDEF@@ZCXPEX@Z                                  @139
+  ?Intern_DATADICT_FREEVARDEF@@ZCXPEX@Z                                    @140
+  ?Intern_DATADICT_GETACCESSLIST@@ZCPEUAccessListEntry@@PEX@Z              @141
+  ?Intern_DATADICT_GETMTYPE@@ZCGPEX@Z                                      @142
+  ?Intern_DATADICT_GETVARPROPERTY@@ZCHPEX0G0@Z                             @143
+  ?Intern_DATADICT_ISACCESSFORVIEW@@ZCHPEXPED@Z                            @144
+  ?Intern_DATADICT_TABLEDEF@@ZCPEXPEXPEDPEHPEK@Z                           @145
+  ?Intern_DATADICT_VARDEF@@ZCPEXPEXG0PEDPEHPEK@Z                           @146
+  ?Intern_DBCALL@@ZCHGHPEUDBRequest@@PEPEXPEURecBuffer@@@Z                 @147
+  ?Intern_DBRESET@@ZCXXZ                                                   @148
+  ?Intern_GETVARDESCEXTRA@@ZCXPEXPEDG@Z                                    @149
+  ?Intern_ISPRIMARY@@ZCHPEX@Z                                              @150
+  ?IsCommandFifoEmpty@fifo@@RECHXZ                                         @151
+  ?IsMoreOnHead@RecordList@@RECHXZ                                         @152
+  ?IsMoreOnTail@RecordList@@RECHXZ                                         @153
+  ?IsNullKey@PrimKey@@RECHXZ                                               @154
+  ?IsTableReferenced@InternTable@@RECHPED@Z                                @155
+  ?IsUpdateDone@DBRecord@@RECHXZ                                           @156
+  ?IsUpdateFrom@@ZCHPEUVarElem@@@Z                                         @157
+  ?IsUsedBy@DBRecord@@RECHK@Z                                              @158
+  ?IsViewAllowed@TableDef@@RECHPED@Z                                       @159
+  ?LoadDLL@DLLAdmin@@RECHPED@Z                                             @160
+  ?LoadResDLL@DLLAdmin@@RECHXZ                                             @161
+  ?LoadScriptContent@@ZCXXZ                                                @162
+  ?NewJoins@DBRecord@@RECXG@Z                                              @163
+  ?Next@DataDictCont@@RECPEUContEntry@@PEU2@@Z                             @164
+  ?NoFurtherUpdates@@ZCXK@Z                                                @165
+  ?OnExit@TableAdmin@@RECXXZ                                               @166
+  ?Pack@@ZCPEUInternTable@@PEU1@PEIPEK@Z                                   @167
+  ?PopBlock@@ZCPEUcmdcount@@PEU1@@Z                                        @168
+  ?PopFromMDIList@@ZCXPEVmdiChild@@@Z                                      @169
+  ?PopUpdateExtraData@@ZCXXZ                                               @170
+  ?PushBlock@@ZCPEUcmdcount@@PEU1@G@Z                                      @171
+  ?PushKeySeg@PrimKey@@RECXPEXH@Z                                          @172
+  ?PushToMDIList@@ZCXPEVmdiChild@@@Z                                       @173
+  ?PushUpdateExtraData@@ZCXXZ                                              @174
+  ?PutCommandFifo@fifo@@RECXKGPEX0PEUVarElem@@PEUcmdcount@@H0H@Z           @175
+  ?ReadResContent@@ZCXXZ                                                   @176
+  ?RefreshJoin@DBRecord@@RECXPEUDBRequest@@GPEPEXH@Z                       @177
+  ?RefreshJoins@DBList@@RECXPEPEXH@Z                                       @178
+  ?ReInitialize@TableAdmin@@RECXXZ                                         @179
+  ?Release@DBRecordAdmin@@RECHPEVDBRecord@@K@Z                             @180
+  ?ReleaseFrom@DBRecord@@RECXK@Z                                           @181
+  ?ResetDLLAdmin@DLLAdmin@@RECXXZ                                          @182
+  ?ResetUpdateFlags@DBRecord@@RECXXZ                                       @183
+  ?Set@DBRecord@@RECXGPEXG0HH0H@Z                                          @184
+  ?SetConnection@DBHelpRecord@@VECXGKPEXPEUcmdcount@@H0H@Z                 @185
+  ?SetConnection@DBRecord@@VECXGKPEXPEUcmdcount@@H0H@Z                     @186
+  ?SetConnection@VarElem@@RECXKPEXPEUcmdcount@@H0H@Z                       @187
+  ?SetConnectionInfo@DBList@@VECXPEX0@Z                                    @188
+  ?SetConnectionInfo@RecordList@@VECXPEX0@Z                                @189
+  ?SetDLLDef@TableDef@@RECXPEXK@Z                                          @190
+  ?SetKeyNull@PrimKey@@RECXXZ                                              @191
+  ?SetNewDimension@DBRequest@@RECXH@Z                                      @192
+  ?SetParams@DBList@@RECXPEUParamBlock@@@Z                                 @193
+  ?SetRec@RecRoot@@RECXPEVDBRecord@@GK@Z                                   @194
+  ?SetReqElem@DBRequest@@RECXHGG@Z                                         @195
+  ?SetReqElemDirect@DBRequest@@RECXHGG@Z                                   @196
+  ?SetReqElemExtended@DBRequest@@RECXHGGH@Z                                @197
+  ?SetupQueue@@ZCXIP7CXPEUtagMSG@@@Z@Z                                     @198
+  ?ShowFifoStat@@ZCXH@Z                                                    @199
+  ?StoreBitmap@@ZCHPED0HH@Z                                                @200
+  ?StoreWMF@@ZCHPED0@Z                                                     @201
+  ?TableDef_NewPack@@ZCPEUTableDef@@PEU1@PEK@Z                             @202
+  ?ThrowAtHead@RecordList@@RECXPEVDBRecord@@@Z                             @203
+  ?ThrowAtTail@RecordList@@RECXPEVDBRecord@@@Z                             @204
+  ?ThrowFirstUsed@RecordList@@RECXXZ                                       @205
+  ?ThrowLastUsed@RecordList@@RECXXZ                                        @206
+  ?ThrowList@RecordList@@RECXXZ                                            @207
+  ?ThrowRecord@RecordList@@RECXPEVDBRecord@@@Z                             @208
+  ?UnloadResContent@@ZCXXZ                                                 @209
+  ?UnloadScriptContent@@ZCXXZ                                              @210
+  ?Update@VarElem@@RECXPEX0H0H@Z                                           @211
+  ?UpdateEleCount@@ZCHXZ                                                   @212
+  ?UseBy@DBRecord@@RECXK@Z                                                 @213
+  ?AddRecBefore@RecordList@@RECXPEVDBRecord@@0H@Z                          @214
+  ?SortList@RecordList@@RECXHPEHH@Z                                        @215
+  ?DBTest@@ZCXXZ                                                           @216
+  ?GetProperty@ScriptContent_Entry@@RECHPED0H@Z                            @217
+  ?GetNextScript@@ZCPEUScriptContent_Entry@@PEU1@@Z                        @218
+  ?GetFirstScript@@ZCPEUScriptContent_Entry@@XZ                            @219
+  ??0DBConstRecord@@REC@GKI@Z                                              @220
+  ??1DBConstRecord@@VEC@XZ                                                 @221
+  ?FindRecord@RecordList@@RECPEVDBRecord@@PEHPEPEXH@Z                      @222
+  ?AddFileTranslation@@ZCXKPED0@Z                                          @223
+  ?RemoveFileTranslation@@ZCXKPED@Z                                        @224
+  ?FillIn@VarElem@@RECXPEU1@@Z                                             @225
+  ?IsValidChild@@ZCHPEX@Z                                                  @226
+  ?GetAnzCachedRecords@RecordList@@RECHXZ                                  @227
+  ?InTransaction@@ZCHXZ                                                    @228
+  ?ResetTransactionDLL@@ZCXXZ                                              @229
+
+  CALCTABLEID  = ?CalcTableID@@YGGPAD@Z                                    @230
+

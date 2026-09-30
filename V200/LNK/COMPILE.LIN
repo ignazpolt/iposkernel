@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\COMPILE\COMPILE.LNK
+COPY ..\..\%ACTVERS%.SRC\COMPILE\compile1.LNK
+COPY ..\..\%ACTVERS%.SRC\COMPILE\comp.DEF
+COPY ..\..\%ACTVERS%.SRC\COMPILE\comp1.DEF
+
+link /nod /noe /co /li /map @compile.lnk
+rc -r -v -z -focompile.res ..\..\%ACTVERS%.SRC\COMPILE\compile.rc
+rc -T -K compile.res compile.dll
+copy compile.dll ..\*.*
+implib compile.lib compile.dll
+copy compile.lib ..\*.*
+
+link /nod /noe /co /li /map @compile1.lnk
+rc -T -K compile.res compile1.dll
+copy compile1.dll ..\restool
+implib compile1.lib compile1.dll
+copy compile1.lib ..\restool

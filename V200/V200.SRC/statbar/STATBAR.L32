@@ -1,0 +1,5 @@
+statbar
+statbar.res
+user32.lib gdi32.lib ..\ddsmem.lib ..\ctool.lib
+/OUT:statbar.dll
+/MAP:statbar.map

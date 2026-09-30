@@ -1,0 +1,10 @@
+frmobj+paint+wmfcache+metaplay+sc2d+namfld+
+frmobj1+frmobj2+frmobj3+frmobj4+frmobj5+
+trcobj+rotcent+cubspl+cutedit+digcnf+frmtable+
+frmobj6+moveobj
+frmobj1.dll
+frmobj.map
+libw.lib+ldllcew.lib+oldnames.lib+..\restool\tiffimg1.lib+
+..\restool\ctool1.lib+..\restool\dmwapi1.lib+..\restool\ddsmem1.lib+
+..\restool\dbhelp1.lib+ltkrn_w.lib+ltfil_w.lib
+frmo1.def

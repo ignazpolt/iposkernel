@@ -1,0 +1,11 @@
+dbhelp
+network
+dlladmin tbdef dbreq dbrecord dblist 
+inttable resadmin scripthd cmdsort 
+cmdfifo showdata sqlconn dllname
+ressql rep tbdiff
+time date
+dbhelp.res
+user32.lib gdi32.lib ..\ddsmem.lib ..\dmwapi.lib
+/OUT:dbhelp.dll
+/MAP:dbhelp.map

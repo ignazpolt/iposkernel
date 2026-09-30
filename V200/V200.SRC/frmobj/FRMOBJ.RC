@@ -1,0 +1,97 @@
+/*
+ *
+ *      $Header:   P:/marille/clinicum/frmobj/rev/frmobj.rcv   1.5   14 Sep 1998 16:56:08   Martin  $
+ *      $Log:   P:/marille/clinicum/frmobj/rev/frmobj.rcv  $
+ * 
+ *    Rev 1.5   14 Sep 1998 16:56:08   Martin
+ * SoftWork raus
+ * 
+ *    Rev 1.4   08 Sep 1997 11:33:26   Gerhold
+ * Context-Menu
+ * 
+ *    Rev 1.3   07 Mar 1997 17:43:42   gerhold
+ * VERSION_INFO
+ * 
+ *    Rev 1.2   13 Sep 1995 19:39:28   GERHOLD
+ * 
+ *    Rev 1.1   21 Mar 1995 16:59:44   GERHOLD
+ * 
+ *    Rev 1.0   24 Jun 1994 16:46:24   MARTIN
+ * Neuuebernahme clinicum
+ * 
+ */
+
+#include <windows.h>
+#include <winver.h>
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+ChildIcon  ICON    C:\ipos_kernel\PICTURES\MDICHILD.ICO
+DocIcon    ICON    C:\ipos_kernel\PICTURES\DOCUMENT.ICO
+
+   STRINGTABLE
+   Begin
+     ; Meldungen fuer Chirurgie
+     15000,    "Chirurgie - Meldung"
+     15001,    "Schnitt darf nicht �ber mehrere Teilst�cke gehen !"
+     15002,    "Geschlossene Kontur mu� ganz durchgeschnitten werden !"
+     15003,    "Maximal zwei Schnittpunkte mit Kontur erlaubt !"
+     15004,    "Bitte geben sie zuerst einen Schnitt ein !"
+     15005,    "Schnitt mu� in Richtung Knochen gehen !"
+     15006,    "Teilschnitte m�ssen durch Konturen verbunden sein !"
+
+   End
+
+ContextMenu MENU 
+BEGIN 
+  POPUP "Dummy Popup" 
+    BEGIN 
+      MENUITEM "Kurzhilfe...", 100, GRAYED
+;      POPUP "Hotkeys..." 
+    END 
+ 
+END 
+
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "FRMOBJ.DLL\0"
+            VALUE "InternalName", "FRMOBJ\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+END
+
+

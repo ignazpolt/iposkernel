@@ -1,0 +1,10 @@
+toolbar+bitlist+bubbles+
+hotkey+barelem+ddslist+
+icontool+myline+barelem1+
+mappe+buttons+barelem2+dlg3d+
+trbit+pedit+mergetxt
+ctool1.dll
+ctool.map
+libw.lib+mdllcew.lib+..\restool\ddsmem1.lib+..\restool\dmwapi1.lib+
+oldnames.lib
+ctl1.def

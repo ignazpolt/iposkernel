@@ -1,0 +1,346 @@
+/********************************************************/
+/*      Verwaltung von allg. Datenstrukturen            */
+/*                                                      */
+/*      Einfach verkette Listen                         */
+/********************************************************/
+//
+// $Header:   P:/marille/clinicum/rev/atomic.cpv   1.0   24 Jun 1994 17:04:02   HANNES  $
+// $Log:   P:/marille/clinicum/rev/atomic.cpv  $
+// 
+//    Rev 1.0   24 Jun 1994 17:04:02   HANNES
+// Neuuebernahme clinicum
+// 
+//    Rev 1.0   02 Dec 1992 16:27:24   HANNES
+// Initial revision.
+//
+
+#include <windows.h>
+#include <string.h>
+#include "globmem.h"
+#include "dds.hpp"
+#include "test.hpp"
+#include "dos.h"
+
+#ifdef PROTOKOLL
+#undef PROTOKOLL
+#endif
+
+/****************************************/
+/* Einfach verkettete Liste, wobei      */
+/* Speicher nach Windows - Konvention   */
+/* verwaltet wird                       */
+/****************************************/
+
+slList::~slList()
+  {
+#ifdef PROTOKOLL
+  tp << "slList::~slList()\r\n" ;
+#endif
+  mode = 2 ;
+  prvTraverse () ;
+  }
+
+void FAR * slList::pushData (LONG signature,void *Data,WORD size)
+  {
+  WORD wOffset;
+  BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) GetGlobalMem (&hGmem,&wOffset,
+                                                sizeof (BASESTRUCT) + size);
+  lmemcpy (lpact+1,Data,size);
+  lpact->next = List;
+  lpact->atomic = signature;
+  lpact->Locked = FALSE;
+  List = wOffset;
+  ReleaseGlobalMem (lpact,hGmem);
+  return lpact + 1;
+  }
+
+void FAR * slList::pushData (LONG signature,LONG Data)
+  {
+  return pushData (signature,&Data,sizeof(LONG));
+  }
+
+void FAR * slList::pushNormal (LONG signature,void *Data,WORD size)
+  {
+  void FAR *res ;
+  if (List) {
+    WORD wOffset;
+    BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) GetGlobalMem (&hGmem,&wOffset,
+					sizeof (BASESTRUCT) + size);
+    lmemcpy (lpact+1,Data,size);
+    res = lpact + 1 ;
+    lpact->atomic = signature;
+    lpact->Locked = FALSE;
+    lpact->next = 0;	// Es wird ja am Ende eingefuegt
+    ReleaseGlobalMem (lpact,hGmem);
+      for (lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,List) ; lpact->next ; ) {
+      WORD help = lpact->next ;
+      ReleaseGlobalMem (lpact,hGmem);
+      lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,help);
+      } ;
+    lpact->next = wOffset;
+    ReleaseGlobalMem (lpact,hGmem);
+    return res ;
+    }
+  else return pushData (signature,Data,size);
+  }
+
+void slList::DelData (LONG signature)
+  {
+  BASESTRUCT FAR *lpact,FAR *lpprev;
+  WORD wPrev = 0;
+
+  for (WORD wAct = List ; (wAct != 0) ; ) {
+    lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,wAct);
+    if (lpact->atomic == signature) {
+      if (wPrev == 0) {
+        // Erstes Element
+        List = lpact->next ;
+        FreeGlobalMem (lpact,&hGmem);
+        return ;
+        }
+      // zu loeschendes Element gefunden
+      lpprev = (BASESTRUCT FAR *) FixGlobalMem (hGmem,wPrev);
+      lpprev -> next = lpact -> next ;
+      FreeGlobalMem (lpact,&hGmem);
+      ReleaseGlobalMem (lpprev,hGmem);
+      return ;
+      }
+    wPrev = wAct ;
+    wAct = lpact -> next;
+    ReleaseGlobalMem (lpact,hGmem);
+    }
+  }
+
+void slList::DelData (void FAR *Data)
+  {
+  WORD sOffs = GetOffset (Data);
+  BASESTRUCT FAR *lpdel = (BASESTRUCT FAR *) Data - 1 ;
+  BASESTRUCT FAR *lpact;
+  WORD wPrev = 0;
+
+  if (List == sOffs) List = lpdel->next ;
+  else {
+    for (WORD wAct = List ; (wAct != 0) ; ) {
+      lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,wAct);
+      if (lpact->next == sOffs) {
+        lpact->next = lpdel->next ;
+        break ;
+        }
+      wAct = lpact -> next;
+      ReleaseGlobalMem (lpact,hGmem);
+      }
+    }
+  ReleaseGlobalMem (lpdel,hGmem);
+  FreeGlobalMem (lpdel,&hGmem);
+  }
+
+void slList::Insertbehind (void FAR *ele,LONG sig,void *Data,int size) 
+  {
+  WORD Offset;
+  BASESTRUCT FAR *lpnew = (BASESTRUCT FAR *) GetGlobalMem (&hGmem,&Offset,sizeof (BASESTRUCT)+size);
+  BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) ele - 1 ;
+  lpnew->next = lpact->next ;
+  lpnew->atomic = sig ;
+  lpnew->Locked = 0 ;
+  lmemcpy (lpnew+1,Data,size);
+  ReleaseGlobalMem (lpnew,hGmem);
+  lpact->next = Offset ;
+  }
+
+void slList::AutoSignature (LONG start) 
+  {
+  for (WORD wAct = List ; wAct != 0 ; ) {
+    BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,wAct);
+    lpact->atomic = start++ ;
+    wAct = lpact->next ;
+    ReleaseGlobalMem (lpact,hGmem);
+    }
+  }
+
+void FAR *slList::GetData (LONG signature)
+  {
+  BOOL ready = FALSE ;
+  BASESTRUCT FAR *lpact ;
+
+  for (WORD wAct = List ; ((wAct != 0) && (!ready)) ; ) {
+    lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,wAct);
+    if (lpact->atomic == signature) ready = TRUE;
+    else {
+      WORD wnext = lpact->next;
+      ReleaseGlobalMem (lpact,hGmem);
+      wAct = wnext;
+      }
+    }
+
+  if (ready) {
+    lpact->Locked = TRUE;
+    return (void FAR *) (lpact+1);
+    }
+  else return NULL;
+  }
+
+LONG slList::prvTraverse()
+  {
+  WORD wAct,wNext;
+  BASESTRUCT FAR *lpact ;
+  LONG RetVal = 0 ;
+  for (wAct = List ; wAct != 0 ; wAct = wNext) {
+    lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,wAct);
+    wNext = lpact->next;
+    switch (mode) {
+      case 0:   // Rufe virtuelle Funktion auf
+        RetVal |= TraverseFnc(lpact + 1);
+#ifdef PROTOKOLL
+	tp << "slList::prvTraverse " << wNext << "\r\n" ;
+#endif
+      case 1:   // Unlock
+        lpact->Locked = FALSE ;
+        ReleaseGlobalMem(lpact,hGmem) ;
+        break ;
+      case 2:   // Aufrauemen
+        FreeGlobalMem (lpact,&hGmem);           
+      }
+    }
+
+  return RetVal ;
+  }
+
+LONG slList::Traverse ()
+  {
+  mode = 0 ;
+  return prvTraverse () ;
+  }
+
+void slList::UnLockall()
+  {
+  mode = 1 ;
+  prvTraverse () ;
+  }
+
+LONG slList::TraverseFnc(void FAR * Data)
+  {
+  return 0L ;
+  }
+
+
+void * slList::operator new (size_t size)
+  {
+  HANDLE hm = LocalAlloc (LHND,size);
+  void *res = LocalLock (hm);
+  ((slList *) res)->hmem = hm ;
+#ifdef PROTOKOLL
+  tp << "slList: new" << hm << "\r\n" ;
+#endif
+  return res;
+  }
+
+void slList::operator delete (void *object)
+  {
+  HANDLE hm = ((slList *) object)->hmem ;
+#ifdef PROTOKOLL
+  tp << "slList: delete" << hm << "\r\n" ;
+#endif
+  LocalUnlock (hm);
+  LocalFree (hm);
+  }
+
+void FAR *slList::GetNext (void FAR *oldBuffer)
+  {
+  BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) oldBuffer - 1 ;
+  if (lpact->next) {
+    BASESTRUCT FAR *lpnext = (BASESTRUCT FAR *) FixGlobalMem (hGmem,lpact->next);
+    lpact->Locked = FALSE ;
+    ReleaseGlobalMem (lpact,hGmem);
+    lpnext->Locked = TRUE ;
+    return (lpnext + 1) ;
+    }
+  else {
+    ReleaseGlobalMem (lpact,hGmem);
+    return NULL ;
+    }
+  }
+
+WORD slList::GetNextOffset (void FAR *Data)
+  {
+  BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) Data - 1;
+  return lpact->next ;
+  }
+
+void FAR *slList::GetBuffer (WORD Offset)
+  {
+  if (Offset) {
+    BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) FixGlobalMem (hGmem,Offset);
+    lpact->Locked = TRUE ;
+    return (lpact + 1) ;
+    }
+  else return NULL ;
+  }
+
+void FAR *slList::GetLast (void)
+  {
+  void FAR *hlp = GetBuffer (List) ;
+  for ( ; ((hlp != NULL) && (GetNextOffset(hlp) != 0)) ; )
+    hlp = GetNext(hlp);
+  return hlp;
+  }
+
+void slList::ReleaseBuffer (void FAR *Buffer)
+  {
+  BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) Buffer - 1 ;
+  lpact->Locked = FALSE ;
+  ReleaseGlobalMem (lpact,hGmem);
+  }
+
+int slList::GetCount (void)
+  {
+  void far *hlp = GetBuffer (List);
+  int res = 0 ;
+  for ( ; hlp != NULL ; hlp = GetNext (hlp)) {
+    res ++ ;
+    }
+  return res ;
+  }
+
+void FAR *slList::ChangeElement (void FAR *old,void *buffer,int size)
+  {
+  /*----< Vorbereiten des neuen Elementes >-----*/
+  WORD wOffset ;
+  BASESTRUCT FAR *lpnew = (BASESTRUCT FAR *) GetGlobalMem (&hGmem,&wOffset,
+                                                sizeof (BASESTRUCT) + size);
+  BASESTRUCT FAR *lpold = (BASESTRUCT FAR *) old - 1 ;
+  lpnew->next = lpold->next ;
+  lpnew->atomic = lpold->atomic ;
+  lmemcpy (lpnew+1,buffer,size);
+  lpnew->Locked = TRUE ;
+  /*---< Suchen des Alten >----*/
+  WORD wSearch = GetOffset (old);
+  if (List == wSearch) 
+    List = wOffset ;
+  else {
+    for (void FAR *search = GetBuffer (List) ; search != NULL ; 
+                      search = GetNext (search)) {
+      BASESTRUCT FAR *lpsearch = (BASESTRUCT FAR *) search - 1 ;
+      if (lpsearch->next == wSearch) {
+        // Austauschen der Zeigerkette
+        lpsearch->next = wOffset ;
+        break ;
+        }
+      }
+    }
+  // Alten Buffer freigeben
+  FreeGlobalMem (lpold,&hGmem);
+  // fertig
+  return lpnew + 1 ;
+  }
+
+WORD slList::GetOffset (void FAR *Data)
+  {
+  BASESTRUCT FAR *lpact = (BASESTRUCT FAR *) Data - 1 ;
+  return FP_OFF (lpact);        // Es wird die Eigenschaft ausgenuetzt,
+                                // dass ein Pointer mit GlobalAlloc immer
+                                // Offsetadresse 0 hat. Andere Methode ist
+                                // nicht gueltig, da Data auch ein nicht 
+                                // gueltiger Zeiger sein darf.
+  }
+
+

@@ -1,0 +1,11 @@
+COPY ..\..\%ACTVERS%.SRC\HOOK\dmwhook.L32
+
+rc -r -v -dWIN32 -fodmwhook.res ..\..\%ACTVERS%.SRC\HOOK\dmwhook.rc
+
+link /DLL /DEBUG @dmwhook.l32
+copy dmwhook.dll ..\*.*
+copy dmwhook.lib ..\*.*
+copy dmwhook.exp ..\*.*
+copy dmwhook.dll ..\restool\*.*
+
+

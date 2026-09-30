@@ -1,0 +1,15 @@
+EXETYPE WINDOWS
+
+CODE    PRELOAD MOVEABLE DISCARDABLE
+DATA    PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE    4096
+
+EXPORTS
+    WEP                              @1   RESIDENTNAME
+    ?StatBar_WndProc@@ZCJIIIJ@Z      @2
+    ?StatBar_Register@@ZCHI@Z        @3
+    ?CreateStatusbar@@ZCIKPEDIH@Z    @4
+    ?STATBAR_SetClassNames@@ZCXPED@Z @5
+    ?ResetFieldColor@@ZCXIH@Z        @6
+    ?SetFieldColor@@ZCXIHKK@Z        @7

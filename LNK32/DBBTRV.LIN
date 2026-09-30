@@ -1,0 +1,11 @@
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv.l32
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv32.DEF
+
+rc -r -v -dWIN32 -fodbbtrv.res ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv.rc
+
+link /DLL /DEBUG @dbbtrv.l32
+copy dbbtrv.dll ..\*.*
+copy dbbtrv.lib ..\*.*
+copy dbbtrv.exp ..\*.*
+copy dbbtrv.dll ..\restool\*.*
+

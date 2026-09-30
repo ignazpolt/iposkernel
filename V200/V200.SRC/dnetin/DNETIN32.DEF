@@ -1,0 +1,18 @@
+LIBRARY DNETIN
+EXPORTS
+;    ===List your explicitly exported functions here===
+  GETUNIQUEADDRESS         = ?GetUniqueAddress@@YGXPADH@Z          @2
+  NETSETSTATIONSEMAPHOR    = ?NetSetStationSemaphor@@YGKPAD@Z      @3
+  NETCLEARSTATIONSEMAPHOR  = ?NetClearStationSemaphor@@YGXK@Z      @4
+  NETCHECKSTATIONSEMAPHOR  = ?NetCheckStationSemaphor@@YGHPAD@Z    @5
+  NETSETSEMA               = ?NetSetSema@@YGKPADPAG@Z              @6
+  NETCLEARSEMA             = ?NetClearSema@@YGXK@Z                 @7
+  NETTESTSEMA              = ?NetTestSema@@YGHPAD@Z                @8
+  NETGETCONNECTIONNMBR     = ?NetGetConnectionNmbr@@YGHXZ          @9
+  NETSEMAPHOREAVAILABLE    = ?NetSemaphoreAvailable@@YGHXZ         @10
+  NWADDRESSSTRTOBIN        = ?NWAddressStrToBin@@YGHPAXPAHPADF@Z   @11
+  NWADDRESSBINTOSTR        = ?NWAddressBinToStr@@YGHPADHPAFPAX@Z   @12
+  NWSOCKETFAMILY           = ?NWSocketFamily@@YGHXZ                @13
+  NWADDRESSSIZE            = ?NWAddressSize@@YGHXZ                 @14
+  NWSOCKETPROTOCOL         = ?NWSocketProtocol@@YGHH@Z             @15
+

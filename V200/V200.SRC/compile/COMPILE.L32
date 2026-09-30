@@ -1,0 +1,7 @@
+compile parse codegen lexscan 
+twodim parse1 prgicon fncprot tbvar 
+wonschd
+compile.res
+user32.lib gdi32.lib ..\ddsmem.lib ..\dbhelp.lib
+/OUT:compile.dll
+/MAP:compile.map

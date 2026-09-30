@@ -1,0 +1,143 @@
+///////////////////////////////////////////////////////////////////
+//  Verwaltung der Folders (Neuanlage eines Dokumentes)
+///////////////////////////////////////////////////////////////////
+// $Header:   P:/marille/clinicum/rev/icnfld.cpv   1.2   24 Aug 1995 00:20:28   HANNES  $
+// $Log:   P:/marille/clinicum/rev/icnfld.cpv  $
+// 
+//    Rev 1.2   24 Aug 1995 00:20:28   HANNES
+// DBWIN_ASSERT
+// 
+//    Rev 1.1   20 Mar 1995 11:56:12   HANNES
+// Konstantenhanling, RunNmbr...
+// 
+//    Rev 1.0   05 Aug 1994 17:13:24   HANNES
+// Initial revision.
+//
+#include <windows.h>
+#include <stdio.h>
+#include "globmem.h"
+#include "dds.hpp"
+
+#include "printer.hpp"
+#include "sc2d.hpp"
+#include "font.hpp"
+#include "paint.hpp"
+
+#include "dlladmin.h"
+#include "dlladmin.hpp"
+#include "tbdef.hpp"
+#include "dbrecord.hpp"
+#include "scripthd.hpp"
+#include "mdichild.hpp"
+#define MODULENUM 122
+#include "winass.hpp"
+
+#include "icnpaint.hpp"
+#define NODLL
+#include "toolbar.hpp"
+
+#include "cfield.hpp"
+#include "dllchild.hpp"
+#include "frmobj.hpp"
+
+void _export FAR PASCAL IcnNotify (LPICONELEDATA ele,CreateIconFolder_param FAR *par,WORD code)
+  {
+  if (code == ICN_DOEXCUTE) {
+    LPDBRECORD old = par->c->rr->GetRecord(par->TableInd);
+    par->c->rr->SetRecord (par->TableInd,LPDBRECORD (ele->Record));
+    par->c->ExCuteProc (par->cbProc,EM_LOAD | EM_CHANGETOTRUE);
+    par->c->ExCuteProc (par->cbProc,EM_RESET);
+    par->c->rr->SetRecord (par->TableInd,old);
+    }
+  else if (code == ICN_DOABORT) {
+    par->c->ExCuteProc (par->abortProc,EM_LOAD | EM_CHANGETOTRUE);
+    par->c->ExCuteProc (par->abortProc,EM_RESET);
+    }
+  }
+
+ICNNOTIFY GetNotify()
+  {
+  static ICNNOTIFY lpntf;
+  if (lpntf == NULL)
+    lpntf = ICNNOTIFY (MakeProcInstance (FARPROC(IcnNotify),WBase::hInstance));
+  return lpntf;
+  }
+
+BOOL CreateIconFolder (mdiChild *c,LPVOID param,WORD mode)
+  {
+  if (mode & EM_LOAD) {
+    CreateIconFolder_param FAR *par = (CreateIconFolder_param FAR *) param ;
+    par->c = c;
+
+    c->WritelData (par->res,&par,sizeof(par),LPSTR(param)-sizeof(WORD));
+
+    par->TableInd = 0xFFFF;
+    LPSTR TableNameToChange = LPSTR (c->ReadlData (par->TableNameToChange));
+    for (WORD i = 0 ; i < c->schd->AnzTables ; i++) {
+      LPTABLEDEF td = GetTableAdmin()->GetTableDef(c->schd->TableNr[i]);
+      if (lstrcmp(TableNameToChange,td->GetName()) == 0) {
+        par->TableInd = i + 2;
+        }
+      GetTableAdmin()->FreeTable(td->GetTableID());
+      }
+    DBWIN_ASSERT (par->TableInd != 0xFFFF);
+
+    HWND hWndDDS = WBase::hFrameWin ;
+    LPSCREEN FAR *scl = (LPSCREEN FAR *) 
+          c->ReadlData (par->Screen);
+    HWND hWndParent = ((scl != NULL) && (*scl != NULL)) ? 
+            (* scl)->hWnd : 
+            hWndDDS;
+
+    CreateGroupWindow (hWndParent,"",1,par,GetNotify());
+    CreateIconWindow ("");
+    }
+  if (mode & (EM_RESET | EM_CLEAR)) {
+    CreateIconFolder_param FAR *par = (CreateIconFolder_param FAR *) param ;
+    par->c = NULL;
+    CloseIconWnd ();
+    }
+  return FALSE ;
+  }
+
+struct AddIconEle_param {
+  WORD parSize;
+  DWORD cpar;
+  DWORD prgName;
+  };
+
+BOOL AddIconEle (mdiChild *c,LPVOID param,WORD mode)
+  {
+  if (mode & EM_LOAD) {
+    AddIconEle_param FAR *par = (AddIconEle_param FAR *) param;
+    LPSTR prgName = LPSTR (c->ReadlData (par->prgName));
+    LPCIFPAR FAR *cpar = (LPCIFPAR FAR *) c->ReadlData (par->cpar);
+    DBWIN_ASSERT (prgName != NULL);
+    DBWIN_ASSERT ((cpar != NULL) && (*cpar != NULL)) ;
+    LPSCRIPTCONTENT ele = GetScriptEntry (prgName);
+    DBWIN_ASSERT (ele != NULL);
+    IconEleData d;
+    d.sc = ele;
+    LPDBRECORD r = c->rr->GetRecord ((*cpar)->TableInd);
+    DBWIN_ASSERT (r != NULL);
+    d.Record = r;
+    if (ele->IconData != NULL) {
+      // Ein Icon steht zur Verfuegung
+      LPBITMAPINFO lpbmi = LPBITMAPINFO (ele->IconData);
+      AddPmEle (ele->Name,lpbmi,&d);
+      }
+    else {
+      AddPmEle (ele->Name,LoadDefIcon(),&d);
+      }
+    }
+  return FALSE ;
+  }
+
+BOOL ShowIconFolder (mdiChild *c,LPVOID param,WORD mode)
+  {
+  if (mode & EM_LOAD) {
+    GroupReady ();
+    ShowGroupWindow ();
+    }
+  return FALSE ;
+  }

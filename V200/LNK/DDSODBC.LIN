@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DDSODBC\DDSO.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSODBC\DDSO1.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSODBC\DDSODBC.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSODBC\ddsodbc.lnk
+COPY ..\..\%ACTVERS%.SRC\DDSODBC\ddsodbc1.lnk
+
+link /nod /noe /co /li /map @ddsodbc.lnk
+rc -r -v -z -foddsodbc.res ..\..\%ACTVERS%.SRC\DDSODBC\ddsodbc.rc
+rc -T -K ddsodbc.res ddsodbc.dll
+copy ddsodbc.dll ..\*.*
+implib ddsodbc.lib ddsodbc.dll
+copy ddsodbc.lib ..\*.*
+
+link /nod /noe /co /li /map @ddsodbc1.lnk
+rc -T -K ddsodbc.res ddsodbc1.dll
+copy ddsodbc1.dll ..\restool
+implib ddsodbc1.lib ddsodbc1.dll
+copy ddsodbc1.lib ..\restool

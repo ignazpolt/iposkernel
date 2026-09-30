@@ -1,0 +1,7 @@
+LIBRARY DNETNV1
+               
+DESCRIPTION 'DNETs Application Interface - Novell IPX/SPX , (c)GWI'
+
+INCLUDE NETAPINV.DEF
+
+

@@ -1,0 +1,427 @@
+/*
+;
+;       $Header:   P:/marille/clinicum/compile/rev/compile.rcv   1.31   16 Feb 2000 15:03:20   Wolfgang  $
+;       $Log:   P:/marille/clinicum/compile/rev/compile.rcv  $
+ * 
+ *    Rev 1.31   16 Feb 2000 15:03:20   Wolfgang
+ * 1.) Neue Schluesselwoerter und Fehlermeldungen fuer neue FDEF-Syntax.
+ * 
+ *    Rev 1.30   29 Sep 1999 16:55:22   Wolfgang
+ * 1.) Meldung fuer CYCLICIMPORT neu.
+ * 
+ *    Rev 1.29   04 Aug 1999 18:43:22   Hannes
+ * Neues Syntaxelement: passthrough
+ * 
+ *    Rev 1.28   26 Apr 1999 18:10:24   Wolfgang
+ * 1.) Fehlermeldung 8063 (ERRORINIMPORTED) neu.
+ * 2.) Kosmetische Korrekturen.
+ * 
+ *    Rev 1.27   22 Apr 1999 10:24:32   Hannes
+ * TOFLAG
+ * 
+ *    Rev 1.26   26 Mar 1999 18:15:38   Wolfgang
+ * 1.) import_virtual als echtes Keyword.
+ * 
+ *    Rev 1.25   14 Sep 1998 16:56:04   Martin
+ * SoftWork raus
+ * 
+ *    Rev 1.24   06 Aug 1998 22:10:18   Hannes
+ * import_virtual
+ * 
+ *    Rev 1.23   04 Aug 1998 17:55:08   Hannes
+ * Timestamp
+ * 
+ *    Rev 1.22   26 Jan 1998 20:01:54   Hannes
+ * KWNULL
+ * 
+ *    Rev 1.21   16 Jun 1997 07:47:26   Hannes
+ * TOOBJ
+ * 
+ *    Rev 1.20   13 Mar 1997 19:07:32   Hannes
+ * 
+ *    Rev 1.19   19 Feb 1997 12:04:44   Hannes
+ * Scriptfunktionen
+ * 
+ *    Rev 1.18   26 Nov 1996 07:57:12   HANNES
+ * Versionshistory von DDD's
+ * 
+ *    Rev 1.17   08 Nov 1996 13:25:06   HANNES
+ * Einbau von QLong
+ * 
+ *    Rev 1.16   30 Oct 1996 08:42:10   HANNES
+ * Compilererweiterung: break, continue, staticcall
+ * 
+ *    Rev 1.15   22 Oct 1996 08:39:12   HANNES
+ * 
+ *    Rev 1.14   21 Oct 1996 18:51:08   HANNES
+ * Einbau von Aliasnamen in das Script
+ * 
+ *    Rev 1.13   04 Feb 1996 15:36:42   GERHOLD
+ * 
+ *    Rev 1.12   25 Sep 1995 20:49:08   HANNES
+ * 
+ *    Rev 1.11   16 Sep 1995 22:26:32   HANNES
+ * 
+ *    Rev 1.10   15 May 1995 08:23:12   HANNES
+ * structs im normalen Script
+ * 
+ *    Rev 1.9   20 Mar 1995 12:09:00   HANNES
+ * Konstantenhanling, RunNmbr
+ * 
+ *    Rev 1.8   08 Mar 1995 09:12:12   HANNES
+ * 
+ *    Rev 1.7   05 Dec 1994 17:37:48   HANNES
+ * 
+ *    Rev 1.6   14 Nov 1994 19:30:02   HANNES
+ * 
+ *    Rev 1.5   31 Oct 1994 10:03:56   hannes
+ * 
+ *    Rev 1.4   03 Sep 1994 14:54:32   HANNES
+ * Formulartyp in den Header
+ * 
+ *    Rev 1.3   24 Aug 1994 19:40:22   HANNES
+ * Erweiterungen im Header
+ * 
+ *    Rev 1.2   05 Aug 1994 19:32:44   HANNES
+ * Time Eingebaut
+ * 
+ *    Rev 1.1   24 Jun 1994 18:05:52   HANNES
+ * 
+ *    Rev 1.0   24 Jun 1994 16:37:36   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.17   22 Feb 1994 15:28:34   HANNES
+ * 
+ *    Rev 1.16   04 Feb 1994 16:54:00   HANNES
+ * Dynamisches Linken eingebaut
+ * 
+ *    Rev 1.15   25 Jan 1994 18:12:24   HANNES
+ * 
+ *    Rev 1.14   04 Jan 1994 17:30:20   HANNES
+ * Neuen Datentyp rcDat
+ * 
+ *    Rev 1.13   16 Nov 1993 04:27:06   HANNES
+ * Verallgemeinerung der Benutzerdaten
+ * 
+ *    Rev 1.12   11 Oct 1993 11:43:54   HANNES
+ * Benutzerdaten, lastmod includiert
+ * 
+ *    Rev 1.11   05 Sep 1993 22:07:52   HANNES
+ * 
+ *    Rev 1.10   05 Aug 1993 13:25:58   HANNES
+ * Verbesserte Memstat
+ * 
+ *    Rev 1.9   05 Jul 1993 14:54:00   HANNES
+ * Bitmaps, Commondata
+ * 
+ *    Rev 1.8   03 Jun 1993 19:10:10   HANNES
+ * ??
+ * 
+ *    Rev 1.7   10 May 1993 12:54:28   HANNES
+ * Extrastammdaten
+ * 
+ *    Rev 1.6   02 Apr 1993 18:34:46   HANNES
+ * ??
+ * 
+ *    Rev 1.5   29 Jan 1993 20:25:14   HANNES
+ * Dokumenttyp Simulation
+ * 
+ *    Rev 1.4   29 Jan 1993 19:08:30   HANNES
+ * Implementierung des Datentyp DCDATA
+ * 
+ *    Rev 1.3   06 Dec 1992 15:16:52   HANNES
+ * Hoffentlich der Letzte Versuch
+ * 
+ *    Rev 1.2   06 Dec 1992 15:15:38   HANNES
+ * Naechster Versuch mit den Kommentaren
+ *
+ * 
+ *    Rev 1.1   06 Dec 1992 15:14:46   HANNES
+ * Kommentare fuer PVCS
+ *
+ * 
+ *    Rev 1.0   02 Dec 1992 16:20:28   HANNES
+ * Initial revision.
+ */
+
+#include <windows.h>
+#include <winver.h>
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+   STRINGTABLE
+   Begin
+     8010, "%s:\r %s in Zeile %d, Spalte %d"
+     8011, "Datei nicht gefunden"
+     8012, "zuwenig Speicher"
+     8013, "Include - Datei n. gef."
+     8014, "Unbekanntes Zeichen"
+     8015, "Ung�ltige Nummer"
+     8016, "Ung�ltige Dezimalnummer"
+     8017, "Unbekanntes Kommando"
+     8018, "Preprozessor Syntaxerror"
+     8019, "Define bereits verwendet"
+     8020, "Zu kompl. Ausdruck"
+     8021, "Semantik - Error"
+     8022, "Ausgabe - Datei kann nicht ge�ffnet werden"
+     8023, "Syntax - Error"
+     8024, "Variable schon dekl."
+     8025, "Parameterfehler"
+     8026, "Prozedur schon verw."
+     8027, "Unbekannte Prozedur"
+     8028, "!!!! Lookup Fehler !!!!"
+     8029, "!!!! Inline Lookup Fehler !!!!"
+     8030, "Nesting Error"
+     8031, "enum Variablen mit ver. Dimension"
+     8032, "!!!! Const Lookup Fehlper !!!!"
+     8033, "Help Daten d�rfen keinen Ident haben !"
+     8034, "Error Im Editor - Segment"
+     8035, "Edit Feld doppelt definiert"
+     8036, "Keinen Editabschnitt gefunden"
+     8037, "No Match found"
+     8038, "Kein Kontext exportiet"
+     8039, "Importstatement nach Definition"
+     8040, "Keine Exportprozeduren zugelassen"
+     8041, "Keine einzige Funktion exportiert"
+     8042, "Programm hat bereits einen anderen Kontext geladen -> darf nicht mehr exportiert werden"
+     8043, "Importprogramm nicht gefunden"
+     8044, "Funktionsprototypen k�nnen nicht geladen werden"
+     8045, "Unbekannte Tabelle"
+     8046, "Variablenname nicht eindeutig->Verwende Tabellennamen zur identifizierung"
+     8047, "Tabelle bereits verwendet"
+     8048, "Variablenreferenz ung�ltig, Tabellennamen oder Variablennamen nicht korrekt oder Tabellen nicht verwendet"
+     8049, "Inline Funktionen nicht unterst�tzt"
+     8050, "Tabelle noch nicht ohne Alias verwendet"
+     8051, "Illegale Version bei Tabelle"
+     8052, "Keine Zielversion f�r das Updatescript angegeben"
+     8053, "Wenn Versionangaben gemacht werden, dann m�ssen f�r alle Tabellen Versionen angegeben werden!"
+     8054, "Modul nicht gefunden"
+     8055, "Modul enth�lt keine Exportdefinition"
+     8056, "Export nicht erlaubt (z.B. wenn bereits ein Import gemacht wurden)"
+     8057, "Import nicht erlaubt (z.B. wenn bereits ein Export durchgef�hrt wurde)"
+     8058, "Funktionsprototyp in den Basisklassen nicht gefunden->�berladen illegal"
+     8059, "Kontext�bergabe bei lokalen Funktionen nicht erlaubt"
+     8060, "Inkompatible Tabellen"
+     8061, "Kontext f�r den Funktionsaufruf nicht deklariert"
+     8062, "static modifier nur f�r Scriptfunktionen erlaubt"
+     8063, "Fehler in Datei verwendet"
+     8064, "Zyklische Abh�ngigkeit"
+     8065, "Fixer Parameter nach optionalem oder freien"
+     8066, "Geschachtelter {}, [] oder count Parameter"
+     8067, "Doppelter {} Parameter"
+     8068, "Doppelte Funktion"
+
+     8100, "Compile - Error"
+     8101, "%s"
+
+     ; Keywoerter fuer den Compiler
+     7000,     ";"
+     7001,     "contvar"
+     7002,     "pointvar"
+     7003,     "decvar"
+     7004,     "intvar"
+     7005,     "stringvar"
+     7006,     "string"
+     7007,     "int"
+     7008,     "dec"
+     7009,     ":"
+     7010,     ")"
+     7011,     "("
+     7012,     ","
+     7013,     "free"
+     7014,     "fdef"
+     7015,     "local"
+     7016,     "point"
+     7017,     "cont"
+     7018,     "begin"
+     7019,     "end"
+     7020,     "&&"
+     7021,     "||"
+     7022,     "!"
+     7023,     "if"
+     7024,     "{"
+     7025,     "}"
+     7026,     "else"
+     7027,     "procedure"
+     7028,     "endproc"
+     7029,     "call"
+     7030,     "private"
+     7031,     "strfield"
+     7032,     "strfieldvar"
+     7033,     "fullname"
+     7034,     "typ"
+     7035,     "form"
+     7036,     "text"
+     7037,     "digitize"
+     7038,     "tracing"
+     7039,     "numana"
+     7040,     "case"
+     7041,     "further"
+     7042,     "flag"
+     7043,     "scale"
+     7044,     "flagvar"
+     7045,     "scalevar"
+     7046,     "pictvar"
+     7047,     "picture"
+     7048,     "datevar"
+     7049,     "date"
+     7050,     "grana"
+     7051,     "image"
+     7052,     "procptr"
+     7053,     "imagevar"
+     7054,     "img"
+     7055,     "_%$_"
+     7056,     "_%%_"
+     7057,     "inline"
+     7058,     "enum"
+     7059,     "="
+     7060,     "loop"
+     7061,     "&"
+     7062,     "["
+     7063,     "]"
+     7064,     "patsingle"
+     7065,     "syssingle"
+     7066,     "category"
+     7067,     "long"
+     7068,     "longvar"
+     7069,     "obj"
+     7070,     "objvar"
+     7071,     "Simulation"
+     7072,     "help"
+     7073,     "operator"
+     7074,     "map"
+     7075,     "result"
+     7076,     "bitmap"
+     7077,     "bitmapvar"
+     7078,     "icon"
+     7079,     "_export_kontext"
+     7080,     "import"
+     7081,     "export"
+     7082,     "use_table"
+     7083,     "alias"
+     7084,     "DefaultVerweisSpeicherer"
+     7085,     "DefaultVerweisErzeugerer"
+     7086,     "BearbeiteSelektor"
+     7087,     "IstVerweisSpeicherer"
+     7088,     "IstVerweisErzeugerer"
+     7089,     "DarfImVerzeichnisVorkommen"
+     7090,     "DarfImFachVorkommen"
+     7091,     "timevar"
+     7092,     "time"
+     7093,     "DarfInKrankenGeschichteVorkommen"
+     7094,     "NoMDI"
+     7095,     "FormularOhneVerweise"
+     7096,     "FormularMitVerweise"
+     7097,     "FachOhneVerweise"
+     7098,     "FachMitVerweise"
+     7099,     "MappeMitVerweise"
+     7100,     "intern"
+     7101,     "OptionScript"
+     7102,     "abort"
+     7103,     "assignment"
+     7104,     "simple_condition"
+     7105,     "compare_operator"
+     7106,     "for"
+     7107,     "select"
+     7108,     "from"
+     7109,     "where"
+     7110,     "order"
+     7111,     "innerlist"
+     7112,     "outerlist"
+     7113,     "remove"
+     7114,     "insert"
+     7115,     "into"
+     7116,     "set"
+     7117,     "after"
+     7118,     "before"
+     7119,     "in"
+     7120,     "with"
+     7121,     "Property"
+     7122,     "struct"
+     7123,     "forall"
+     7124,     "reverse"
+     7125,     "dowith"
+     7126,     "break"
+     7127,     "staticcall"
+     7128,     "continue"
+     7129,     "qlong"
+     7130,     "qlongvar"
+     7131,     "View"
+     7132,     "const"
+     7133,     "return"
+     7134,     "void"
+     7135,     "extern"
+     7136,     "base"
+     7137,     "overloaded"
+     7138,     "static"
+     7139,     "TOSTRING"
+     7140,     "TOTIME"
+     7141,     "TODATE"
+     7142,     "TOFLOAT"
+     7143,     "TOLONG"
+     7144,     "TOSHORT"
+     7145,     "blobvar"
+     7146,     "blob"
+     7147,     "TOBLOB"
+     7148,     "TOOBJ"
+     7149,     "NULL"
+     7150,     "timestampvar"
+     7151,     "timestamp"
+     7152,     "TOTIMESTAMP"
+     7153,     "import_virtual"
+     7154,     "TOFLAG"
+     7155,     "passthrough"
+     7156,     "countvar"
+     7157,     "DESCRIBED_AS"
+     7158,     "odef"
+     7159,     "mdef"
+     7160,     "omap"
+
+     7161,     "short alias strfield"
+     7162,     "float alias dec"
+
+     7163,     "END"
+
+   End
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "COMPILE.DLL\0"
+            VALUE "InternalName", "COMPILE\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+END
+

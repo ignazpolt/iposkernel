@@ -1,0 +1,11 @@
+COPY ..\..\%ACTVERS%.SRC\HOOK\dmwhook.LNK
+COPY ..\..\%ACTVERS%.SRC\HOOK\dmwhook.DEF
+
+link /nod /noe /co /li /map @dmwhook.lnk
+rc -r -v -z -fodmwhook.res ..\..\%ACTVERS%.SRC\HOOK\dmwhook.rc
+rc -T dmwhook.dll
+copy dmwhook.dll ..\*.*
+implib dmwhook.lib dmwhook.dll
+copy dmwhook.lib ..\*.*
+
+

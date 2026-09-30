@@ -1,0 +1,9 @@
+COPY ..\..\%ACTVERS%.SRC\DDSMEM\DDSMEM.L32
+
+rc -r -v -dWIN32 -foddsmem.res ..\..\%ACTVERS%.SRC\DDSMEM\ddsmem.rc
+
+link /DLL /DEBUG @ddsmem.l32
+copy ddsmem.dll ..\*.* 
+copy ddsmem.lib ..\*.*
+copy ddsmem.exp ..\*.*
+copy ddsmem.dll ..\restool\*.* 

@@ -1,0 +1,426 @@
+
+TABLE DIALOG 48, 36, 225, 161
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Liste aller Tabellen"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 6, 21, 213, 120, LBS_USETABSTOPS | LBS_NOTIFY |
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Zugriffe", 107, 63, 144, 52, 14
+    PUSHBUTTON      "&Spalten", 106, 117, 144, 49, 14
+    PUSHBUTTON      "S&chließen", IDOK, 168, 144, 52, 14
+    LTEXT           "Tablename", 102, 6, 12, 102, 8
+    LTEXT           "TableID", 103, 105, 12, 27, 8
+    LTEXT           "Anz. Spalten", 104, 177, 12, 42, 8
+    LTEXT           "Handler", 105, 132, 12, 42, 8
+END
+
+ATTRIBUTE DIALOG 48, 36, 201, 63
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Attribute"
+FONT 10, "Arial"
+BEGIN
+    LTEXT           "Tabellename:", 102, 6, 12, 48, 8
+    LTEXT           "File:", 103, 6, 30, 27, 8
+    EDITTEXT        101, 63, 9, 135, 12, ES_AUTOHSCROLL
+    EDITTEXT        104, 63, 27, 135, 12, ES_AUTOHSCROLL
+    PUSHBUTTON      "OK", IDOK, 159, 45, 40, 14
+    PUSHBUTTON      "Abbruch", IDCANCEL, 111, 45, 40, 14
+END
+
+COLUMN DIALOG 30, 27, 354, 234
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Tabelle %s"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 6, 30, 342, 165, LBS_MULTIPLESEL | LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Zugriff für View", 112, 12, 208, 48, 8
+    COMBOBOX        110, 63, 207, 93, 76, CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Parameter", 113, 162, 207, 48, 14
+    PUSHBUTTON      "&Druckvorschau...", 115, 231, 201, 70, 14
+    DEFPUSHBUTTON   "View", 109, 303, 201, 45, 14
+    PUSHBUTTON      "Schließen", IDOK, 303, 216, 46, 14
+    LTEXT           "Spaltennr.", 102, 6, 21, 36, 8
+    LTEXT           "Spaltenname", 103, 45, 21, 93, 8
+    LTEXT           "Datentyp", 104, 153, 21, 48, 8
+    CONTROL         "", 108, "Static", SS_BLACKFRAME, 6, 201, 210, 27
+    LTEXT           "DLL - spezifische Info", 111, 207, 21, 114, 8
+END
+
+FORMATINFO DIALOG 18, 18, 253, 268
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Format Definition"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         252, 21, 27, 152, 119, WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "E&xtra...", 250, 205, 17, 40, 14
+    PUSHBUTTON      "&Font...", 251, 205, 38, 40, 14
+    PUSHBUTTON      "&Löschen", 254, 205, 59, 40, 14
+    PUSHBUTTON      "&Neu...", 414, 205, 78, 40, 14
+    DEFPUSHBUTTON   "&OK", IDOK, 205, 216, 38, 14
+    PUSHBUTTON      "&Abbruch", IDCANCEL, 205, 237, 38, 14
+    EDITTEXT        255, 10, 213, 182, 41, ES_MULTILINE | ES_READONLY
+    GROUPBOX        "Formatnamen", -1, 10, 9, 180, 147, WS_GROUP
+    CONTROL         "", 253, "Static", SS_WHITERECT | WS_BORDER, 10, 165, 
+                    180, 38
+END
+
+COLUMNDROP DIALOG 30, 27, 354, 234
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Tabelle %s"
+FONT 9, "Arial"
+BEGIN
+    LTEXT           "Spaltennr.", 102, 6, 21, 36, 8
+    LISTBOX         101, 6, 30, 342, 183, LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "S&chließen", IDOK, 303, 216, 46, 14
+    LTEXT           "Spaltenname", 103, 45, 21, 93, 8
+    LTEXT           "Datentyp", 104, 153, 21, 48, 8
+    LTEXT           "DLL - spezifische Info", 111, 207, 21, 114, 8
+END
+
+ACCESSLIST DIALOG 81, 69, 210, 111
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Zugriffsliste"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 3, 15, 96, 93, LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
+                    WS_TABSTOP
+    EDITTEXT        102, 105, 15, 102, 75, ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_READONLY | WS_VSCROLL
+    DEFPUSHBUTTON   "S&chließen", IDOK, 105, 93, 103, 14
+    LTEXT           "&Zugriffe", 103, 4, 4, 42, 8
+    LTEXT           "&Info %s", 105, 105, 4, 99, 8
+END
+
+RESOURCE DIALOG 48, 24, 273, 248
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Resourcen"
+FONT 9, "Arial"
+BEGIN
+	LISTBOX 101, 6, 25, 261, 194, LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+	DEFPUSHBUTTON "&View", 109, 141, 227, 64, 14
+	PUSHBUTTON "&OK", IDOK, 210, 227, 58, 14
+	LTEXT "Typ", 104, 6, 12, 45, 8
+	LTEXT "Name", 108, 93, 12, 90, 8
+	LTEXT "ResID", 111, 231, 12, 36, 8
+END
+
+SCRIPT DIALOG 15, 21, 384, 198
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Scripts"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 6, 12, 372, 168, LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Neu", 112, 6, 183, 40, 14
+    PUSHBUTTON      "&Generieren", 114, 51, 183, 46, 14
+    DEFPUSHBUTTON   "&Bearbeiten", 120, 102, 183, 51, 14
+    PUSHBUTTON      "&OK", IDOK, 339, 183, 40, 14
+    LTEXT           "Name", 103, 6, 3, 96, 8
+    LTEXT           "File", 104, 147, 3, 20, 8
+    LTEXT           "Größe", 108, 213, 3, 30, 8
+    LTEXT           "Konstanten", 111, 249, 3, 42, 8
+    LTEXT           "AnzLocal", 115, 297, 3, 36, 8
+    LTEXT           "AnzHelp", 116, 339, 3, 39, 8
+END
+
+PROJECTS DIALOG 15, 21, 248, 205
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Script - Hauptdateien"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         350, 10, 23, 228, 154, LBS_SORT | LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         351, 10, 23, 228, 154, LBS_HASSTRINGS | LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&OK", IDOK, 152, 186, 40, 14
+    PUSHBUTTON      "Abbruch", IDCANCEL, 198, 186, 40, 14
+    CONTROL         "Beschreibung", 352, "Button", BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP, 12, 10, 92, 12
+    CONTROL         "Dateiname", 353, "Button", BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP, 150, 10, 54, 12
+END
+
+GENINTTBL DIALOG 48, 36, 225, 161
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Liste der echten Tabellen"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 6, 21, 213, 120, LBS_MULTIPLESEL | LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        108, 6, 144, 33, 12, ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "-", 116, 42, 144, 15, 14
+    PUSHBUTTON      "+", 111, 60, 144, 16, 14
+    PUSHBUTTON      "&Vorreihen", 121, 87, 144, 45, 14
+    PUSHBUTTON      "&Spalten", 106, 135, 144, 40, 14
+    PUSHBUTTON      "&Schließen", IDCANCEL, 177, 144, 43, 14
+    LTEXT           "Tablename", 102, 6, 12, 102, 8
+    LTEXT           "TableID", 103, 105, 12, 27, 8
+    LTEXT           "Anz. Spalten", 104, 177, 12, 42, 8
+    LTEXT           "Handler", 105, 132, 12, 42, 8
+END
+
+GENINTVAR DIALOG 35, 17, 279, 336
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Mögliche Variablen"
+FONT 8, "Arial"
+BEGIN
+    LISTBOX         101, 6, 21, 267, 291, LBS_MULTIPLESEL | LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Alles Selektieren", 122, 102, 318, 64, 14
+    PUSHBUTTON      "Schreiben", 118, 168, 318, 52, 14
+    PUSHBUTTON      "Schließen", IDCANCEL, 222, 318, 52, 14
+    LTEXT           "Typ", 102, 6, 12, 48, 8
+    LTEXT           "Name", 103, 57, 12, 84, 8
+    LTEXT           "von", 104, 210, 12, 51, 8
+    LTEXT           "Nr", 117, 180, 12, 20, 8
+END
+
+WRITEINT DIALOG 90, 24, 201, 87
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Int. Tabelle schreiben"
+FONT 9, "Arial"
+BEGIN
+    EDITTEXT        117, 9, 24, 120, 12, ES_AUTOHSCROLL
+    EDITTEXT        119, 9, 48, 120, 12, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK", IDOK, 108, 66, 40, 14
+    PUSHBUTTON      "&Abbruch", IDCANCEL, 153, 66, 43, 14
+    LTEXT           "Tabellenname", 103, 9, 15, 60, 8
+    LTEXT           "Variablenprefix", 104, 9, 39, 78, 8
+END
+
+INSERTSCREEN DIALOG 81, 42, 160, 93
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Grundeigenschaften"
+FONT 9, "Arial"
+BEGIN
+    EDITTEXT        103, 21, 21, 90, 12, ES_AUTOHSCROLL
+    EDITTEXT        104, 21, 45, 90, 12, ES_AUTOHSCROLL
+    PUSHBUTTON      "&Abbrechen", IDCANCEL, 72, 75, 40, 14
+    DEFPUSHBUTTON   "&OK", IDOK, 117, 75, 40, 14
+    LTEXT           "Bildschirmname", 123, 6, 12, 84, 8
+    LTEXT           "Objectname", 124, 6, 36, 108, 8
+END
+
+WONHLINE DIALOG 168, 63, 132, 60
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Dialog Title"
+FONT 9, "Arial"
+BEGIN
+    EDITTEXT        201, 45, 21, 78, 12, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK", IDOK, 84, 39, 40, 14
+    LTEXT           "Position (in log. Koordinaten)", 202, 9, 9, 93, 8
+END
+
+MULTIHLINE DIALOG 90, 24, 201, 78
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Setzen einer Serie von Hilfslinien"
+FONT 9, "Arial"
+BEGIN
+    EDITTEXT        202, 132, 12, 48, 12, ES_AUTOHSCROLL
+    EDITTEXT        203, 132, 32, 48, 12, ES_AUTOHSCROLL
+    PUSHBUTTON      "&Abbruch", IDCANCEL, 100, 56, 44, 14
+    DEFPUSHBUTTON   "&OK", IDOK, 148, 56, 44, 14
+    RTEXT           "Anzahl neue Hilfslinien", 103, 40, 16, 84, 8
+    RTEXT           "Abstand zwischen den Hilfslinien", 104, 12, 36, 112, 8
+END
+
+MOVEDIALOG DIALOG 99, 33, 160, 100
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Verschiebung"
+FONT 9, "Arial"
+BEGIN
+    EDITTEXT        211, 69, 24, 36, 12, ES_AUTOHSCROLL
+    EDITTEXT        212, 69, 39, 36, 12, ES_AUTOHSCROLL
+    PUSHBUTTON      "&Abbruch", IDCANCEL, 69, 78, 40, 14
+    DEFPUSHBUTTON   "&OK", IDOK, 111, 78, 40, 14
+    LTEXT           "Verschiebung in logischen Koordinaten", 208, 9, 12, 135, 
+                    8
+    LTEXT           "X - Richtung:", 209, 9, 27, 57, 8
+    LTEXT           "Y - Richtung:", 210, 9, 42, 57, 8
+END
+
+EXTRAFORMATINFO DIALOG 75, 48, 273, 164
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Format Einstellungen"
+FONT 8, "Arial"
+BEGIN
+    EDITTEXT        400, 24, 16, 180, 12
+    EDITTEXT        401, 24, 52, 180, 12
+    GROUPBOX        "Name", -1, 16, 4, 196, 32
+    GROUPBOX        "Beschreibung", -1, 16, 40, 196, 32
+    LTEXT           "linker Einzug:", -1, 25, 96, 48, 8
+    LTEXT           "rechter Einzug:", -1, 25, 116, 52, 8
+    LTEXT           "Zeilenabstand:", -1, 28, 136, 52, 8
+    EDITTEXT        402, 88, 92, 28, 12
+    EDITTEXT        403, 88, 112, 28, 12
+    EDITTEXT        404, 88, 132, 28, 12
+    GROUPBOX        "Absatz", -1, 16, 80, 108, 72
+    CONTROL         "linksbündig", 410, "Button", BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP, 148, 96, 56, 12
+    CONTROL         "zentriert", 411, "Button", BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP, 148, 108, 56, 12
+    CONTROL         "rechtsbündig", 412, "Button", BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP, 148, 120, 56, 12
+    CONTROL         "Blocksatz", 413, "Button", BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP, 148, 132, 56, 12
+    DEFPUSHBUTTON   "&OK", IDOK, 220, 16, 40, 14
+    PUSHBUTTON      "&Abbruch", IDCANCEL, 220, 36, 40, 14
+    GROUPBOX        "Ausrichtung", -1, 136, 80, 76, 72
+END
+
+LINESTYLE DIALOG 65, 67, 190, 144
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Linien Stile"
+FONT 8, "Arial"
+BEGIN
+    DEFPUSHBUTTON   "&OK", IDOK, 132, 96, 48, 16
+    PUSHBUTTON      "Abbruch", IDCANCEL, 132, 116, 48, 16
+    PUSHBUTTON      "&Farben...", 101, 132, 20, 48, 16
+    COMBOBOX        106, 48, 20, 60, 76, CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | WS_TABSTOP
+    COMBOBOX        105, 48, 64, 60, 76, CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "", 103, "Static", SS_BLACKFRAME, 48, 108, 60, 16
+    CONTROL         "", 104, "Static", SS_BLACKFRAME, 48, 40, 49, 16
+    CONTROL         "Text", 102, "MicroScroll", 0x0005, 97, 40, 11, 16
+    GROUPBOX        "Vorschau", -1, 12, 92, 104, 40
+    LTEXT           "Farbe:", -1, 20, 24, 24, 8
+    LTEXT           "Dicke:", -1, 20, 44, 24, 8
+    LTEXT           "Stil:", -1, 20, 68, 20, 8
+    GROUPBOX        "Eigenschaften", -1, 12, 4, 104, 81
+END
+
+WATCHDIALOG DIALOG 22, 20, 154, 60
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Watch Variable"
+BEGIN
+    EDITTEXT        100, 10, 20, 138, 12, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 64, 38, 40, 14
+    PUSHBUTTON      "Abbruch", IDCANCEL, 108, 38, 40, 14
+    LTEXT           "Variable:", -1, 10, 8, 40, 8
+END
+
+TEMPLATEDIALOG DIALOG 20, 20, 315, 226
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog - Templates"
+FONT 8, "Arial"
+BEGIN
+    LISTBOX         100, 8, 18, 112, 200, LBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        101, 134, 18, 120, 76, ES_MULTILINE | ES_READONLY | 
+                    WS_VSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 262, 18, 40, 14
+    PUSHBUTTON      "Abbruch", IDCANCEL, 262, 34, 40, 14
+    LTEXT           "Templatename:", -1, 9, 8, 106, 8
+    LTEXT           "Beschreibung:", -1, 136, 8, 110, 8
+    CONTROL         "", 102, "Static", SS_BLACKFRAME, 135, 110, 120, 108
+    LTEXT           "Vorschau:", -1, 136, 100, 116, 8
+END
+
+FINDDLG DIALOG 30, 73, 236, 62
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Find"
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "Fi&nd What:", -1, 4, 8, 42, 8, NOT WS_GROUP
+    EDITTEXT        1152, 470, 7, 128, 12, ES_AUTOHSCROLL | WS_GROUP | NOT 
+                    WS_TABSTOP
+    COMBOBOX        1136, 47, 7, 128, 72, CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+                    WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "Match &Whole Word Only", 1040, "Button", 
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 4, 26, 100, 12
+    CONTROL         "Match &Case", 1041, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 4, 42, 64, 12
+    GROUPBOX        "Direction", 1072, 107, 26, 68, 28
+    CONTROL         "&Up", 1056, "Button", BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP, 111, 38, 20, 12
+    CONTROL         "&Down", 1057, "Button", BS_AUTORADIOBUTTON | WS_TABSTOP, 
+                    138, 38, 30, 12
+    DEFPUSHBUTTON   "&Find Next", IDOK, 182, 5, 50, 14, WS_GROUP
+    PUSHBUTTON      "Cancel", IDCANCEL, 182, 23, 50, 14, WS_GROUP
+    PUSHBUTTON      "&Help", 1038, 182, 45, 50, 14, WS_GROUP
+END
+
+REPLACEDLG DIALOG 36, 44, 230, 94
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Replace"
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "Fi&nd What:", -1, 4, 9, 48, 8, NOT WS_GROUP
+    EDITTEXT        1152, 540, 7, 114, 12, ES_AUTOHSCROLL | WS_GROUP | NOT WS_TABSTOP
+    COMBOBOX        1136, 54, 7, 114, 72, CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+                    WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "Re&place With:", -1, 4, 26, 48, 8, NOT WS_GROUP
+    EDITTEXT        1153, 540, 24, 114, 12, ES_AUTOHSCROLL | WS_GROUP | NOT WS_TABSTOP
+    COMBOBOX        1137, 54, 24, 114, 72, CBS_DROPDOWN | CBS_AUTOHSCROLL | 
+                    WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "Match &Whole Word Only", 1040, "Button", 
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 5, 46, 104, 12
+    CONTROL         "Match &Case", 1041, "Button", BS_AUTOCHECKBOX | 
+                    WS_TABSTOP, 5, 62, 59, 12
+    DEFPUSHBUTTON   "&Find Next", IDOK, 174, 4, 50, 14, WS_GROUP
+    PUSHBUTTON      "&Replace", 1024, 174, 21, 50, 14, WS_GROUP
+    PUSHBUTTON      "Replace &All", 1025, 174, 38, 50, 14, WS_GROUP
+    PUSHBUTTON      "Cancel", IDCANCEL, 174, 55, 50, 14, WS_GROUP
+    PUSHBUTTON      "&Help", 1038, 174, 75, 50, 14, WS_GROUP
+END
+
+BPLIST DIALOG 80, 17, 172, 161
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Breakpoints"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 7, 6, 158, 131, LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Loeschen", 107, 7, 139, 52, 14
+    PUSHBUTTON      "&Modus", 106, 61, 139, 49, 14
+    PUSHBUTTON      "S&chließen", IDOK, 112, 139, 52, 14
+END
+
+BPMODE DIALOG 80, 17, 121, 57
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Breakpoint - Modus"
+FONT 9, "Arial"
+BEGIN
+    PUSHBUTTON      "S&chließen", IDOK, 61, 39, 52, 14
+    CONTROL         "LOAD", 101, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 6, 
+                    5, 40, 10
+    CONTROL         "UPDATE", 102, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 6, 
+                    17, 40, 10
+    CONTROL         "RESET", 103, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 6, 
+                    29, 40, 10
+END
+
+WATCH DIALOG 79, 17, 299, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Watch"
+FONT 9, "Arial"
+BEGIN
+    LISTBOX         101, 8, 18, 284, 135, LBS_USETABSTOPS | 
+                    LBS_DISABLENOSCROLL | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Loeschen", 107, 138, 156, 52, 14
+    PUSHBUTTON      "&Break On/Off", 106, 192, 156, 49, 14
+    PUSHBUTTON      "S&chließen", IDOK, 243, 156, 52, 14
+    PUSHBUTTON      "&Expand", 102, 82, 156, 52, 14
+    PUSHBUTTON      "&Refresh", 103, 26, 156, 52, 14
+    LTEXT           "Aktueller Kontext:", 104, 7, 5, 68, 8
+    COMBOBOX        105, 90, 4, 201, 143, CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+END
+
+RASTERDIALOG DIALOG 100, 100, 127, 75
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Raster"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK", IDOK, 3, 47, 50, 14
+    PUSHBUTTON      "Abbruch", IDCANCEL, 56, 47, 50, 14
+    EDITTEXT        1000, 66, 9, 40, 13, ES_AUTOHSCROLL
+    EDITTEXT        1001, 66, 25, 40, 13, ES_AUTOHSCROLL
+    LTEXT           "X - Raster", -1, 23, 13, 36, 8
+    LTEXT           "Y - Raster", -1, 23, 26, 40, 8
+END

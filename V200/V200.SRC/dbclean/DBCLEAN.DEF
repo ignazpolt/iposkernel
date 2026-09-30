@@ -1,0 +1,20 @@
+;-----------------------------------------------------
+;       $Header:   P:/marille/clinicum/dbclean/rev/dbclean.dev   1.1   04 Feb 1996 15:33:16   GERHOLD  $ 
+;       $Log:   P:/marille/clinicum/dbclean/rev/dbclean.dev  $
+;  
+;     Rev 1.1   04 Feb 1996 15:33:16   GERHOLD
+;  
+;     Rev 1.0   03 Jan 1996 18:52:22   HANNES
+;  Initial revision.
+;-----------------------------------------------------
+LIBRARY DBCLEAN
+EXETYPE WINDOWS
+
+DESCRIPTION 'Datenbankanbindung Marille - Aufraemen'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   4096
+

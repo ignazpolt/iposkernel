@@ -1,0 +1,45 @@
+#include <windows.h>
+#include <winver.h>
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "DMWHOOK.DLL\0"
+            VALUE "InternalName", "DMWHOOK\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+END

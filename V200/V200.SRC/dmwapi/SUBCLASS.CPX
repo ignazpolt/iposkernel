@@ -1,0 +1,873 @@
+//
+//  $Header:   P:/marille/clinicum/dmwapi/rev/subclass.cpv   1.1   02 Feb 1996 10:46:44   GERHOLD  $
+//  $Log:   P:/marille/clinicum/dmwapi/rev/subclass.cpv  $
+// 
+//    Rev 1.1   02 Feb 1996 10:46:44   GERHOLD
+// 1.Umstellung auf 32 Bit
+// 
+//    Rev 1.0   24 Jun 1994 16:49:04   HANNES
+// Neuuebernahme clinicum
+// 
+//    Rev 1.4   06 Oct 1993 09:55:14   HANNES
+// WORDWIN gleich wie edit behandelt...
+// 
+//    Rev 1.3   23 Jun 1993 11:17:32   HANNES
+// Checkboxen
+// 
+//    Rev 1.2   10 Jun 1993 18:50:36   HANNES
+// Listboxen vertikal um ein Pixel vergroessert
+// 
+//    Rev 1.1   05 Apr 1993 10:35:48   HANNES
+// Sauberes Aufraeumen..
+// 
+//    Rev 1.0   02 Apr 1993 18:14:02   HANNES
+// Initial revision.
+//
+#include <windows.h>
+#include <stdio.h>
+#include "dds32.h"
+#include "globmem.h"
+#include "hash.hpp"
+
+#include "subclass.hpp"
+
+static HBITMAP hbmp = 0;
+static int RefCount;
+static int xw,yh;
+extern HANDLE hLibInst;
+
+void GetBitMap ()
+  {
+  if (hbmp == 0) {
+    RefCount = 0;
+    hbmp = LoadBitmap (hLibInst,"MyBitmap");
+    BITMAP bmp;
+    GetObject (hbmp,sizeof(bmp),&bmp);
+    xw = bmp.bmWidth;
+    yh = bmp.bmHeight;
+    }
+  RefCount ++;
+  }
+
+void ReleaseBitMap ()
+  {
+  if (-- RefCount == 0) {
+    DeleteObject (hbmp);
+    hbmp = 0;
+    }
+  }
+
+void PaintCheckBox (HWND hWnd,int id)
+  {
+  HDC hDC = GetDC (hWnd);
+  HDC hMemDC = CreateCompatibleDC (hDC);
+  HBITMAP hOldBmp = SelectObject (hMemDC,hbmp);
+  RECT r;
+  if (hbmp == 0) MessageBeep (0);
+  GetClientRect (hWnd,&r);
+  BitBlt (hDC,0,(r.bottom - (yh / 3)) / 2,
+                xw / 4,yh / 3,
+                hMemDC,id * xw / 4,0,SRCCOPY
+         );
+  SelectObject (hMemDC,hOldBmp);
+  DeleteDC (hMemDC);
+  ReleaseDC (hWnd,hDC);
+  }
+
+hash *WndHash;
+
+struct HwndInfo {
+  WNDPROC DefHandler;
+  };
+
+static void ResetStack ()
+  {
+  }
+
+static DWORD dwWndCount;
+static void PushWnd (HWND hWnd,WNDPROC wndProc)
+  {
+  if (WndHash == NULL) {
+    WndHash = new hash (317,WORDKEY);
+    }
+  HwndInfo hi;
+  hi.DefHandler = wndProc;
+  WndHash->SetDataW (hWnd,&hi,sizeof(hi));
+  dwWndCount ++;
+  }
+
+static void PopWnd (HWND hWnd)
+  {
+  WndHash->DelDataW (hWnd);
+  if (--dwWndCount == 0) {
+    delete WndHash ;
+    WndHash = NULL;
+    }
+  }
+
+static WNDPROC SearchDefProc (HWND hWnd)
+  {
+  HwndInfo FAR *info = (HwndInfo FAR *)WndHash->GetDataW (hWnd);
+  return info->DefHandler;
+  }
+
+void DrawEditRect (HDC hDC,LPRECT r)
+  {
+  HPEN OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0x80, 0x80, 0x80)));
+  MoveToEx (hDC, r->left-1, r->bottom, NULL);
+  LineTo (hDC, r->left-1, r->top-1);
+  LineTo (hDC, r->right, r->top-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0xC0, 0xC0, 0xC0)));
+  MoveToEx (hDC, r->right-1, r->top, NULL);
+  LineTo (hDC, r->right-1, r->bottom-1);
+  LineTo (hDC, r->left, r->bottom-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject (hDC, GetStockObject(WHITE_PEN));
+  MoveToEx (hDC, r->left-1, r->bottom, NULL);
+  LineTo (hDC, r->right, r->bottom);
+  LineTo (hDC, r->right, r->top-1);
+  SelectObject (hDC, OldPen);
+  }
+
+void DrawMyHorzRect (HDC hDC,LPRECT r)
+  {
+  HPEN OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0x80, 0x80, 0x80)));
+  MoveToEx (hDC, r->left-1, r->bottom, NULL);
+  LineTo (hDC, r->left-1, r->top-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0xC0, 0xC0, 0xC0)));
+  MoveToEx (hDC, r->right-1, r->top, NULL);
+  LineTo (hDC, r->right-1, r->bottom-1);
+  LineTo (hDC, r->left, r->bottom-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject (hDC, GetStockObject(WHITE_PEN));
+  MoveToEx (hDC, r->left-1, r->bottom, NULL);
+  LineTo (hDC, r->right, r->bottom);
+  LineTo (hDC, r->right, r->top-1);
+  SelectObject (hDC, OldPen);
+  }
+
+void DrawMyVertRect (HDC hDC,LPRECT r)
+  {
+  HPEN OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0x80, 0x80, 0x80)));
+  MoveToEx (hDC, r->left-1, r->top-1, NULL);
+  LineTo (hDC, r->right, r->top-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0xC0, 0xC0, 0xC0)));
+  MoveToEx (hDC, r->right-1, r->top, NULL);
+  LineTo (hDC, r->right-1, r->bottom-1);
+  LineTo (hDC, r->left, r->bottom-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject (hDC, GetStockObject(WHITE_PEN));
+  MoveToEx (hDC, r->left-1, r->bottom, NULL);
+  LineTo (hDC, r->right, r->bottom);
+  LineTo (hDC, r->right, r->top-1);
+  SelectObject (hDC, OldPen);
+  }
+
+void DrawMyListRect (HDC hDC,LPRECT r)
+  {
+#ifdef OLDVERSION
+  HPEN OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0x80, 0x80, 0x80)));
+  MoveTo (hDC, r->left-1, r->bottom);
+  LineTo (hDC, r->left-1, r->top-1);
+  LineTo (hDC, r->right, r->top-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0xC0, 0xC0, 0xC0)));
+  MoveTo (hDC, r->right-2, r->top);
+  LineTo (hDC, r->right-2, r->bottom-2);
+  LineTo (hDC, r->left+1, r->bottom-2);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject (hDC, GetStockObject(WHITE_PEN));
+  MoveTo (hDC, r->left, r->bottom-1);
+  LineTo (hDC, r->right-1, r->bottom-1);
+  LineTo (hDC, r->right-1, r->top-2);
+  SelectObject (hDC, OldPen);
+#else
+  HPEN OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0x80, 0x80, 0x80)));
+  MoveToEx (hDC, r->left-1, r->bottom, NULL);
+  LineTo (hDC, r->left-1, r->top-1);
+  LineTo (hDC, r->right, r->top-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject(hDC, CreatePen(PS_SOLID, 0, RGB(0xC0, 0xC0, 0xC0)));
+  MoveToEx (hDC, r->right-2, r->top, NULL);
+  LineTo (hDC, r->right-2, r->bottom-1);
+  LineTo (hDC, r->left+1, r->bottom-1);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject (hDC, GetStockObject(WHITE_PEN));
+  MoveToEx (hDC, r->left, r->bottom, NULL);
+  LineTo (hDC, r->right-1, r->bottom);
+  LineTo (hDC, r->right-1, r->top-2);
+  SelectObject (hDC, OldPen);
+
+#endif
+  }
+
+static int Get_3dOffs (HWND hWnd)
+  {
+  static int _3dOffs;
+  if (_3dOffs == 0) {
+    HDC hDC = GetDC (hWnd);
+    HFONT hOldFont = 0;
+    HFONT hFont = HFONT (SendMessage (hWnd,WM_GETFONT,0,0L));
+    if (hFont)
+      hOldFont = SelectObject (hDC,hFont);
+    TEXTMETRIC tm;
+    GetTextMetrics (hDC,&tm);
+    _3dOffs = tm.tmHeight / 2;
+    if (hOldFont)
+      SelectObject (hDC,hOldFont);
+
+    ReleaseDC (hWnd,hDC);
+    }
+  return _3dOffs;
+  }
+
+
+void Draw3dRect (HWND hWnd,HDC hDC,LPRECT r)
+  {
+  HBRUSH OldBrush = SelectObject(hDC, GetStockObject(NULL_BRUSH));
+
+  HPEN OldPen = SelectObject (hDC, CreatePen(PS_SOLID, 0, RGB(0x80, 0x80, 0x80)));
+  Rectangle (hDC, r->left, r->top, r->right, r->bottom);
+  DeleteObject (SelectObject(hDC, OldPen));
+
+  OldPen = SelectObject (hDC, GetStockObject(WHITE_PEN));
+  OffsetRect (r, 1, 1);
+  Rectangle (hDC, r->left, r->top, r->right, r->bottom);
+  SelectObject (hDC, OldPen);
+  SelectObject (hDC, OldBrush);
+
+  char WinTxt[128];
+  char WinTxt1[128];
+  GetWindowText (hWnd,WinTxt,sizeof(WinTxt));
+  if (lstrlen (WinTxt)) {
+    WinTxt1[0] = ' ';
+    WinTxt1[1] = '\0';
+    lstrcat (WinTxt1,WinTxt);
+    lstrcat (WinTxt1," ");
+    HFONT hFnt = HFONT (SendMessage (hWnd,WM_GETFONT,0,0L));
+    HFONT hOldFnt = 0;
+    if (hFnt)
+      hOldFnt = SelectObject (hDC,hFnt);
+    SetBkColor (hDC,RGB(0xC0,0xC0,0xC0));
+    SetTextAlign (hDC,TA_LEFT | TA_TOP);
+    TextOut (hDC,r->left + Get_3dOffs (hWnd),r->top - Get_3dOffs (hWnd) + 2,WinTxt1,lstrlen (WinTxt1));
+    if (hOldFnt)
+      SelectObject (hDC,hOldFnt);
+
+    }
+  }
+
+BOOL IsCheckBox (HWND hWnd,LPSTR classname,DWORD Style)
+  {
+  return ((lstrcmp (classname,"BUTTON") == 0) && 
+          (((Style & BS_CHECKBOX) == BS_CHECKBOX) ||
+           ((Style & BS_AUTOCHECKBOX) == BS_AUTOCHECKBOX))
+         );
+  }
+
+BOOL IsMyListBox (HWND hWnd,LPSTR classname,DWORD Style)
+  {
+  return ((lstrcmp (classname,"LISTBOX") == 0) && 
+          ((Style & LBS_OWNERDRAWFIXED) == LBS_OWNERDRAWFIXED) &&
+          ((Style & LBS_DISABLENOSCROLL) != LBS_DISABLENOSCROLL)
+         );
+  }
+
+BOOL IsMyVertBar (HWND hWnd,LPSTR classname,DWORD Style)
+  {
+  return ((lstrcmp (classname,"SCROLLBAR") == 0) &&
+          ((Style & SBS_VERT) == SBS_VERT));
+  }
+
+BOOL IsMyHorzBar (HWND hWnd,LPSTR classname,DWORD Style)
+  {
+  return ((lstrcmp (classname,"SCROLLBAR") == 0) &&
+          ((Style & SBS_HORZ) == SBS_HORZ));
+  }
+
+void FAR PASCAL ListNCPaint (HWND hWnd)
+  {
+  RECT r;
+  HWND hwParent = GetParent (hWnd);
+  GetWindowRect (hWnd,&r);
+  MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+  HDC hDC = GetDC (hwParent);
+  DrawMyListRect (hDC,&r);
+  ReleaseDC (hwParent,hDC);
+  }
+
+LONG FAR PASCAL MyWindowProc (HWND hWnd,unsigned msg,WORD wP,LONG lP)
+  {
+  WNDPROC DefProc = SearchDefProc (hWnd);
+  LONG res = 0L;
+
+  RECT r;
+  if (DefProc) {
+    RECT rcUpdRect;
+    char classname[128];
+
+    GetClassName (hWnd,classname,sizeof(classname));
+    AnsiUpper (classname);
+    DWORD Style = GetWindowLong (hWnd,GWL_STYLE);
+
+    BOOL doPaint = ((msg == WM_PAINT)
+            && (GetUpdateRect (hWnd,&rcUpdRect,FALSE)));
+
+    BOOL doErase = ((msg == WM_PAINT) && 
+          (lstrcmp (classname,"COMBOBOX") == 0) &&
+          ((Style & CBS_DROPDOWN) == CBS_DROPDOWN)) ;
+
+    if (doErase) {
+      HDC hDC = GetDC (hWnd);
+      RECT r;
+      GetWindowRect (hWnd,&r);
+      HBRUSH hOldBrush = SelectObject (hDC,GetStockObject (LTGRAY_BRUSH));
+      Rectangle (hDC,r.left,r.top,r.right,r.bottom);
+      SelectObject (hDC,hOldBrush);
+      ReleaseDC (hWnd,hDC);
+      }
+
+    res = CallWindowProc (FARPROC(DefProc),hWnd,msg,wP,lP);
+
+    if (msg == BM_SETSTATE) {
+      if (IsCheckBox (hWnd,classname,Style)) {
+        PaintCheckBox (hWnd,
+                  (SendMessage (hWnd,BM_GETCHECK,0,0L) ? 1 : 0) +
+                          wP * 2 
+                      );
+        }
+      }
+
+    if (msg == BM_SETCHECK) {
+      if (IsCheckBox (hWnd,classname,Style)) {
+        PaintCheckBox (hWnd,wP);
+        }
+      }
+
+    if (msg == WM_ENABLE) {
+      if (IsCheckBox (hWnd,classname,Style)) {
+        PaintCheckBox (hWnd,
+                  (SendMessage (hWnd,BM_GETCHECK,0,0L) ? 1 : 0)
+                      );
+        }
+      }
+
+    if ((msg == LB_GETCURSEL) || (msg == WM_NCPAINT)) {
+      if (IsMyListBox (hWnd,classname,Style)) {
+        HWND hwParent = GetParent (hWnd);
+        GetWindowRect (hWnd,&r);
+        MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+        HDC hDC = GetDC (hwParent);
+        DrawMyListRect (hDC,&r);
+        ReleaseDC (hwParent,hDC);
+        }
+      }
+
+    if (msg == WM_USER) {
+      if ((IsMyVertBar (hWnd,classname,Style)) ||
+          (IsMyHorzBar (hWnd,classname,Style))) {
+        HWND hwParent = GetParent (hWnd);
+        GetWindowRect (hWnd,&r);
+        MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+        HDC hDC = GetDC (hwParent);
+        (IsMyHorzBar (hWnd,classname,Style) ?
+              DrawMyHorzRect : DrawMyVertRect) (hDC,&r);
+        ReleaseDC (hwParent,hDC);
+        }
+      }
+
+    if (doPaint) {
+      HWND hwParent = GetParent (hWnd);
+
+      if (IsMyListBox (hWnd,classname,Style)) {
+        GetWindowRect (hWnd,&r);
+        MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+        HDC hDC = GetDC (hwParent);
+        DrawMyListRect (hDC,&r);
+        ReleaseDC (hwParent,hDC);
+        }
+      else if (IsMyHorzBar(hWnd,classname,Style)) {
+        GetWindowRect (hWnd,&r);
+        MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+        HDC hDC = GetDC (hwParent);
+        DrawMyVertRect (hDC,&r);
+        ReleaseDC (hwParent,hDC);
+        }
+      else if (IsMyVertBar(hWnd,classname,Style)) {
+        GetWindowRect (hWnd,&r);
+        MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+        HDC hDC = GetDC (hwParent);
+        DrawMyHorzRect (hDC,&r);
+        ReleaseDC (hwParent,hDC);
+        }
+      else if ((lstrcmp (classname,"EDIT") == 0) ||
+               (lstrcmp (classname,"COMBOBOX") == 0) ||
+               (lstrcmp (classname,"WORDWIN") == 0) ||
+               (lstrcmp (classname,"LISTBOX") == 0)) {
+        GetWindowRect (hWnd,&r);
+        MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+        HDC hDC = GetDC (hwParent);
+        DrawEditRect (hDC,&r);
+        ReleaseDC (hwParent,hDC);
+        }
+      else if (lstrcmp (classname,"BUTTON") == 0) {
+        if ((Style & BS_GROUPBOX) == BS_GROUPBOX) {
+          GetWindowRect (hWnd,&r);
+          MapWindowPoints (NULL,hwParent,LPPOINT(&r),2);
+          r.top += Get_3dOffs (hWnd);
+          HDC hDC = GetDC (hwParent);
+          Draw3dRect (hWnd,hDC,&r);
+          ReleaseDC (hwParent,hDC);
+          }
+        else {
+          if (IsCheckBox (hWnd,classname,Style))
+            PaintCheckBox (hWnd,
+                  SendMessage (hWnd,BM_GETCHECK,0,0L) ? 1 : 0
+                          );
+          }
+        }
+      }
+    if (msg == WM_DESTROY) {
+      SetWindowLong (hWnd,GWL_WNDPROC,LONG (DefProc));
+      PopWnd (hWnd);
+      ReleaseBitMap ();
+      }
+    }
+  else {
+    for (int i = 0 ; i < 100 ; i++)
+      MessageBeep (0);
+    res = 0L;
+    }
+  return res ;
+  }
+
+static WNDPROC lpfnc;
+BOOL FAR PASCAL SubClassElements (HWND hDlg,HINSTANCE hInst)
+  {
+  HWND hwChild;
+  ResetStack();
+  hwChild = GetWindow(hDlg, GW_CHILD) ;
+  while (hwChild) {
+    char classname[128];
+    GetClassName (hwChild,classname,sizeof(classname));
+    AnsiUpper (classname);
+    DWORD Style = GetWindowLong (hwChild,GWL_STYLE);
+    HWND hSubWnd = 0;
+
+    if ((lstrcmp (classname,"COMBOBOX") == 0) &&
+          ((Style & CBS_DROPDOWN) == CBS_DROPDOWN)) {
+      // Nicht die Combobox, sondern dessen Kind "EDIT" ableiten
+      hSubWnd = GetWindow(hwChild, GW_CHILD) ;
+      while (hSubWnd) {
+        GetClassName (hSubWnd,classname,sizeof(classname));
+        AnsiUpper (classname);
+        if (lstrcmp (classname,"EDIT") == 0) break ;
+        hSubWnd = GetWindow (hSubWnd,GW_HWNDNEXT);
+        }
+      }
+    else
+      hSubWnd = hwChild;
+
+    if (hSubWnd) {
+      WNDPROC DefaultHandler = 
+          WNDPROC (SetWindowLong (hSubWnd,GWL_WNDPROC,LONG (MyWindowProc)));
+      PushWnd (hSubWnd,DefaultHandler);
+      GetBitMap ();
+      }
+
+    hwChild = GetWindow (hwChild,GW_HWNDNEXT);
+    }
+  return TRUE ;
+  }
+
+LONG FAR PASCAL GetCtlColor (HWND hDlg,WORD wP,LONG lP,BOOL FAR &done)
+  {
+  done = TRUE;
+  LONG res = 0L;
+  char ClassName[128];
+
+  if (IsWindow(LOWORD(lP))) {
+    GetClassName (LOWORD(lP), ClassName, sizeof(ClassName));
+
+    AnsiUpper (ClassName);
+    if (lstrcmp(ClassName, "COMBOBOX") == 0)
+      res = GetStockObject (LTGRAY_BRUSH);
+    else {
+      switch (HIWORD(lP)) {
+        case CTLCOLOR_BTN : 
+          SetBkColor (wP, 0xC0C0C0);
+          res = GetStockObject(LTGRAY_BRUSH);
+          break;
+        case CTLCOLOR_STATIC :
+          SetBkMode (wP, TRANSPARENT);
+          res = GetStockObject(LTGRAY_BRUSH);
+          break;
+        case CTLCOLOR_DLG :
+          SetBkMode (wP, TRANSPARENT);
+          res = GetStockObject(LTGRAY_BRUSH);
+          break;
+        default:
+          done = FALSE;
+        }
+      }
+    }
+  else
+    done = FALSE;
+  
+  return res ;
+  }
+
+BOOL FAR PASCAL ReleaseClassInfo ()
+  {
+  return TRUE ;
+  }
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+//  DrawItem fuer eine Kommentarliste
+//
+///////////////////////////////////////////////////////////////////////////
+static int GetSystemFontHeight ()
+  {
+  HDC hDC = CreateDC ("DISPLAY",NULL,NULL,NULL);
+  TEXTMETRIC tm;
+  GetTextMetrics (hDC,&tm);
+  return tm.tmHeight - tm.tmInternalLeading;
+  DeleteDC (hDC);
+  }
+
+HFONT GetDrawingFont ()
+  {
+  static HFONT hDrwFont;
+  if (hDrwFont == 0) {
+    hDrwFont = CreateFont (-GetSystemFontHeight(),
+                     0,
+                     0,
+                     0,
+                     FW_BOLD,
+                     FALSE,
+                     FALSE,
+                     FALSE,
+                     DEFAULT_CHARSET,
+                     OUT_TT_PRECIS,
+                     CLIP_DEFAULT_PRECIS,
+                     DEFAULT_QUALITY,
+                     DEFAULT_PITCH,
+                     "ARIAL"
+                    );
+    }
+  return hDrwFont;
+  }
+
+HFONT GetItalicFont (HFONT hfnt)
+  {
+  static HFONT hIDrwFont;
+  LOGFONT lf;
+  GetObject (hfnt,sizeof(LOGFONT),LPSTR(&lf));
+  lf.lfItalic = TRUE ;
+  if (hIDrwFont == 0) {
+    hIDrwFont = CreateFontIndirect (&lf);
+    }
+  return hIDrwFont;
+  }
+
+static int actx0;
+static int actAnzTabs;
+static int FAR *actTabs;
+BOOL MyTabbedTextOut (HDC hDC,LPARAM lP,int cch)
+  {
+  TabbedTextOut (hDC,0,0,
+                      LPSTR (lP),
+                      cch,
+                      actAnzTabs,actTabs,actx0
+                );
+  return TRUE;
+  }
+
+void MyGrayString (HDC hDC,HBRUSH hBrush,FARPROC Tout,
+                    LPARAM txt,int txtlen,
+                    int x,int y,int cx,int cy,BOOL IsSelected)
+  {
+  HDC hmemDC = CreateCompatibleDC (hDC);
+  HBITMAP hbmp = CreateCompatibleBitmap (hDC,cx,cy);
+  hbmp = SelectObject (hmemDC,hbmp);
+
+  LONG bkColor = GetBkColor(hDC);
+  HBRUSH hmBrush = CreateSolidBrush (bkColor);
+  hmBrush = SelectObject (hmemDC,hmBrush);
+  HPEN hPen = CreatePen (PS_SOLID,0,bkColor);
+  hPen = SelectObject (hmemDC,hPen);
+  Rectangle (hmemDC,0,0,cx,cy);
+  
+  SetTextColor (hmemDC,(GetTextColor(hDC)));
+  SetBkMode (hmemDC,TRANSPARENT);
+  HFONT htFnt = SelectObject (hDC,GetStockObject (SYSTEM_FONT));
+  SelectObject (hmemDC,htFnt);
+  MyTabbedTextOut (hmemDC,txt,txtlen);
+  SelectObject (hDC,htFnt);
+  
+  HBRUSH holdBrush = SelectObject (hDC,hBrush);
+  if (IsSelected)
+    BitBlt (hDC,x,y,cx,cy,hmemDC,0,0,MERGECOPY);
+  else
+    BitBlt (hDC,x,y,cx,cy,hmemDC,0,0,0x00FC008A);
+  
+  SelectObject (hDC,holdBrush);
+  DeleteObject (SelectObject (hmemDC,hmBrush));
+  DeleteObject (SelectObject(hmemDC,hbmp));
+  DeleteObject (SelectObject(hmemDC,hPen));
+  DeleteDC (hmemDC);
+  }
+
+static HBITMAP hdb;
+static int diRefCount;
+HBITMAP GetDisable ()
+  {
+  if (hdb == 0) 
+    hdb = LoadBitmap (hLibInst,"Disable");
+   
+  diRefCount++;
+  return hdb ;
+  }
+
+void ReleaseDisable ()
+  {
+  if (--diRefCount == 0) {
+//    DeleteObject (hdb);
+//    hdb = 0;
+    }
+  }
+
+LONG FAR PASCAL SpcEdWinFunc (HWND hWnd,unsigned msg,WORD wP,LONG lP,
+                                      BOOL FAR &done,
+                                      edw_extradata FAR *x
+                             )
+  {
+  done = FALSE ;
+  LONG res = 0L;
+
+  switch (msg) {
+    case WM_CREATE :
+      GetDisable ();    // Bitmap initialisieren
+      x->hFnt = GetDrawingFont ();
+      if (x->isKursiv) 
+        x->hIFnt = GetItalicFont (x->hFnt);
+      SendMessage (hWnd,WM_SETFONT,
+                        (x->isKursiv) ? x->hIFnt : x->hFnt,
+                        MAKELONG(FALSE,0)
+                  );
+      if (x->hFnt == 0) 
+        MessageBeep (0);
+      x->oisKursiv = x->isKursiv;
+      x->oisDisabled = x->isDisabled;
+      x->oisRed = x->isRed;
+      break;
+
+    case WM_DESTROY :
+      ReleaseDisable ();
+//      if (x->hFnt)  DeleteObject (x->hFnt),  x->hFnt = 0;
+//      if (x->hIFnt) DeleteObject (x->hIFnt), x->hIFnt = 0;
+      break ;
+
+    case WM_SETTEXT :
+      if (x->oisKursiv != x->isKursiv) {
+        x->oisKursiv = x->isKursiv;
+
+        if ((x->isKursiv) && (x->hIFnt == 0))
+          x->hIFnt = GetItalicFont (x->hFnt);
+
+        SendMessage (hWnd,WM_SETFONT,
+                        (x->isKursiv) ? x->hIFnt : x->hFnt,
+                        MAKELONG(TRUE,0)
+                  );
+        }
+
+      if (x->oisDisabled != x->isDisabled) {
+        EnableWindow (hWnd,!(x->oisDisabled = x->isDisabled));
+        }
+
+      break ;
+
+    case WM_PAINT :
+      if ((x->isRed) && (x->isDisabled)) {
+        // Windows ist zu bloed, um einen roten disable auszufuehren
+        PAINTSTRUCT ps;
+        HDC hDC = BeginPaint(hWnd,&ps);
+        RECT r;
+        GetClientRect (hWnd,&r);
+        Rectangle (hDC,r.left,r.top,r.right,r.bottom);
+        // Und nun noch das rote Grau zeichnen
+        char Txt[128];
+        GetWindowText (hWnd,Txt,sizeof(Txt));
+        if (*Txt) {
+          HFONT hFnt = SelectObject (hDC,HFONT
+                                          (SendMessage(hWnd,WM_GETFONT,0,0L))
+                                    );
+          TEXTMETRIC tm;
+          GetTextMetrics (hDC,&tm);
+          int dx = (r.bottom - tm.tmHeight) / 2;
+          SetTextColor (hDC,RGB(0xFF,0,0));
+          actx0 = 0;
+          actAnzTabs = 0;
+          actTabs = NULL;
+          HBRUSH hBrush = CreatePatternBrush (GetDisable());
+          MyGrayString (hDC,hBrush,FARPROC(MyTabbedTextOut),
+                        LONG(LPSTR(Txt)),
+                        lstrlen(Txt),
+                        dx,dx,r.right - 2 * dx,r.bottom - 2 * dx,
+                        FALSE
+                       );
+          DeleteObject (hBrush);
+          SelectObject (hDC,hFnt);
+          }
+        EndPaint (hWnd,&ps);
+        done = TRUE ;
+        }
+      break ;
+
+    case WM_CTLCOLOR :
+      if (x->isRed) {
+        SetTextColor (wP,RGB(0xFF,0,0));
+        }
+      res = GetStockObject(WHITE_BRUSH);
+      x->oisRed = x->isRed;
+      done = TRUE ;
+
+      break ;
+    }
+
+  return res;
+  }
+
+
+int FAR PASCAL MeassureFlaggedText (HFONT FAR *hfnt)
+  {
+  int res = 1;
+  if (*hfnt == 0) {
+    *hfnt = GetDrawingFont ();
+    TEXTMETRIC tm;
+    HDC hDC = CreateDC ("DISPLAY",NULL,NULL,NULL);
+    HFONT hOldFont = SelectObject (hDC,*hfnt);
+    GetTextMetrics (hDC,&tm);
+    res = tm.tmHeight;
+    SelectObject (hDC,hOldFont);
+    DeleteDC (hDC);
+    GetDisable ();    // Bitmap initialisieren
+    }
+  return res;
+  }
+
+void FAR PASCAL DrawFlaggedText (
+                                  HFONT FAR *hfnt,
+                                  HFONT FAR *hIfnt,
+                                  DRAWITEMSTRUCT FAR *ds,
+                                  LPSTR Txt,
+                                  BOOL Disabled,
+                                  BOOL Kursiv,
+                                  BOOL Red,
+                                  BOOL Gray,
+                                  int xpos,
+                                  int FAR *Tabs,
+                                  int AnzTabs
+                                          )
+  {
+  if (ds != NULL) {
+    // Zeichnen
+    int dsState = ds->itemState;
+    if (dsState & ODS_SELECTED) {
+      SelectObject (ds->hDC,GetStockObject (BLACK_BRUSH));
+      SelectObject (ds->hDC,GetStockObject (BLACK_PEN));
+      }
+    else {
+      SelectObject (ds->hDC,GetStockObject (WHITE_BRUSH));
+      SelectObject (ds->hDC,GetStockObject (WHITE_PEN));
+      }
+
+    // Zeichnen eines leeren Rechteckes
+    Rectangle (ds->hDC,ds->rcItem.left,ds->rcItem.top,
+                        ds->rcItem.right,ds->rcItem.bottom);
+
+    // Selektion einiger Attribute
+    if (Red)
+      SetTextColor (ds->hDC,RGB(0xFF,0,0));
+    else if (Gray)
+      SetTextColor (ds->hDC,RGB(0x80,0x80,0x80));
+    else {
+      if (dsState & ODS_SELECTED)
+        SetTextColor (ds->hDC,RGB(0xFF,0xFF,0xFF));
+      else
+        SetTextColor (ds->hDC,RGB(0,0,0));
+      }
+
+    if (dsState & ODS_SELECTED)
+      SetBkColor (ds->hDC,RGB(0,0,0));
+    else
+      SetBkColor (ds->hDC,RGB(0xFF,0xFF,0xFF));
+
+    if (Kursiv) {
+      if (*hfnt == 0) MessageBeep (0);
+      if (*hIfnt == 0) *hIfnt = GetItalicFont (*hfnt);
+      SelectObject (ds->hDC,*hIfnt);
+      if (*hIfnt == 0) MessageBeep (0);
+      }
+    else {
+      if (*hfnt == 0) MessageBeep (0);
+      SelectObject (ds->hDC,*hfnt);
+      }
+
+    SetTextAlign (ds->hDC,TA_LEFT | TA_TOP);
+
+    HBRUSH hBrush = 0;
+    if (Disabled) {
+      actx0 = ds->rcItem.left-xpos;
+      actAnzTabs = AnzTabs;
+      actTabs = Tabs;
+      hBrush = CreatePatternBrush (GetDisable());
+      MyGrayString (ds->hDC,hBrush,FARPROC(MyTabbedTextOut),
+                  LONG(Txt),
+                  lstrlen(Txt),
+                  ds->rcItem.left-xpos,ds->rcItem.top,
+                  ds->rcItem.right - ds->rcItem.left,
+                  ds->rcItem.bottom - ds->rcItem.top,
+                  dsState & ODS_SELECTED
+                 );
+      }
+    else {
+      // normale Ausgabe
+      TabbedTextOut (ds->hDC,ds->rcItem.left-xpos,ds->rcItem.top,
+                         Txt,
+                         lstrlen(Txt),
+                         AnzTabs,Tabs,ds->rcItem.left-xpos
+                    );
+      }
+
+    if (hBrush) {
+      DeleteObject (hBrush);
+      ReleaseDisable ();
+      }
+
+    // Zeichnen des Focus
+    if (dsState & ODS_FOCUS) {
+      DrawFocusRect (ds->hDC,&ds->rcItem);
+      }
+
+    }
+  else {
+    // Loeschen der Fonts
+    ReleaseDisable ();
+    }
+  }

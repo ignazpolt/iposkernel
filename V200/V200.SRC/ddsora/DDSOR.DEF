@@ -1,0 +1,3 @@
+LIBRARY DDSORA     
+DESCRIPTION 'Datenbankanbindung Oracle, (c) Glance AG, Switzerland'
+INCLUDE DDSORA.DEF

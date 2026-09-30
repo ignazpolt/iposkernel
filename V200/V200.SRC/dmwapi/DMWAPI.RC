@@ -1,0 +1,75 @@
+#include <windows.h>
+#include <winver.h>
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+#include "dmwapi.dlg"
+
+MyBitmap BITMAP C:\ipos_kernel\PICTURES\bitmap.bmp
+Disable  BITMAP C:\ipos_kernel\PICTURES\disab1.bmp
+
+   STRINGTABLE
+   Begin
+     100,       "K�rzel oder Langtext nicht korrekt"
+     101,       "K�rzeleingabe"
+     102,       "Importfilename"
+     103,       "Exportfilename"
+     104,       "File %s existiert nicht\r Soll das File neu erzeugt werden ?"
+     105,       "Datei �ffnen"
+     106,       "Dokumentdaten werden gespeichert"
+     107,       "DMWAPI - do not use !!! (Bitte melden)"
+     108,       "untitled"
+
+     2000,     "MO"
+     2001,     "DI"
+     2002,     "MI"
+     2003,     "DO"
+     2004,     "FR"
+     2005,     "SA"
+     2006,     "SO"
+
+
+   End
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "DMWAPI.DLL\0"
+            VALUE "InternalName", "DMWAPI\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+END
+
+

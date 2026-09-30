@@ -1,0 +1,351 @@
+/////////////////////////////////////////////////////////////////////
+//      Doclist:
+//
+//      - Ansammlung / Gliederung mit den Dokumenten
+//
+/////////////////////////////////////////////////////////////////////
+// $Header:   P:/marille/clinicum/include/rev/doclist.hpv   1.0   24 Jun 1994 17:01:16   HANNES  $
+// $Log:   P:/marille/clinicum/include/rev/doclist.hpv  $
+// 
+//    Rev 1.0   24 Jun 1994 17:01:16   HANNES
+// Neuuebernahme clinicum
+// 
+//    Rev 1.17   09 Feb 1994 12:26:38   HANNES
+// Abbrechenflag beim GenerateStartup
+// 
+//    Rev 1.16   08 Jan 1994 19:06:30   HANNES
+// Funktionsprototypen von Funktionen aus mkprog und genprgs
+// 
+//    Rev 1.15   20 Oct 1993 13:44:32   HANNES
+// Lizensierung der Dokumente
+// 
+//    Rev 1.14   06 Oct 1993 09:52:44   HANNES
+// Einige Funktionsprototypen
+// 
+//    Rev 1.13   09 Sep 1993 19:09:32   GERHOLD
+// 
+//    Rev 1.12   18 Aug 1993 10:38:56   HANNES
+// ..
+// 
+//    Rev 1.11   20 Jul 1993 12:36:00   HANNES
+// Umstellung auf GetGlobMem..
+// 
+//    Rev 1.10   10 Jun 1993 18:33:38   HANNES
+// MYINI
+// 
+//    Rev 1.9   28 May 1993 21:19:54   HANNES
+// Eibau des Vaterfensters in DocList::WorkOn
+// 
+//    Rev 1.8   10 May 1993 12:51:34   HANNES
+// Import / Export..
+// 
+//    Rev 1.7   17 Mar 1993 18:03:54   HANNES
+// 32 bit Umstellung
+// 
+//    Rev 1.6   08 Mar 1993 14:17:24   HANNES
+// Erweiterungen der Klasse proglist
+// 
+//    Rev 1.5   01 Feb 1993 12:10:52   HANNES
+// Einbau der Klasse VTO->Neue Farben
+// 
+//    Rev 1.4   18 Jan 1993 16:53:58   HANNES
+// In die Programm - beschreibungsliste die Kategorie eingebaut
+// 
+//    Rev 1.3   13 Jan 1993 18:58:06   HANNES
+// Verwaltung mehrerer Datensaetze pro Dokument
+// 
+//    Rev 1.2   11 Dec 1992 16:27:00   HANNES
+// Strings fuer profiling zur Ermittlung der Farben
+// 
+//    Rev 1.1   10 Dec 1992 11:51:12   HANNES
+// Strings fur Profiling zur Ermittlung der maximal offenen Dokumente
+// eingefuegt
+// 
+//    Rev 1.0   02 Dec 1992 15:56:36   HANNES
+// Initial revision.
+#define PICTEXTENSION   ".DBM"
+
+struct ProgEntry {
+  ProgEntry FAR *Next;
+  int  Lfndr;
+  int  idcbase;
+  int  AnzDType;
+  WORD Category;
+  int  dbnr[5];
+  char HeadLine[128];
+  char fname[13];
+  DWORD progSize;
+  WORD ExtraInfo;
+  };    // Direkt dahinter steht die Extra - Info
+
+typedef ProgEntry FAR *LPPE;
+
+#define DOCLISTSECTION          "DocList"
+#define PICTPATH                "PictPath"
+#define PICTPATHDEF             ".\\"
+#define DEFPICT                 "doc"
+
+#define DOCSECTION              "Documents"
+#define DOCCOUNT                "MaxDocCount"
+#define DOCCOUNTDEF             5
+
+#define DC_NORMAL       0
+#define DC_LISTITEM     1
+#define DC_EXTRAITEM    2
+#define DC_USERITEM     3
+#define DC_EXPORT       4
+
+#ifndef INDLL
+extern LPSTR FAR PASCAL GetIniName ();
+#ifndef MYINI
+#define MYINI   GetIniName ()
+#endif
+
+// Referenz auf die ausgewaehlten Dokumente
+////////////////////////////////////////////
+struct DocListRef {
+  WORD Lfndr;   
+  };
+
+typedef DocListRef FAR *LPDLREF;
+
+// Gepackte Daten (PushData, GetData)
+//////////////////////////////////////
+struct DocListData {
+  char PictFileName[9]; // Filename der Bitmaps
+  int AnzDocs;          // Anzahl der mit dem Symbol verbundenen Dokumente
+  int DscLen;           // Laenge der Kurzbeschreibung
+  };
+typedef DocListData FAR *LPDLDATA;
+
+// Temporaere Klasse zum Aufbau eines SymEntrys
+class setemplate {
+ public :
+  char PictName[9];
+  int lfndr;
+  HWND hWnd;
+  setemplate (LPSTR name,int lf,HWND hW)
+    { lstrcpy (PictName,name); lfndr = lf; hWnd = hW ; }
+  };
+
+// Liste aller moeglichen Programme
+//////////////////////////////////////
+// Die Klasse Proglist ist direkt mit der Datenbank verbunden,
+// Zugriff auf die Datenbank durch GetFirst und GetNext...
+class ProgList {
+ public :
+  progkey pk;
+  int AnzProgs;
+  LPPE lpFirst;         // Zeiger auf das erste ProgEntry Element
+  LPPE lpAct;           // Zeiger auf das aktuelle ProgEntry Element
+  void AddProg (LPSTR Buffer);      // Neuen Eintrag erzeugen
+  void ChangeProg (LPSTR Buffer);   // Eintrag neu erzeugen
+  ProgList& operator += (LPPE);     // Initialisierter Eintrag wird 
+                                    // hinzugefuegt
+  ProgList& operator -= (int);      // Eintrag loeschen
+  LPPE NextEntry (LPPE);
+  LPPE operator [] (int); // indizierter Zugriff, wAct wird
+                          // ebenfalls umgestellt
+  void FindId (int id);   // Finden einer laufenden Nummer
+                          // wAct wird umgestellt
+  LPPE GetAct();          // Ermitteln des aktuellen Entrys
+  void GetFirst ();     // Datenbank entsprechend einrichten und
+                        // ersten Eintrag ermitteln
+  BOOL GetNext ();      // Datenbank weiterschalten
+  void GetName (LPSTR,int,int FAR *idcbase = NULL,int FAR *AnzDBNr = NULL,WORD FAR *dbnr = NULL);   
+                              // Lesen des Namens aus der Liste, Suchen
+                              // durch Vergleich mit der laufenden Nummer
+  WORD GetCategory (int,WORD FAR *,int FAR *);
+  void ReadName (LPSTR Buffer);     // Lesen des Programms in den Aktuellen Eintrag abspeichern
+  void ReadList ();     // Lesen der gesamte Liste
+  void DestroyList ();  // Loeschen der Liste
+  void FillList (HWND,int,int FAR *prgind); // Fullen einer Dialogbox
+
+  BOOL Read ();
+  GLOBALHANDLE PushEntry (GLOBALHANDLE,LPPE);
+  void Write ();
+
+  BOOL IsExistant (int);
+  };
+
+// Hauptklasse: 
+// Mit einem Bitmap (genauer 2 Bitmaps: On und Off - Zustand)
+// ist eine Kurzbeschreibung und ein Array mit DocListRef verbunden.
+/////////////////////////////////////////////////////////////////////
+class SymEntry;         // fuer forward - Deklaration
+
+class DocList {
+ protected :
+  int Ident;                // Laufende Nummer des Bitmaps (fuer Menue-
+                            // und indizierte Zugriffe)
+  int state ;
+  HWND hFrameWnd;           // Fensterhandle
+  HBITMAP hBitmap;          // Bitmap, das in der Liste/Knopfleiste erscheint
+                            // Elementen
+  DocList& operator += (setemplate &); // Erzeugen und Anhaengen eines neuen 
+                                       // Symentrys
+ public :
+  char PictFileName[9];     // Name des Bitmaps (ohne Pfad, ohne Extension)
+  LPDLREF List;             // Zeiger auf die Liste mit den ausgewaehlten
+
+  int AnzDocs;              // Anzahl der Dokumente, die mit dem Symbol
+                            // verkettet sind
+  void SetPictName (LPSTR name)
+    { lstrcpy (PictFileName,name); }
+  LPSTR GetPictName ()
+    { return PictFileName ; }
+  void DecId()             // Ident verkleinern
+    { Ident -- ; }
+  int GetId()
+    { return Ident ; }
+  LPSTR Desc;       // Kurzbeschreibung der Gruppe
+  HANDLE hNext;     // Die Listen sind selbst als Listen organisiert
+  int AnzSymbols ;  // Anzahl der Symbole
+  HANDLE hSymList;  // Zeiger auf die Liste aller moeglichen Symbole
+                    // (nur temp. Gueltig)
+  DocList (HWND hW,int id) { Ident = id ; hFrameWnd = hW ; }
+  void Destroy ();
+  virtual ~DocList ();      // freigeben des Speichers
+  HANDLE hmem;              // Handle fuer Speicherverwaltung
+
+  void Unlock ()                 // Durchfuehren eines LocalUnlock
+    { LocalUnlock (hmem); }
+  DocList *Next() 
+    { return (DocList *) ((hNext) ? LocalLock (hNext) : NULL) ; }
+
+  void PushData (GLOBALHANDLE &);     // Daten zu einem Block zusammenkopieren
+  WORD GetData (GLOBALHANDLE,WORD); // Daten von dem Block runterholen
+
+  void ReadBitmaps ();      // Lesen des Bitmaps und skalieren, so
+                            // dass es im Menuebalken platz hat
+  void DestroyBitmaps ()
+    { if (hBitmap)  DeleteObject (hBitmap)  , hBitmap = 0  ; }
+  void ShowBitmap (HDC,int,int,BOOL);    // Anzeigen des Bitmaps
+  void ShowOnBitmap (HDC hDC,int x,int y)
+    { ShowBitmap (hDC,x,y,TRUE); }
+  void ShowOffBitmap (HDC hDC,int x,int y)   
+    { ShowBitmap (hDC,x,y,FALSE); }
+  void GetbmExt (int FAR *,int FAR *);
+  void GetPictPath (LPSTR,int);  // Lesen des Pfades mit den Bitmaps 
+                                 // aus dem INI - File
+  void InitNew ();
+
+  DocList& DocList::operator += (DocListRef);
+                                    // Einfuegen einer neuen Referenz
+  DocList& DocList::operator -= (int);
+                                     // Loeschen eines Elementes (Unter
+                                     // Angabe des Index)
+  BOOL IsSelected (int);             // Check, ob Element schon selektiert
+                                     // ist
+  void Add (HWND,int,int);           // Neues Element (auch in der Dialog-
+                                     // box) hinzufuegen
+  void Remove (HWND,int,int);        // Element (auch in der Dialog-
+                                     // box) entfernen
+  void FillList (HWND,int);  // Fuellen der gesamten Liste in
+                             // die Dialogbox
+  void GetFullList (void);
+  void GetEmptyDsc (void);
+
+  void InsertToBBar ();                     // Einfuegen des Symbols im Menue
+  void DelBBarEntry ();                     // Loeschen des Muenueeintrages
+  void ChangeBBarPict ();                   // Das Symbol im Menue aendern
+  void ChangeBBarIdent (int);               // Den Itemid veraendern
+
+  BOOL WorkOn (HWND hWParent);       // Bearbeiten der Zusammenstellung
+
+  void *operator new (size_t);          // Speicherverwaltung
+  void operator delete (void *);
+
+  BOOL IsChecked ()
+    { return state ; }
+  void ToggleState ();
+  BOOL CheckCommand ();                 // Verarbeiten des Kommandos
+
+  BOOL IsListShown ();          // Wird die Liste gerade angezeigt ?
+  void HideList ();             // Liste verstecken
+  void ShowList ();             // Liste anzeigen
+  void SetListEntrys ();        // Liste fuellen
+  void ListredrawOff ();        // Zeichenmodus (bei Listen - Fuellen..)
+  void ListredrawOn ();         // -"-
+  void RedrawList ();           // Invalidate auf ganzes Fenster..
+
+  void CheckList ();            // Die Referenzdaten auf Konsistenz pruefen
+  };
+
+// Eintrag in der Liste aller moeglichen Symbole
+// Es wird DocList ueberlagert, um die Bearbeitung 
+// der Bitmaps zu erben
+//////////////////////////////////////////////////
+class SymEntry : public DocList {
+ public :
+  SymEntry (HWND hW,int Lfndr,LPSTR fname) : DocList (hW , Lfndr)
+    { lstrcpy (PictFileName,fname) ; }
+  virtual ~SymEntry () { }
+  void ShowBitmaps (HDC,int,int);
+  };
+
+#define BBARIDBASE      0
+class DocCollection {
+ public :
+  HANDLE hFirstDocList;         // Zeiger auf das erste Elemet
+  int AnzDocList;               // Anzahl der Dokumentenlisten
+  BOOL dataChanged;             // Daten wurden up to date gebrachet
+  void Write ();                // Schreiben der Daten aller DocLists
+                                // in die Datenbank (abhaengig von
+                                //    Datachanged)
+  void Destroy ();              // Alle Daten wieder freigeben
+  void CreateList ();           // Erzeugen der Liste (durch Lesen
+                                // der Daten aus der Datenbank)
+  DocList* First ();
+  DocList* operator [] (int);   // Zugriff mit der laufenden Nummer
+  DocList* GetByCommand (int);  // Zugriff mit dem MenuIdent
+  DocList* GetActiveList ();    // Suchen der aktiven Liste
+  DocCollection& operator += (DocList *);       // Einbinden einer neuen
+                                                // Liste 
+                                                // (inkl. Menue - Handling)
+  DocCollection& operator -= (int);             // Loeschen einer Liste
+                                                // (inkl. Menue - Handling)
+
+  void Export (HWND hDlg);
+  void Import (HWND hDlg);
+
+  void Init ();                         // Initialisierung
+  void Exit ();                         // Daten freigeben, abspeichern
+  void WorkOn ();                       // Konfiguration festlegen
+  void Rebuild (DWORD User);            // Exit und danach init
+
+  void OtherOff (WORD);                 // Aktive Zeichen ausschalten
+  BOOL CheckCommand (WORD);             // Interpretierung des Kommandos
+
+  int LastActive ;
+  int GetLastActive ()
+    { return LastActive ; }
+  void SetLastActive (int la)
+    { LastActive = la ; }
+  void ActivateList ();
+  void HideList ();
+
+  void CheckLists ();
+
+  int GetGroupCount ();
+  };
+
+HICON LoadDefIcon ();
+BOOL GetProgFName (int Lfndr,LPSTR DocName,int size);
+int GetProgLfndr (LPSTR name);
+void NewDocument (char FAR *fname,WORD RecordType,BOOL NoListExist);
+
+PSTR CheckName (PSTR res,PSTR Name);
+
+BOOL GenerateStartUp (BOOL FAR *aborted);
+
+
+#ifdef DOCLIST_MAIN
+ProgList proglist;              // Diese Klasse wird systemweit einmal
+                                // global gehalten
+DocCollection dcnf;
+#else
+extern ProgList proglist;
+extern DocCollection dcnf;
+#endif
+#endif

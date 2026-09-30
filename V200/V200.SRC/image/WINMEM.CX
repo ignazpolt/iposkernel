@@ -1,0 +1,344 @@
+/*
+ *
+// $Header:   P:/marille/clinicum/image/rev/winmem.c_v   1.0   24 Jun 1994 16:50:56   HANNES  $
+// $Log:   P:/marille/clinicum/image/rev/winmem.c_v  $
+ * 
+ *    Rev 1.0   24 Jun 1994 16:50:56   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.2   03 Dec 1992 13:02:58   HANNES
+ * 2. Versuch die Kommentare zu setzen
+ * 
+ *    Rev 1.1   03 Dec 1992 13:01:32   HANNES
+ * Kommentare richtig gesetzt
+ ******************************************************************************
+ * 
+ *    Rev 1.0   02 Dec 1992 16:29:22   HANNES
+ * Initial revision.
+ ******************************************************************************
+**	Filename: 		winmem.c
+**	Purpose:		Contains Windows Memory Routines.
+**	Author:			Dave Formanek
+**	Environment:	DOS machines.
+**	Library:		For use with HP-TIFF 5.0 Library.
+**	History:		Created: 12/12/89, dlf.
+**					Updated: 07/13/90, dlf, changed ERROR to MEMORYERROR.
+**					Updated: 07/15/91, dlf, took out errors.h include.
+**	Version:		2.0
+**
+**	(c) Copyright Hewlett-Packard Company, 1986, 1987, 1988.
+**	All rights are reserved. Copying or other reproduction of
+**	this program except for archival purposes is prohibited
+**	without the prior written consent of Hewlett-Packard Company.
+**
+**			  RESTRICTED RIGHTS LEGEND
+**
+**	Use, duplication, or disclosure by the Government
+**	is subject to restrictions as set forth in
+**	paragraph (b) (3) (B) of the Rights in Technical
+**	Data and Computer Software clause in
+**	DAR 7-104.9(a).
+**
+**	HEWLETT-PACKARD COMPANY
+**	Greeley, Colorado
+*****************************************************************************/
+
+
+/*-----------------------------------------------------------------------------
+					Include Files and Type Defines
+-----------------------------------------------------------------------------*/
+#include <windows.h>
+#include "host.h"
+#include "hostmem.h"
+
+#define MEMORYERROR 	-1
+
+/*-----------------------------------------------------------------------------
+				    Public Function Prototypes
+-----------------------------------------------------------------------------*/
+/* POINTER ROUTINES */
+PUINT8 AllocPointer(UINT32 Size);
+INT16 DumpPointer(PUINT8 pMemory);
+UINT32 GetHandle(PUINT8 pMemory);
+UINT32 PointerSize(PUINT8 pMemory);
+PUINT8 ReallocPointer(PUINT8 pMemory, UINT32 Size, PINT16 pStatus);
+
+/* HANDLE ROUTINES */
+UINT32 AllocHandle(UINT32 Size);
+PUINT8 LockHandle(UINT32 Handle);
+INT16 UnlockHandle(UINT32 Handle);
+INT16 DumpHandle(UINT32 Handle);
+UINT32 HandleSize(UINT32 Handle);
+UINT32 ReallocHandle(UINT32 Handle, UINT32 Size);
+
+/* GENERAL HEAP ROUTINES */
+UINT32 LargestFreeBlock(void);
+
+/*-----------------------------------------------------------------------------
+				    Private Function Prototypes
+-----------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------
+			  Global Data Definitions and Declarations
+-----------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------
+						  Public Code
+-----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+PUINT8 AllocPointer(UINT32 Size)
+/*
+**	Parameters:
+**		Size		amount of memory in bytes to allocate.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure allocates the amount of memory specified by Size.
+**	Return:	
+**		pointer to the allocated memory.
+**		NULL if couldn't allocate the memory specified.
+**	History:
+*/
+{
+	HANDLE	hMem;
+
+	if (!(hMem = GlobalAlloc(GHND, Size))) return(0L);
+	return(GlobalWire(hMem));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+INT16 DumpPointer(PUINT8 pMemory)
+/*
+**	Parameters:
+**		pMemory		pointer to the memory to be dumped.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure releases the memory pointed to by pMemory.
+**	Return:	
+**		OKAY if successful.
+**		MEMORYERROR if an error occurred.
+**	History:
+*/
+{
+	HANDLE	hMem;
+
+	hMem = LOWORD(GlobalHandle(HIWORD(pMemory)));
+	GlobalUnWire(hMem);
+	if (!(GlobalFree(hMem))) return(OKAY);
+	return(MEMORYERROR);
+}
+
+
+/*---------------------------------------------------------------------------*/
+UINT32 GetHandle(PUINT8 pMemory)
+/*
+**	Parameters:
+**		pMemory		pointer to the memory to get the handle of.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure returns the handle to pMemory.
+**	Return:	
+**		handle to pMemory.
+**		NULL if an error occurred.
+**	History:
+*/
+{
+	return((UINT32)(LOWORD(GlobalHandle(HIWORD(pMemory)))));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+UINT32 PointerSize(PUINT8 pMemory)
+/*
+**	Parameters:
+**		pMemory		pointer to the memory to get the size of.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure returns the amount of memory allocated to pMemory.
+**	Return:	
+**		amount of memory allocated to pMemory.
+**	History:
+*/
+{
+	return(GlobalSize(LOWORD(GlobalHandle(HIWORD(pMemory)))));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+PUINT8 ReallocPointer(PUINT8 pMemory, UINT32 Size, PINT16 pStatus)
+/*
+**	Parameters:
+**		pMemory		pointer to the memory to set the size of.
+**		Size		new amount of memory in bytes to allocate to pMemory.
+**		pStatus		pointer to a variable to place the status in.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure reallocates pMemory to the size specified by Size and
+**		returns an updated pMemory.
+**	Return:	
+**		new value of pMemory.
+**		pStatus	- OKAY if reallocation was a success.
+**				- MEMORYERROR if reallocation failed.
+**	History:
+*/
+{
+	HANDLE	hMemOld, hMemNew;
+
+	hMemOld = LOWORD(GlobalHandle(HIWORD(pMemory)));
+	GlobalUnWire(hMemOld);
+	if (!(hMemNew = GlobalReAlloc(hMemOld, Size, GHND)))
+		{ *pStatus = MEMORYERROR; return(GlobalWire(hMemOld)); }
+	else { *pStatus = OKAY; return(GlobalWire(hMemNew)); }
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+UINT32 AllocHandle(UINT32 Size)
+/*
+**	Parameters:
+**		Size		amount of memory in bytes to allocate.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure will allocate the amount of memory specified by Size.
+**	Return:	
+**		handle to the allocated memory.
+**		NULL if an error occurred.
+**	History:
+*/
+{
+	return((UINT32)GlobalAlloc(GHND, Size));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+PUINT8 LockHandle(UINT32 Handle)
+/*
+**	Parameters:
+**		Handle		handle to the memory to lock.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure locks the memory allocated to Handle and returns a
+**		pointer to the locked memory.
+**	Return:	
+**		pointer to the locked memory.
+**		NULL if an error occurred.
+**	History:
+*/
+{
+	return(GlobalWire((HANDLE)Handle));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+INT16 UnlockHandle(UINT32 Handle)
+/*
+**	Parameters:
+**		Handle		handle to the memory to unlock.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure unlocks the memory allocated to Handle.
+**	Return:	
+**		OKAY if successful.
+**		MEMORYERROR if an error occurred.
+**	History:
+*/
+{
+	GlobalUnWire((HANDLE)Handle);
+	return(OKAY);
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+INT16 DumpHandle(UINT32 Handle)
+/*
+**	Parameters:
+**		Handle		handle to the memory to dump.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure dumps the memory associated with Handle.
+**	Return:	
+**		OKAY if successful.
+**		MEMORYERROR if an error occurred.
+**	History:
+*/
+{
+	if (GlobalFree((HANDLE)Handle)) return(MEMORYERROR);
+	return(OKAY);
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+UINT32 HandleSize(UINT32 Handle)
+/*
+**	Parameters:
+**		Handle		handle to the memory to get the size of.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure returns the amount of memory allocated to Handle.
+**	Return:	
+**		amount of memory allocated to Handle.
+**	History:
+*/
+{
+	return(GlobalSize((HANDLE)Handle));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+UINT32 ReallocHandle(UINT32 Handle, UINT32 Size)
+/*
+**	Parameters:
+**		Handle		handle to the memory to set the size of.
+**		Size		new amount of memory in bytes to allocate to pMemory.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure reallocates Handle to the size specified by Size.
+**	Return:	
+**		new value of Handle.
+**		NULL if an error occurred.
+**	History:
+*/
+{
+	return((UINT32)GlobalReAlloc((HANDLE)Handle, Size, GHND));
+}
+
+
+
+/*---------------------------------------------------------------------------*/
+UINT32 LargestFreeBlock(void)
+/*
+**	Parameters:
+**		None.
+**	Globals:
+**		None.
+**	Operation:
+**		This procedure returns the total number of bytes in the largest free
+**		block of memory.
+**	Return:	
+**		size of largest free block.
+**	History:
+*/
+{
+	return(GlobalCompact(0L));
+}
+

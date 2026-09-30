@@ -1,0 +1,7 @@
+compile+parse+codegen+lexscan+
+twodim+parse1+prgicon+fncprot+tbvar+
+wonschd
+compile.dll
+compile.map
+libw.lib+mdllcew.lib+..\dbhelp.lib+..\ddsmem.lib+toolhelp.lib
+comp.def

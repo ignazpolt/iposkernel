@@ -1,0 +1,4 @@
+copy ..\%ACTVERS%.SRC\dds.l32
+
+rc -r -v -dWIN32 -fodds.res ..\%ACTVERS%.SRC\dds.rc
+link /DEBUG @dds.l32 > lnk.err

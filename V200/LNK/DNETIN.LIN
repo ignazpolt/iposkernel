@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DNETIN\dnetin.DEF
+COPY ..\..\%ACTVERS%.SRC\DNETIN\dnetin1.DEF
+COPY ..\..\%ACTVERS%.SRC\DNETIN\netapiin.DEF
+COPY ..\..\%ACTVERS%.SRC\DNETIN\dnetin.LNK
+COPY ..\..\%ACTVERS%.SRC\DNETIN\dnetin1.LNK
+
+link /nod /noe /co /li /map @dnetin.lnk
+rc -r -v -z -fodnetin.res ..\..\%ACTVERS%.SRC\DNETIN\dnetin.rc
+rc -T -K dnetin.res dnetin.dll
+copy dnetin.dll ..\*.*
+implib dnetin.lib dnetin.dll
+copy dnetin.lib ..\*.*
+
+link /nod /noe /co /li /map @dnetin1.lnk
+rc -T -K dnetin.res dnetin1.dll
+copy dnetin1.dll ..\restool
+implib dnetin1.lib dnetin1.dll
+copy dnetin1.lib ..\restool

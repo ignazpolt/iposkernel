@@ -1,0 +1,6 @@
+LIBRARY DNETIN
+               
+DESCRIPTION 'DNETs Application Interface - Winsockets Version 1.1, (c)1996 Glance'
+
+INCLUDE NETAPIIN.DEF
+

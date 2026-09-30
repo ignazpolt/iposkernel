@@ -1,0 +1,5 @@
+ddsmem+waitwin+globmem+hash+ddsdeb_c
+ddsmem1.dll
+ddsmem.map
+libw.lib+mdllcew.lib+toolhelp
+ddsmem1.def

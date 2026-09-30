@@ -1,0 +1,1 @@
+DLLExport LONG WINAPI _export MusTestWndProc(HWND, UINT, WPARAM, LPARAM);

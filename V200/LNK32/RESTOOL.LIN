@@ -1,0 +1,10 @@
+copy ..\..\%ACTVERS%.SRC\RESTOOL\restool.l32
+
+rc -r -v -dWIN32 -forestool.res ..\..\%ACTVERS%.SRC\RESTOOL\restool.rc
+link /DEBUG @restool.l32
+if errorlevel 1 goto error
+goto continue
+:error
+pause
+:continue
+

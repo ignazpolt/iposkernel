@@ -1,0 +1,408 @@
+/*----------------------------------------------*/
+/*      Anzeige eines Wartefensters             */
+/*----------------------------------------------*/
+//
+// $Header:   P:/marille/clinicum/dmwapi/rev/waitwin.cpv   1.1   02 Feb 1996 10:46:16   GERHOLD  $
+// $Log:   P:/marille/clinicum/dmwapi/rev/waitwin.cpv  $
+// 
+//    Rev 1.1   02 Feb 1996 10:46:16   GERHOLD
+// 1.Umstellung auf 32 Bit
+// 
+//    Rev 1.0   24 Jun 1994 16:49:06   HANNES
+// Neuuebernahme clinicum
+// 
+//    Rev 1.8   11 Jan 1994 19:05:42   HANNES
+// Abbrechen - Knopf
+// 
+//    Rev 1.7   07 Jan 1994 12:14:50   HANNES
+// Waitwin in die DLL
+// 
+//    Rev 1.6   05 Jan 1994 19:37:38   HANNES
+// Umstellung auf DLL
+// 
+//    Rev 1.5   09 Dec 1993 15:02:56   HANNES
+// Auch rueckwaerts zaehlen
+// 
+//    Rev 1.4   22 Sep 1993 09:44:04   GERHOLD
+// Version nach St. Poelten
+// 
+//    Rev 1.3   20 Sep 1993 15:27:42   GERHOLD
+// PaintFilesInProcess
+// 
+//    Rev 1.2   18 Jun 1993 15:03:52   MARTIN
+// GetWindowInst
+// 
+//    Rev 1.1   16 Jun 1993 16:53:38   MARTIN
+// Sanduhr
+// 
+//    Rev 1.0   02 Dec 1992 15:46:14   HANNES
+// Initial revision.
+//
+
+#include <windows.h>
+#include <stdio.h>
+#include <string.h>
+#include "dds32.h"
+#define NODDSDATA
+#include "dds.hpp"
+#include "globmem.h"
+#define WAITWIN_MAIN
+#include "waitwin.hpp"
+
+DLLExport LPVOID _export WINAPI WaitWin::operator new (size_t size)
+  {
+  return GetGlobMem (size);
+  }
+
+DLLExport void _export WINAPI WaitWin::operator delete (LPVOID obj)
+  {
+  FreeGlobMem (obj);
+  }
+
+DLLExport _export WINAPI WaitWin::WaitWin (LPSTR caption,LPSTR extra,HWND hWnd,BOOL showAbort)
+  {
+  Create (caption,extra,hWnd,showAbort);
+  }
+
+#define GWL_HWINFO  0
+LONG _export CALLBACK WaitWndProc (HWND hWnd,UINT msg,WPARAM wP,LPARAM lP)
+  {
+  LONG RetVal = 0L;
+
+  switch (msg) {
+    case WM_CREATE :
+      SetWindowLong(hWnd, GWL_HWINFO,LONG(LPCREATESTRUCT (lP)->lpCreateParams));
+      break ;
+    case WM_PAINT :
+      {
+      WaitWin FAR *lpww = (WaitWin FAR *) GetWindowLong (hWnd,GWL_HWINFO);
+      lpww->Paint ();
+      }
+      break ;
+    case WM_COMMAND :
+      {
+      CRACKER_VARS
+      CRACK_MESSAGEsc
+
+      if ((CRACKER_wID == IDCANCEL) && (CRACKER_wNotify == BN_CLICKED)) {
+        MessageBeep (0);
+        WaitWin FAR *lpww = (WaitWin FAR *) GetWindowLong (hWnd,GWL_HWINFO);
+        lpww->_IsAborted = TRUE ;
+        }
+      }
+      break ;
+    case WM_NCHITTEST:
+      RetVal = DefWindowProc (hWnd,msg,wP,lP);
+      if (RetVal == HTCAPTION)
+        RetVal = HTNOWHERE;
+      break ;
+    default :
+      RetVal = DefWindowProc (hWnd,msg,wP,lP);
+    }
+
+  return RetVal ;
+  }
+
+static BOOL WaitWinRegistered = FALSE ;
+extern HANDLE hLibInst;
+void RegisterWaitWin ()
+  {
+  if (!WaitWinRegistered) {
+    WNDCLASS WndClass;
+    WndClass.style         = CS_GLOBALCLASS ; 
+    WndClass.lpfnWndProc   = WNDPROC (WaitWndProc) ;
+    WndClass.cbClsExtra    = 0;
+    WndClass.cbWndExtra    = sizeof(LPVOID);
+    WndClass.hInstance     = hLibInst;
+    WndClass.hIcon         = NULL;
+    WndClass.hCursor       = LoadCursor (0,IDC_ARROW);
+    WndClass.hbrBackground = GetStockObject (WHITE_BRUSH);
+    WndClass.lpszMenuName  = NULL;
+    WndClass.lpszClassName = (LPSTR) "WWND" ;
+    WaitWinRegistered = RegisterClass (&WndClass);
+    }
+  }
+
+DLLExport void _export WINAPI WaitWin::SetExtra (LPSTR Text)
+  {
+  if (ExtraText != NULL)
+    FreeGlobMem (ExtraText);
+  if (Text != NULL) {
+    ExtraText = LPSTR (GetGlobMem (lstrlen (Text)+1));
+    lstrcpy (ExtraText,Text);
+    }
+  else
+    ExtraText = NULL;
+  if (MyHandle != NULL) {
+    RECT r;
+    GetClientRect (MyHandle,&r);
+    r.top = r.bottom - ysu / 2 ;
+    r.top -= tmh / 2 + 1 ;
+    InvalidateRect (MyHandle,&r,TRUE);
+    UpdateWindow (MyHandle);
+    }
+  }
+
+void WaitWin::Create (LPSTR caption,LPSTR txt,HWND hWndParent,BOOL showAbort) 
+  {
+  RegisterWaitWin ();
+  DWORD style = WS_BORDER | WS_POPUP | WS_VISIBLE ;
+  int hext = 2 * GetSystemMetrics (SM_CYBORDER);
+  if (caption != NULL) {
+    style |= WS_CAPTION ;
+    hext += GetSystemMetrics (SM_CYCAPTION);
+    }
+
+  Parent = hWndParent;
+  if (Parent == 0)
+    Parent = GetActiveWindow();
+
+  HDC hDC = CreateDC ("DISPLAY",NULL,NULL,NULL);
+  TEXTMETRIC tm;
+  GetTextMetrics (hDC,&tm);
+
+  height = tm.tmHeight * 6;
+  width = GetSystemMetrics (SM_CXSCREEN) * 2 / 5 ; 
+  xs = width / 8 ;
+  ysu = yso = (height - tm.tmHeight * 3 / 2) / 2 ;
+  if (txt != NULL) {
+    tmh = tm.tmHeight ;
+    height += tm.tmHeight;
+    ysu += tm.tmHeight;
+    }
+  xact = -1;
+  percstep = 0.01 ;
+  percval = 0.0 ;
+  ToBusyCursor();
+  int x0 = (GetSystemMetrics (SM_CXSCREEN) - width) / 2 ;
+  int y0 = (GetSystemMetrics (SM_CYSCREEN) - height) / 4 ;
+  DeleteDC (hDC);
+
+  SetExtra (txt);
+
+  doShowAbort = showAbort;
+
+  MyHandle = CreateWindow ("WWND",caption,style,x0,y0,width,height+hext,
+                                Parent,0,hLibInst,this);
+  SetVal (0.0) ;
+
+  if (showAbort) {
+    int bx = width  / 5 ;
+    int by = 3 * tm.tmHeight / 2 ;
+    int dx = 4 * GetSystemMetrics (SM_CYDLGFRAME);
+    hBtnWnd = CreateWindowEx (0, "BUTTON", "Abbrechen", WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+                               width - bx - dx, height - by - dx,
+                               bx, by,
+                               MyHandle,
+                               HMENU(IDCANCEL),
+                               hLibInst,
+                               LPVOID(NULL));
+
+    EnableWindow (Parent,FALSE);
+    }
+  };
+
+void WaitWin::Paint ()
+  {
+  RECT r;
+  PAINTSTRUCT ps;
+  GetClientRect (MyHandle,&r);
+  HDC hDC = BeginPaint (MyHandle,&ps);
+  r.left += xs ;
+  r.right -= xs ;
+  r.top += yso ;
+  r.bottom -= ysu ;
+  HPEN hOldPen ;
+
+  RECT rb;
+  lmemcpy (&rb,&r,sizeof(RECT));
+  int fw = min(xs/4,min(yso/4,ysu/4));
+  rb.left -= fw ;      rb.right += fw ;
+  rb.top -= fw ;       rb.bottom += fw ;
+  // Zeichnen eines Grauen Hintergrundes
+  SelectObject (hDC,GetStockObject(LTGRAY_BRUSH));
+  hOldPen = SelectObject (hDC,CreatePen (PS_SOLID,0,RGB(0xC0,0xC0,0xC0)));
+  Rectangle (hDC,rb.left,rb.top,r.left,rb.bottom);
+  Rectangle (hDC,r.right,rb.top,rb.right,rb.bottom);
+  Rectangle (hDC,rb.left,rb.top,rb.right,r.top);
+  Rectangle (hDC,rb.left,r.bottom,rb.right,rb.bottom);
+  DeleteObject (SelectObject (hDC,hOldPen));
+
+  // Zeichnen eines Weissen Hintergrundes
+  SelectObject (hDC,GetStockObject (WHITE_BRUSH));
+//  Rectangle (hDC,r.left,r.top,r.right,r.bottom);
+  BasePainted = TRUE ;
+
+  // Zeichnen der Schatten
+  SelectObject (hDC,GetStockObject (WHITE_PEN));
+  MoveToEx (hDC,rb.left+1,rb.top+1, NULL);
+  LineTo (hDC,rb.right-1,rb.top+1);
+  MoveToEx (hDC,rb.left+2,rb.top+2, NULL);
+  LineTo (hDC,rb.right-2,rb.top+2);
+  MoveToEx (hDC,rb.left+1,rb.top+1, NULL);
+  LineTo (hDC,rb.left+1,rb.bottom-1);
+  MoveToEx (hDC,rb.left+2,rb.top+2, NULL);
+  LineTo (hDC,rb.left+2,rb.bottom-2);
+
+  MoveToEx (hDC,r.left-1,r.bottom+1, NULL);
+  LineTo (hDC,r.right+1,r.bottom+1);
+  MoveToEx (hDC,r.left-2,r.bottom+2, NULL);
+  LineTo (hDC,r.right+2,r.bottom+2);
+  MoveToEx (hDC,r.right+1,r.top-1, NULL);
+  LineTo (hDC,r.right+1,r.bottom+1);
+  MoveToEx (hDC,r.right+2,r.top-2, NULL);
+  LineTo (hDC,r.right+2,r.bottom+2);
+
+  hOldPen = SelectObject (hDC,CreatePen (PS_SOLID,0,RGB(0x80,0x80,0x80)));
+  MoveToEx (hDC,rb.left+1,rb.bottom-1, NULL);
+  LineTo (hDC,rb.right-1,rb.bottom-1);
+  MoveToEx (hDC,rb.left+2,rb.bottom-2, NULL);
+  LineTo (hDC,rb.right-2,rb.bottom-2);
+  MoveToEx (hDC,rb.right-1,rb.bottom-1, NULL);
+  LineTo (hDC,rb.right-1,rb.top+1);
+  MoveToEx (hDC,rb.right-2,rb.bottom-2, NULL);
+  LineTo (hDC,rb.right-2,rb.top+2);
+
+  MoveToEx (hDC,r.left-1,r.top-1, NULL);
+  LineTo (hDC,r.right+1,r.top-1);
+  MoveToEx (hDC,r.left-2,r.top-2, NULL);
+  LineTo (hDC,r.right+2,r.top-2);
+  MoveToEx (hDC,r.left-1,r.top-1, NULL);
+  LineTo (hDC,r.left-1,r.bottom+1);
+  MoveToEx (hDC,r.left-2,r.top-2, NULL);
+  LineTo (hDC,r.left-2,r.bottom+2);
+  DeleteObject (SelectObject (hDC,hOldPen));
+
+  // Zeichnen des Prozentuellen Fortschrittes
+  r.left += 1 ;         r.right -= 1 ;
+  r.top += 1 ;          r.bottom -= 1 ;
+  int xactnew = int (double (r.right - r.left) * percval + 0.5);
+  if (xactnew != xact) {
+    char txt[20];
+    int pv = int (percval * 100.0 + 0.5);
+    if (pv < 0) pv = 0 ;
+    if (pv > 100) pv = 100 ;
+    wsprintf (txt,"%d %%",pv);
+
+    // Loeschen des alten Textes
+    int cx, cy;
+#ifdef WIN32
+    SIZE size;
+    GetTextExtentPoint32 (hDC,txt,lstrlen(txt), &size);
+    cx = size.cx;
+    cy = size.cy;
+#else
+    DWORD tx = GetTextExtent (hDC,txt,lstrlen(txt));
+    cx = LOWORD(tx);
+    cy = HIWORD(tx);
+#endif
+
+    int x0 = r.left + (r.right - r.left - cx) / 2;
+    int y0 = r.top  + (r.bottom - r.top - cy) / 2;
+    SelectObject (hDC,GetStockObject (WHITE_PEN));
+    SelectObject (hDC,GetStockObject (WHITE_BRUSH));
+    Rectangle (hDC,x0,y0,x0 + cx,y0 + cy);
+
+    // Zeichnen des Fortschrittes in Blau
+    hOldPen = SelectObject (hDC,CreatePen (PS_SOLID,1,RGB(0,0,0xFF)));
+    HBRUSH hbro,hbr;
+    hbro = SelectObject (hDC,hbr = CreateSolidBrush(RGB(0,0,0xFF)));
+    Rectangle (hDC,r.left,r.top,r.left + xactnew,r.bottom);
+    // Zeichnen des Textes (etw. Komplizierter...)
+    HDC hdcmem = CreateCompatibleDC (hDC);
+    HBITMAP hbmtxt = CreateCompatibleBitmap (hDC,cx,cy);
+    SelectObject (hdcmem,hbmtxt);
+    SetBkColor (hdcmem,RGB(0xFF,0xFF,0xFF));
+    SetTextColor (hdcmem,RGB(0,0,0xFF));
+    SetTextAlign (hdcmem,TA_TOP|TA_LEFT);
+    DWORD dwRop = 0x00990066;
+    TextOut (hdcmem,0,0,txt,lstrlen(txt));
+    BitBlt (hDC,x0,y0,cx,cy,
+            hdcmem,0,0,dwRop);
+
+    // fertig
+    DeleteObject (SelectObject (hDC,hOldPen));
+    SelectObject (hDC,hbro);
+    DeleteObject (hbr);
+    DeleteDC (hdcmem);
+    DeleteObject (hbmtxt);
+    xact = xactnew ;
+    }
+
+  if (ExtraText != NULL) {
+    RECT r;
+    GetClientRect (MyHandle,&r);
+    r.top = r.bottom - ysu / 2 ;
+    r.top -= tmh / 2 + 1 ;
+    r.bottom = r.top + tmh / 2 + 1 ;
+    DrawText (hDC,ExtraText,-1,&r,DT_NOCLIP | DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    }
+
+  EndPaint(MyHandle,&ps);
+  }
+
+DLLExport void _export WINAPI WaitWin::SetVal (double val)
+  {
+  MSG msg;
+
+  if (doShowAbort) {
+    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) { 
+      TranslateMessage (&msg);
+      DispatchMessage (&msg);
+      }
+    }
+
+  percval = val ;
+  
+  RECT r;
+  GetClientRect (MyHandle,&r);
+  r.left += xs + 1;
+  r.right -= xs + 1;
+  r.top += yso + 1;
+  r.bottom -= ysu + 1;
+  InvalidateRect (MyHandle,&r,FALSE);
+  UpdateWindow (MyHandle);
+  }
+
+DLLExport void _export WINAPI WaitWin::ResetVal ()
+  {
+  percval = 0.0 ;
+  
+  RECT r;
+  GetClientRect (MyHandle,&r);
+  r.left += xs + 1;
+  r.right -= xs + 1;
+  r.top += yso + 1;
+  r.bottom -= ysu + 1;
+  InvalidateRect (MyHandle,&r,TRUE);
+  UpdateWindow (MyHandle);
+  }
+
+
+DLLExport _export WINAPI WaitWin::~WaitWin ()
+  {
+  if (ExtraText != NULL)
+    FreeGlobMem (ExtraText);
+
+  if (doShowAbort)
+    EnableWindow (Parent,TRUE);
+
+  DestroyWindow (MyHandle);
+  }
+
+DLLExport void _export WINAPI WaitWin::SetCaption (char FAR *txt)
+  {
+  SetWindowText (MyHandle,txt);
+  }
+
+DLLExport void _export WINAPI WaitWin::SetStep (double s) 
+  { 
+  percstep = s ; 
+  }
+
+DLLExport BOOL _export WINAPI WaitWin::IsAborted ()
+  {
+  return _IsAborted ;
+  }
+
+

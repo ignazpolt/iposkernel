@@ -1,0 +1,9 @@
+#define PROGRAM_VERSION 200
+#define SUB_VERSION 198
+#ifdef WIN32
+#define FILE_VERSION "4.00,200.198\0"
+#define PRODUCT_VERSION "200.198\0"
+#else
+#define FILE_VERSION "3.10,200.198\0"
+#define PRODUCT_VERSION "200.198\0"
+#endif

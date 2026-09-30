@@ -1,0 +1,9 @@
+COPY ..\..\%ACTVERS%.SRC\TOOLBAR\toolbar.LNK
+COPY ..\..\%ACTVERS%.SRC\TOOLBAR\toolbar.DEF
+
+link /nod /noe /co /li /map @toolbar.lnk
+rc -r -v -z -fotoolbar.res ..\..\%ACTVERS%.SRC\TOOLBAR\toolbar.rc
+rc -T -K msdntb.res toolbar.dll
+copy toolbar.dll ..\restool
+implib toolbar.lib toolbar.dll
+copy toolbar.lib ..\restool

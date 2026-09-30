@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\CTOOL\CTL.DEF
+COPY ..\..\%ACTVERS%.SRC\CTOOL\CTL1.DEF
+COPY ..\..\%ACTVERS%.SRC\CTOOL\ctool.LNK
+COPY ..\..\%ACTVERS%.SRC\CTOOL\ctool1.LNK
+
+link /nod /noe /co /li /map @ctool.lnk
+rc -r -v -z -fotoolbar.res ..\..\%ACTVERS%.SRC\CTOOL\toolbar.rc
+rc -T -K toolbar.res ctool.dll
+copy ctool.dll ..\*.*
+implib ctool.lib ctool.dll
+copy ctool.lib ..\*.*
+
+link /nod /noe /co /li /map @ctool1.lnk
+rc -T -K toolbar.res ctool1.dll
+copy ctool1.dll ..\restool
+implib ctool1.lib ctool1.dll
+copy ctool1.lib ..\restool

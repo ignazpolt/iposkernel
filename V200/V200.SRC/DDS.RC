@@ -1,0 +1,1159 @@
+/*
+ * dds.rc
+ *
+ * $Header:   P:/marille/clinicum/rev/dds.rcv   1.32   29 Jan 1999 22:51:36   Martin  $
+ * $Log:   P:/marille/clinicum/rev/dds.rcv  $
+ * 
+ *    Rev 1.32   29 Jan 1999 22:51:36   Martin
+ * MDICHILD.ICO wieder aufgenommen (fuer Andi)
+ * 
+ *    Rev 1.31   06 Nov 1998 19:24:20   Martin
+ * AboutBox raus
+ * 
+ *    Rev 1.30   14 Sep 1998 16:56:02   Martin
+ * SoftWork raus
+ * 
+ *    Rev 1.29   12 Aug 1998 15:17:34   Gerhold
+ * FrameIcon in BaseIcon umgetauft => DefaultIcon, da alphabetisch sortiert
+ * 
+ *    Rev 1.28   22 May 1998 10:31:26   Gerhold
+ * Product-Version in der Versionsinfo
+ * 
+ *    Rev 1.27   19 Jun 1997 16:01:10   Gerhold
+ * Versionsstrings eingebaut
+ * 
+ *    Rev 1.26   10 Apr 1997 16:01:24   Gerhold
+ * Hauptmenu geaendert
+ * 
+ *    Rev 1.25   19 Feb 1997 12:23:54   Hannes
+ * 
+ *    Rev 1.23   17 Dec 1996 11:02:58   GERHOLD
+ * Ein POSTITBACK war zuviel
+ * 
+ *    Rev 1.22   05 Dec 1996 19:08:50   HANNES
+ * 
+ *    Rev 1.21   18 Feb 1996 14:43:16   GERHOLD
+ * 
+ *    Rev 1.20   16 Feb 1996 15:09:10   GERHOLD
+ * Semikolons gelten nicht als Kommentar? Dann halt alle auskommentieren
+ * 
+ *    Rev 1.19   05 Jan 1996 16:43:02   GERHOLD
+ * 
+ *    Rev 1.18   04 Oct 1995 16:02:42   MARTIN
+ * Clinicum raus
+ * 
+ *    Rev 1.17   16 Sep 1995 21:01:26   MARTIN
+ * Diag->Clinicum
+ * 
+ *    Rev 1.16   14 Sep 1995 15:34:46   GERHOLD
+ * Buttons Bitmap
+ * 
+ *    Rev 1.15   13 Sep 1995 19:40:30   GERHOLD
+ * 
+ *    Rev 1.14   08 Sep 1995 10:12:28   HANNES
+ * 
+ *    Rev 1.13   07 Jul 1995 17:20:52   GERHOLD
+ * Post-It Bitmap
+ * 
+ *    Rev 1.12   20 Mar 1995 12:07:24   HANNES
+ * Konstantenhanling, RunNmbr
+ * 
+ *    Rev 1.11   03 Mar 1995 14:25:48   GERHOLD
+ * 
+ *    Rev 1.10   02 Mar 1995 15:22:54   GERHOLD
+ * im Menu "uebereinander anzeigen"
+ * 
+ *    Rev 1.9   24 Feb 1995 11:17:58   HANNES
+ *  
+ * 
+ *    Rev 1.8   08 Dec 1994 22:06:38   HANNES
+ * 
+ *    Rev 1.7   19 Nov 1994 17:29:58   GERHOLD
+ * Accelerator ^C, ^V, ^X
+ * 
+ *    Rev 1.6   07 Nov 1994 11:31:50   GERHOLD
+ * 
+ *    Rev 1.5   27 Oct 1994 16:00:20   GERHOLD
+ * Info von CTRL-I auf CTRL-O
+ * 
+ *    Rev 1.4   25 Oct 1994 12:42:56   GERHOLD
+ * Accelerator
+ * 
+ *    Rev 1.3   20 Oct 1994 17:44:56   GERHOLD
+ * Clipboard-Accelerator
+ * 
+ *    Rev 1.2   11 Oct 1994 09:45:08   HANNES
+ * 
+ *    Rev 1.1   22 Sep 1994 16:07:30   GERHOLD
+ * 
+ *    Rev 1.0   24 Jun 1994 17:04:54   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.55   26 May 1994 13:25:50   MARTIN
+ * Exportmenue unabhaengig von DEBUG
+ * 
+ *    Rev 1.54   21 Apr 1994 18:12:34   ANDI
+ * 
+ *    Rev 1.53   21 Apr 1994 17:15:32   ANDI
+ * No change.
+ * 
+ *    Rev 1.52   20 Apr 1994 12:32:32   MARTIN
+ * dentomed.ico -> diagnost.ico
+ * 
+ *    Rev 1.51   19 Apr 1994 20:00:46   MARTIN
+ * DMWS -> Diagnosticum
+ * 
+ *    Rev 1.50   18 Apr 1994 09:20:28   ANDI
+ * 
+ *    Rev 1.49   18 Apr 1994 09:01:10   ANDI
+ * mit neuem Logo
+ * 
+ *    Rev 1.48   04 Feb 1994 17:06:16   MARTIN
+ * TWAIN ausgelagert in tiffimg.rc
+ * 
+ *    Rev 1.47   17 Jan 1994 09:16:34   HANNES
+ * Recall aus dem Menue
+ * 
+ *    Rev 1.46   13 Jan 1994 17:11:24   HANNES
+ * 
+ *    Rev 1.45   09 Dec 1993 15:03:32   HANNES
+ * 
+ *    Rev 1.44   21 Oct 1993 09:22:40   HANNES
+ * 
+ *    Rev 1.43   22 Sep 1993 12:11:38   HANNES
+ * Version nach St. Poelten
+ * 
+ *    Rev 1.42   05 Jul 1993 14:53:30   HANNES
+ * Patientenfilter
+ * 
+ *    Rev 1.41   23 Jun 1993 12:08:36   HANNES
+ * ???
+ * 
+ *    Rev 1.40   20 Jun 1993 15:57:36   HANNES
+ * Dialogbox beim Beenden von Windows
+ * 
+ *    Rev 1.39   20 Jun 1993 11:37:12   HANNES
+ * No change.
+ * 
+ *    Rev 1.38   15 Jun 1993 11:05:10   HANNES
+ * Rechtschreibfehler
+ * 
+ *    Rev 1.37   11 Jun 1993 11:18:26   HANNES
+ * Verschiedenes
+ * 
+ *    Rev 1.36   07 Jun 1993 14:15:12   HANNES
+ * Fehlermeldung bei doppelter Neuaufnahme
+ * 
+ *    Rev 1.35   07 Jun 1993 11:30:52   HANNES
+ * ??
+ * 
+ *    Rev 1.34   03 Jun 1993 19:32:52   HANNES
+ * Eintrag fuer Datensatzbezeichnung Wechselgebi�
+ * 
+ *    Rev 1.33   02 Jun 1993 22:03:38   ANDI
+ * Schiebelehrenmenues...
+ * 
+ *    Rev 1.32   10 May 1993 12:52:18   HANNES
+ * ..
+ * 
+ *    Rev 1.31   04 May 1993 08:52:42   ANDI
+ * no specific changes made (hannes)
+ * 
+ *    Rev 1.30   18 Apr 1993 22:58:40   HANNES
+ * ??
+ * 
+ *    Rev 1.29   14 Apr 1993 12:31:40   MARTIN
+ * Meldungen fuer Chirurgie
+ * 
+ *    Rev 1.28   05 Apr 1993 15:58:58   GERHOLD
+ * No change.
+ * 
+ *    Rev 1.27   05 Apr 1993 15:53:54   GERHOLD
+ * 
+ *    Rev 1.26   05 Apr 1993 15:43:56   GERHOLD
+ * Men�punkt Makrodefinition (+Accelerator) entfernt
+ * "..." an weiterf�hrende Men�punkte angef�gt.
+ * 
+ *    Rev 1.25   02 Apr 1993 17:59:26   HANNES
+ * Wieder einmal
+ * 
+ *    Rev 1.24   17 Mar 1993 18:20:24   HANNES
+ * Wieder einmal ein put
+ * 
+ *    Rev 1.23   08 Mar 1993 14:21:08   HANNES
+ * Wieder einmal eine Zwischenversion
+ * 
+ *    Rev 1.22   05 Feb 1993 19:42:56   HANNES
+ * ??
+ * 
+ *    Rev 1.21   01 Feb 1993 12:12:54   HANNES
+ * Einbau der Klasse VTO
+ * 
+ *    Rev 1.20   24 Jan 1993 13:08:38   HANNES
+ * Datensatzliste
+ * 
+ *    Rev 1.19   06 Jan 1993 17:02:44   HANNES
+ * Hotkeys bei manchen Knoepfchen's
+ * 
+ *    Rev 1.18   17 Dec 1992 17:30:52   NORBERT
+ * "Scan" icon definition neu dazu gekommen
+ * 
+ *    Rev 1.17   17 Dec 1992 15:59:08   HANNES
+ * Verbesserte Beschreibung, neuen Buttion in ImgWin
+ * 
+ *    Rev 1.16   14 Dec 1992 18:41:18   HANNES
+ * Neues Knopfchen (ShowName) in der Image - Eingabe
+ * 
+ *    Rev 1.15   14 Dec 1992 12:36:18   HANNES
+ * Neuen String: Leere CmtBrowse - Liste
+ * 
+ *    Rev 1.14   12 Dec 1992 13:47:58   HANNES
+ * Elemination der Overlap - Buttons und der Schiebebalken in der Image
+ * Fenstern
+ * 
+ *    Rev 1.13   12 Dec 1992 00:16:34   NORBERT
+ * changed the icon from "dds" to "dentomed"
+ * 
+ *    Rev 1.12   11 Dec 1992 21:34:52   NORBERT
+ * No change.
+ * 
+ *    Rev 1.11   11 Dec 1992 17:47:28   NORBERT
+ * Accellerators fertig implementiert
+ * 
+ *    Rev 1.10   11 Dec 1992 16:40:34   HANNES
+ * Keystroke - Tests
+ * 
+ *    Rev 1.9   11 Dec 1992 16:16:32   HANNES
+ * Neuen Menueitem (Bilder Cache), Accelerator's wieder aktiviert
+ * 
+ *    Rev 1.8   10 Dec 1992 23:51:18   NORBERT
+ * Inaktive Menus geloescht bzw. umgelegt. Accellerators nicht ganz
+ * implementiert.
+ * 
+ *    Rev 1.7   10 Dec 1992 11:48:32   HANNES
+ * Messagestrings fuer MAXOPENDOCUMENTS dazugehaengt
+ * 
+ *    Rev 1.6   09 Dec 1992 22:01:32   NORBERT
+ * Typfehler in Help-Menu ausgebessert
+ * 
+ *    Rev 1.5   09 Dec 1992 19:24:46   NORBERT
+ * Vergroesserungen der Felder von CEDIT, PEDIT, NEDIT
+ * 
+ *    Rev 1.4   07 Dec 1992 18:39:12   HANNES
+ * Text der Checkbox in der Dokumentliste geaendert (neuen Datensatz anlegen)
+ * 
+ *    Rev 1.3   06 Dec 1992 19:14:24   NORBERT
+ * Statusstring erweiterung
+ * 
+ *    Rev 1.2   03 Dec 1992 13:33:10   HANNES
+ * Bildpfade fertig korrigiert
+ * 
+ *    Rev 1.1   03 Dec 1992 13:27:52   HANNES
+ * Pfadnamen fuer Bilder
+ * 
+ *    Rev 1.0   02 Dec 1992 16:16:54   HANNES
+ * Initial revision.
+ *
+ */
+
+#define USETOOLS
+
+#include "windows.h"
+#include <winver.h>
+#include "dds.h"
+#include "about.h"
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+/*  #include "dds.dlg" */
+/*  #include "search.dlg" */
+
+BaseIcon  ICON    C:\ipos_kernel\PICTURES\CLINFIEB.ICO
+Frame1Icon ICON    C:\ipos_kernel\PICTURES\CLINHOSP.ICO
+Frame2Icon ICON    C:\ipos_kernel\PICTURES\CLINPEOP.ICO
+/*;Frame3Icon ICON    C:\ipos_kernel\PICTURES\dentomed.ico*/
+Frame3Icon ICON    C:\ipos_kernel\PICTURES\MDICHILD.ICO
+ChildIcon  ICON    C:\ipos_kernel\PICTURES\DOCUMENT.ICO
+DocIcon    ICON    C:\ipos_kernel\PICTURES\DOCUMENT.ICO
+Scan       ICON    C:\ipos_kernel\PICTURES\scan.ico
+Other      ICON    C:\ipos_kernel\PICTURES\zahn.ico
+FOCUSBITS  BITMAP  C:\ipos_kernel\PICTURES\focpat.bmp
+AdownOn    BITMAP  C:\ipos_kernel\PICTURES\adownon.bmp
+AdownOff   BITMAP  C:\ipos_kernel\PICTURES\adownoff.bmp
+Gauss    BITMAP  C:\ipos_kernel\PICTURES\gauss.bmp
+Store    BITMAP  C:\ipos_kernel\PICTURES\store.bmp
+Hilfe      BITMAP  C:\ipos_kernel\PICTURES\hilfe.bmp
+Txtsc      BITMAP  C:\ipos_kernel\PICTURES\txtsc.bmp
+Filter1    BITMAP  C:\ipos_kernel\PICTURES\filter1.bmp
+Filter2    BITMAP  C:\ipos_kernel\PICTURES\filter2.bmp
+Filter3    BITMAP  C:\ipos_kernel\PICTURES\filter3.bmp
+Filter4    BITMAP  C:\ipos_kernel\PICTURES\filter4.bmp
+Ruler      BITMAP  C:\ipos_kernel\PICTURES\ruler.bmp
+llist      BITMAP  C:\ipos_kernel\PICTURES\llist.bmp
+llistof    BITMAP  C:\ipos_kernel\PICTURES\llistof.bmp
+patbm      BITMAP  C:\ipos_kernel\PICTURES\pat.bmp
+patbmo     BITMAP  C:\ipos_kernel\PICTURES\patoff.bmp
+Histo      BITMAP  C:\ipos_kernel\PICTURES\histo.bmp
+Kontrast   BITMAP  C:\ipos_kernel\PICTURES\kontrast.bmp
+Crisp      BITMAP  C:\ipos_kernel\PICTURES\crisp.bmp
+Median     BITMAP  C:\ipos_kernel\PICTURES\median.bmp
+Sobel      BITMAP  C:\ipos_kernel\PICTURES\sobel.bmp
+Zoom       BITMAP  C:\ipos_kernel\PICTURES\zoom.bmp
+Nextfield  BITMAP  C:\ipos_kernel\PICTURES\nextf.bmp
+Prevfield  BITMAP  C:\ipos_kernel\PICTURES\prevf.bmp
+Boldb      BITMAP  C:\ipos_kernel\PICTURES\bold.bmp
+Italicb    BITMAP  C:\ipos_kernel\PICTURES\italic.bmp
+Underline  BITMAP  C:\ipos_kernel\PICTURES\underl.bmp
+Strikeout  BITMAP  C:\ipos_kernel\PICTURES\strikeo.bmp
+Fblock     BITMAP  C:\ipos_kernel\PICTURES\fblock.bmp
+Fcenter    BITMAP  C:\ipos_kernel\PICTURES\fcenter.bmp
+Fright     BITMAP  C:\ipos_kernel\PICTURES\fright.bmp
+Fleft      BITMAP  C:\ipos_kernel\PICTURES\fleft.bmp
+Bsize      BITMAP  C:\ipos_kernel\PICTURES\bsize.bmp
+Nsize      BITMAP  C:\ipos_kernel\PICTURES\nscale.bmp
+ShowPt     BITMAP  C:\ipos_kernel\PICTURES\showpt.bmp
+Print      BITMAP  C:\ipos_kernel\PICTURES\doprint.bmp
+NextPage   BITMAP  C:\ipos_kernel\PICTURES\nside.bmp
+PrevPage   BITMAP  C:\ipos_kernel\PICTURES\pside.bmp
+imgent     BITMAP  C:\ipos_kernel\PICTURES\imgent.bmp
+nname      BITMAP  C:\ipos_kernel\PICTURES\nname.bmp
+ech        CURSOR  C:\ipos_kernel\PICTURES\ech.cur
+ech1       CURSOR  C:\ipos_kernel\PICTURES\ech1.cur
+ech2       CURSOR  C:\ipos_kernel\PICTURES\ech2.cur
+Lupe       CURSOR  C:\ipos_kernel\PICTURES\lupe.cur
+dodrop     CURSOR  C:\ipos_kernel\PICTURES\drdrop.cur
+nodrop     CURSOR  C:\ipos_kernel\PICTURES\nodrop.cur
+NEWDOC     BITMAP  C:\ipos_kernel\PICTURES\newdoc.bmp
+CORRDOC    BITMAP  C:\ipos_kernel\PICTURES\corrdoc.bmp
+Cut        BITMAP  C:\ipos_kernel\PICTURES\cut.bmp
+Ltrans     BITMAP  C:\ipos_kernel\PICTURES\ltrans.bmp
+Stvto      BITMAP  C:\ipos_kernel\PICTURES\stvto.bmp
+GetBem     BITMAP  C:\ipos_kernel\PICTURES\getbem.bmp
+Softed     BITMAP  C:\ipos_kernel\PICTURES\softed.bmp
+NextSide   BITMAP  C:\ipos_kernel\PICTURES\nexts.bmp
+PrevSide   BITMAP  C:\ipos_kernel\PICTURES\prevs.bmp
+Fix        BITMAP  C:\ipos_kernel\PICTURES\fix.bmp
+
+BUTTONS    BITMAP  C:\ipos_kernel\PICTURES\buttons.bmp
+
+POSTITBACK BITMAP  C:\ipos_kernel\PICTURES\postitbk.bmp
+POSTLOCH   BITMAP  C:\ipos_kernel\PICTURES\postloch.bmp
+
+/* Bitmaps fuer About */
+swlogo     BITMAP  C:\ipos_kernel\PICTURES\newlogo.bmp
+dento      BITMAP  C:\ipos_kernel\PICTURES\dento.bmp
+
+
+Menu  MENU
+   Begin
+       POPUP "&Datei"
+       Begin
+         MENUITEM "&Beenden",                MI_QUIT
+         MENUITEM SEPARATOR
+         MENUITEM "&Export"                  241
+       End
+
+       POPUP "&Bearbeiten"
+       Begin
+         MENUITEM "&Ausschneiden"             MI_Cut
+         MENUITEM "&Kopieren"                 MI_Copy
+         MENUITEM "&Einf�gen"                 MI_Insert
+       End
+
+       POPUP "&Fenster"
+       Begin
+         MENUITEM "&�berlappend\t^U",      MI_CASCADE
+         MENUITEM "&�bereinander\t^N",    MI_TILE
+       End
+       POPUP "&Extra"
+        Begin
+          MENUITEM SEPARATOR
+        End
+
+#ifndef USETOOLS
+#ifdef DEBUG
+       POPUP "&System"                          
+       Begin
+         MENUITEM "&Benutzer..."                         MI_USERLIST
+       End
+#endif
+#endif
+
+       POPUP "&?"
+       Begin
+         MENUITEM "&Hilfe-Index\tF1",                    MI_H_Help_DDS
+         MENUITEM SEPARATOR
+/*
+;#ifdef DEBUG
+;         MENUITEM SEPARATOR
+;         MENUITEM "Callback Reference List..."           MI_CALLREFLIST
+;         MENUITEM "Bilder - Cache..."                    MI_SHOWIMGSTAT
+;         MENUITEM "Speichersegmente..."                  MI_SHOWSEGS
+;         MENUITEM "AnzFunc..."                           MI_SHOWSEGS-1
+;#endif
+*/
+       End
+   End
+
+SlMenu  MENU
+   Begin
+       POPUP "&Datei"
+       Begin
+         MENUITEM "&Beenden",                MI_QUIT
+       End
+
+       POPUP "&Fenster"
+       Begin
+         MENUITEM "&�berlappend  anzeigen\t^U",    MI_CASCADE
+         MENUITEM "&�bereinander anzeigen\t^N",    MI_TILE
+       End
+
+       POPUP "&?"
+       Begin
+         MENUITEM "Inf&o...   ^O",  MI_ABOUT
+       End
+   End
+
+Layout MENU
+   Begin
+       MENUITEM "&N�chste Seite"                       MI_LAYOUT_NEXT
+       MENUITEM "&Vorhergehende Seite"                  MI_LAYOUT_PREV
+   End
+
+EdWinMenu MENU
+   Begin
+       POPUP "&Datei"
+          Begin                                 
+                MENUITEM "Speichern"            100
+          End
+
+       POPUP "&Neu"                      
+          Begin
+                MENUITEM "Stringfeld"           120
+                MENUITEM "Linie"                121
+                MENUITEM "CheckBox"             122
+                MENUITEM "Liste"                123
+                MENUITEM "Dezimalfeld"          124
+                MENUITEM "Datumsfeld"           125
+                MENUITEM "Datensatzliste"       126
+                MENUITEM "WMF - Bild"           127
+                MENUITEM "Schiefes Stringfeld"  128
+                MENUITEM "Schiefes Dezimalfeld" 129
+          End
+
+       MENUITEM "&L�schen"                      140
+       MENUITEM "&Alles sel."                   150
+
+       POPUP "&Anzeige"
+          Begin
+                MENUITEM "50  %"                160
+                MENUITEM "75  %"                161
+                MENUITEM "100 %"                162
+                MENUITEM "150 %"                163
+                MENUITEM "200 %"                164
+          End
+
+   End
+
+Acc ACCELERATORS
+   Begin
+/*
+      "^O",       MI_M_ausfuehren
+*/
+      "^T",           MI_Digitizer
+      "^S",           MI_Scanner
+      "^D",           MI_Config
+      "^F",           MI_Formats
+      "^J",           MI_PrintJob
+      "^G",           MI_Anzeige
+      "^U",           MI_CASCADE
+      "^N",           MI_TILE
+      "^O",           10020
+      VK_F1,          MI_H_Help_DDS        , VIRTKEY
+      "^C",           MI_Copy
+      VK_INSERT,      MI_Copy              , CONTROL , VIRTKEY
+      "^V",           MI_Insert
+      VK_INSERT,      MI_Insert            , SHIFT   , VIRTKEY
+      "^X",           MI_Cut
+      VK_DELETE,      MI_Cut               , SHIFT   , VIRTKEY
+   End
+
+   STRINGTABLE
+   Begin
+
+     FRAMENAMEID, "Initialisierung ..."
+
+
+/*     ; Meldungen*/
+     OVERLAPSTR,        "�berlagerung aktiv"
+
+     8000, "Datenspeicherung"
+     8001, "Sollen die modifizierten Daten gespeichert werden"
+     8002, "Datenbankfehler"
+     8003, "Fehler beim �ffnen des Btrieve - Files"
+     8004, "Datenbankfehler"
+     8005, "Fehler beim Lesen des Btrieve - Files"
+     8006, "Datenbankfehler"
+     8007, "Fehler beim Schreiben des Btrieve - Files"
+     8008, "Execute-Fehler"
+     8009, "Fehler beim Aufruf des Notizblockes"
+     8010, "Fehler beim �ffnen des Dokumentes"
+     8011, "Schlie�en Sie ein Fenster, bevor Sie noch ein weiteres �ffnen"
+     8012, "Neuanlegen eines Datensatzes"
+     8013, "Neuer Datensatz wird angelegt"
+     8014, "Druckjobdefinition"
+     8015, "W�hrend der Druckvorschau darf keine Definition erfolgen.\rSchlie�en Sie die Vorschau"
+     8016, "Druckvorschau"
+     8017, "Es ist bereits eine Druckvorschau offen.\rSchlie�en Sie bitte die Vorschau"
+     8018, "Datensatzkopie"
+     8019, "Sind Sie sicher, da� Sie den Datensatz kopieren wollen ?"
+     8020, "Datensatz schreibsch�tzen"
+     8021, "Sind Sie sicher, da� Sie den Datensatz fixieren wollen ?"
+     8022, "Windows beenden"
+     8023, "Bitte beenden Sie alle GWI - Anwendungen,\rbevor Sie Windows verlassen !"
+     8024, "%d Recall offen"
+     8025, "%d Recalls offen"
+     8026, "Keinen Patienten gefunden"
+     8027, "SVNR\tName\tAddresse\tOrt"
+     8028, "\tName\tAddresse\tOrt"
+     8029, "Seite %d"
+     8030, "Dokumenter�ffnung"
+     8031, "Punkt/Kontur Eingabesequenzen"
+     8032, "Recall Brief / Benachrichtigung"
+
+     8060, "Systemfehler"
+     8061, "Queue kann nicht bedient werden"
+     8062, "!!! Noch keine Daten vorhanden !!!"
+     8063, "<leer>"
+
+     8070, "2 Lateral"
+     8071, "3 Frontal"
+     8072, "5 Bogen"
+     8073, "6 Axiographie"
+     8074, "7 typ0"
+     8075, "8 typ1"
+     8076, "9 typ2"
+     8077, "10 Modellvermessung (bl. Gebi�)"
+     8078, "11 typ4"
+     8079, "12 Modellvermessung (Wechselgebi�)"
+     8080, "13 typ6"
+     8081, "14 typ7"
+     8082, "15 typ8"
+     8083, "16 Anamnese - Formular"
+     8084, "END"
+
+     7200,     "COM1:"
+     7201,     "COM2:"
+     7202,     "COM3:"
+     7203,     "COM4:"
+
+     7210,     "1200"
+     7211,     "2400"
+     7212,     "4800"
+     7213,     "9600"
+
+     7220,     "12,"
+     7221,     "24,"
+     7222,     "48,"
+     7223,     "96,"
+
+     7230,     "Kein Parit�tspr�fung"
+     7231,     "Gerade Parit�t"
+     7232,     "Ungerade Parit�t"
+
+     7240,     "n,"
+     7241,     "o,"
+     7242,     "e,"
+
+     7250,     "8 Bit"
+     7251,     "7 Bit"
+
+     7260,     "8,"
+     7261,     "7,"
+
+     7270,     "1 Stop Bit"
+     7271,     "2 Stop Bit"
+     
+     7280,     "1"
+     7281,     "2"
+
+     8900,     "Montag"
+     8901,     "Dienstag"
+     8902,     "Mittwoch"
+     8903,     "Donnerstag"
+     8904,     "Freitag"
+     8905,     "Samstag"
+     8906,     "Sonntag"
+     9000,     "Punkthilfe"
+     9001,     "Werthilfe"
+     9002,     "Januar"
+     9003,     "Februar"
+     9004,     "M�rz"
+     9005,     "April"
+     9006,     "Mai"
+     9007,     "Juni"
+     9008,     "Juli"
+     9009,     "August"
+     9010,     "September"
+     9011,     "Oktober"
+     9012,     "November"
+     9013,     "Dezember"
+     9014,     "JAN"
+     9015,     "FEB"
+     9016,     "MAR"
+     9017,     "APR"
+     9018,     "MAY"
+     9019,     "JUN"
+     9020,     "JUL"
+     9021,     "AUG"
+     9022,     "SEP"
+     9023,     "OKT"
+     9024,     "NOV"
+     9025,     "DEZ"
+     9026,     "Wert"
+     9027,     "Norm"
+     9028,     "Abw."
+     9029,     "Grauwertbelegung"
+     9030,     "Teilbild"
+     9031,     "Histogrammuntersuchung"
+     9032,     "Kontrastanpassung"
+     9033,     "Crisp-Filter"
+     9034,     "Median-Filter"
+     9035,     "Sobel-Filter"
+     9036,     "Kompilieren"
+     9037,     "DefProgDir"
+     9038,     "\\clinicum\\prog"
+     9039,     "Dokumente"
+     9040,     "Neuen Datensatz anlegen"
+     9041,     "ABCDE abcde"
+     9042,     "MO"
+     9043,     "DI"
+     9044,     "MI"
+     9045,     "DO"
+     9046,     "FR"
+     9047,     "SA"
+     9048,     "SO"
+     9049,     "Format"
+     9050,     "Standard - �berschrift (Level 1)"
+     9051,     "Standard - �berschrift (Level 2)"
+     9052,     "Standard - Text"
+     9053,     "Standard - Text (Hervorhebung)"
+     9054,     "?"
+     9055,     "Vertikale Schrift (Gr. Analyse)"
+     9056,     "Lineal (horizontale Schr.)"
+     9057,     "Lineal (vert. Schrift)"
+     9058,     "?"
+     9059,     "?"
+     9060,     "/ Kopie"
+
+     9061,     "mm"
+     9062,     "�"
+     9063,     "%"
+
+     9070,     "Dateiname des neuen DMW - Programmes"
+     9071,     "Kein gueltiges DMW - Programm"
+     9072,     "Dateiname des zu importierende Bildes"
+
+     9080,     "lokale Kontrastanpassung"
+
+     9980,    "VollerName"
+     9981,    "VorName"
+     9982,    "NachName"
+     9983,    "GebDat"
+     9984,    "XrayDat"
+     9985,    "XrayFact"
+     9986,    "Comment"
+     9987,    "Today"
+     9988,    "Age"
+     9989,    "License"
+     9990,    "DocumentName"
+     9991,    "Side"
+     9992,    "CountSides"
+     9993,    "END"
+
+     10010,    "Image - Eingabe"
+     10011,    "Ist das gescannte Bild in Ordnung ?"
+     10012,    "Scanner Start"
+     10013,    "Legen Sie das zu scannende Bild ein und dr�cken Sie OK, wenn alles bereit"
+
+     10030,    "Format %d: "
+     10031,    "Schrift "
+     10032,    " %d Pkt. + "
+     10033,    "Linksb�ndig"
+     10034,    "Zentriert"
+     10035,    "Rechtsb�ndig"
+     10036,    "Blocksatz"
+     10037,    " + Linker Einzug %.1f mm"
+     10038,    " + Rechter Einzug %.1f mm"
+     10039,    " + Zeilenabstand %.1f mm"
+     10040,    "fett + "
+     10041,    "kursiv + "
+     10042,    "unterstrichen + "
+     10043,    "durchgestrichen + "
+
+     10050,    "Neues Format"
+     10051,    "Kopie von "
+
+     10052,    "Eingabeausschlu�"
+     10053,    "Ein Dokument dieser Kategorie darf nicht mehr ge�ffnet werden"
+     10054,    "Eingabeausschlu�"
+     10055,    "Ein Dokument dieser Kategorie darf f�r diesen Patienten nicht mehr ge�ffnet werden"
+     10056,    "Dokument - Er�ffnung"
+     10057,    "Das Dokument kann auf Grund fehlender Daten nicht angelegt werden"
+     10058,    "Keine Eingaben / Auswertungen von diesem Patient vorhanden"
+     10059,    "Alle Dateien\0*.*\0"
+
+     10060,    "%s\r%s\rgeb.: %s\rerf.: %s"
+     10061,    "\t%s\t%s\t%s\t%s"
+     10062,    "30,320,420,500,580"
+     10063,    "Patientenneuanlage"
+     10064,    "Sie m�ssen zuerst den neuangelegten Patienten speichern"
+
+     10070,    "lfNr: %d, Definition in %s, int. Gr��e: %ld"
+     10071,    "Kopfzeile f�r Einzeldruck"
+     10072,    "Fu�zeile f�r Einzeldruck"
+
+/*;     11000,    "TWAIN.DLL"*/
+     11001,    "AnzFileCached"
+     11002,    "7"
+     11003,    "CPath"
+     11004,    "\\clinicum\\"
+     11005,    "PDrive"
+     11006,    "C:\\"
+     11007,    "SDrive"
+     11008,    "A:\\"
+     11009,    "FixName"
+     11010,    "image.dat"
+
+     12000,    "Druckvorschau %s"
+     12001,    "Druckjobs"
+     12002,    "GWI Formulareditor"
+     12003,    "Generieren (%s)"
+     12004,    "Definitionsfile f�r Gruppierung - Import"
+     12005,    "Definitionsfile f�r Gruppierung - Export"
+
+     13000,    "Login"
+     13001,    "Es existiert kein Stationseintrag\rEs mu� zumindest im Kliniksystem ein Stationseintrag existieren"
+     13002,    "Versicherungsnummer"
+     13003,    "Die Versicherungsnummer ist falsch."
+     13004,    "Datenspeicherung"
+     13005,    "Die Daten haben sich ge�ndert.\rSollen die ge�nderten Daten abgespeichert werden?"
+     13006,    "Datenfehler"
+     13007,    "Die Daten wurden nicht vollst�ndig eingegeben.\rWollen Sie den Datensatz noch fertig korrigieren?"
+     13008,    "Login"
+     13009,    "Falsches Passwort oder falscher Benutzernamen"
+     13010,    "Systeminformation"
+     13011,    "Das Programm l�uft bereits\rVerwenden Sie das bereits laufende Programm."
+     13012,    "Systemfehler"
+     13013,    "Zu der aktuellen Station ist kein Platz eingetragen.\rMelden Sie sich bei ihrem Systembetreuer zur Konfiguration"
+     13014,    "Datenspeicherung"
+     13015,    "Sie m�ssen einen Kommentar zum Datensatz eingeben,\rsonst k�nnen die Daten nicht gespeichert werden.\rWenn Sie abbrechen w�hlen, wird die aktuelle Eingabe nicht gespeichert!"
+     13016,    "Datenspeicherung"
+     13017,    "Sie m�ssen wenigstens den Nachnamen eingeben\r, ansonsten kann der Datensatz nicht gespeichert werden.\rWenn Sie abbrechen w�hlen, wird die aktuelle Eingabe nicht gespeichert!"
+     13018,    "Keine Daten selektiert"
+
+/*     ; Meldungen fuer Chirurgie*/
+     15000,    "Chirurgie - Meldung"
+     15001,    "Schnitt darf nicht �ber mehrere Teilst�cke gehen !"
+     15002,    "Geschlossene Kontur mu� ganz durchgeschnitten werden !"
+     15003,    "Maximal zwei Schnittpunkte mit Kontur erlaubt !"
+     15004,    "Bitte geben sie zuerst einen Schnitt ein !"
+     15005,    "Schnitt mu� in Richtung Knochen gehen !"
+     15006,    "Teilschnitte m�ssen durch Konturen verbunden sein !"
+
+/*     ; Grundsaetzliche Erklaerungen, die bei Mousebewegungen durch */
+/*     ; die Dokument erscheinen*/
+     20000,    "???"
+     20001,    "Durchzeichnung"
+     20002,    "Numerische Analyse: L - Selektion eines Wertes zur weiteren Bearbeitung"
+     20003,    "Text - Fenster: L - Setzen der Caretposition"
+     20004,    "Graphische Analyse"
+     20005,    "Digitizer Eingabe"
+     20006,    "Graphischer Status"
+     20007,    "Eingabe am Image: L - Eingabe, R - Einstellung Zoom, Shift - Ausw. zur Korrektur, Crtl - Punkt in Kontur einf�gen"
+     20008,    "Formular"
+     20009,    "Diagramm"
+     20010,    ""
+
+/*     ; Allgemeine Erklaerungen*/
+     20800,    ""       /*; Loeschen der Statuszeile*/
+     20801,    "Anzeigen einer Dokumentengruppierung bzw. Verstecken der Dokumentenliste"
+     20802,    "Dokumentenliste: Doppelklick f�r das �ffnen eines Dokumentes (mit dem aktuellen Patienten)"
+     20803,    "Patientenliste"
+     20804,    "Neuer Patient"
+     20805,    "Anzeigen der Druckjobliste (Druckvorschau  bzw. Drucken eines Jobs)"
+     20806,    "Globale Patientenverkettung ein/aus (Wechseln des Patienten in einem Dokument bewirkt globalen Wechsel des Patienten)"
+     20807,    "Anzeigen der Liste aller Datens�tze zum aktuellen Patienten (mit Entstehungsgeschichte)"
+     20808,    "Beim �ffnen des n�chsten Dokumentes: Eingabe -> neuer Datensatz, Analyse -> zuletzt eingegebener Datensatz"
+     20809,    "Beim �ffnen des n�chsten Dokumentes: Auswahl des Datensatzes, mit dem das Dokument aufgebaut wird"
+     20810,    "Anzeigen / Bearbeiten der Behandlungsdokumentation"
+     20811,    "Anzeigen der Gruppe ""%s"""
+     20812,    ""
+
+/*     ; Grundsaetzliche Erklaerungen der Kontrollelemente*/
+     20900,    "CECOMBO  "
+     20901,    "CETBUTTON"
+     20902,    "CEGBUTTON"
+     20903,    "CEEDIT   "
+     20904,    "CEBAR    "
+     20905,    "CEWRITE  "
+     20906,    "CESBAR   "
+
+/*     ; Die besseren Erklaerungen*/
+     21100,    "Patientenauswahl (Dr�cken Sie den Knopf f�r die Liste)"
+     21101,    "Einstellung des Darstellungs - Vergr�sserungsfaktors"
+     21102,    "Auswahl eines Datensatzes f�r den aktuellen Patienten (Dr�cken Sie den Knopf f�r die Liste)"
+     21103,    "Einstellung des Anzeige / Eingabe - Datums (Drucken Sie den Knopf fuer den Kalender)"
+     21104,    "graphische Darstellung des aktuellen Wertes in bezug zu seiner Norm"
+     21105,    "Medizinische Erklaerung / Hilfestellung"
+     21106,    "Eingabe des R�ntgen Vergroesserungsfaktors"
+     21107,    "Einstellung eines neuen Formates fuer den aktuellen Block"
+     21108,    "Kontureingabe - Neubeginn"
+     21109,    "Einfuegen eines Punktes in der aktuellen Kontur"
+     21110,    "Anzeige des Graustufen - Histogrammes"
+     21111,    "Kontrastanpassung durch Historgrammeinebnung"
+     21112,    "Anpassung der Fenstergr�sse an die Dokumentgr�sse"
+     21113,    "Anpassung des Darstellungs - Vergroesserungsfaktors an die Fenstergroesse"
+     21114,    "Einstellung der dargestellten Schriftgr�sse"
+     21115,    "Aktuellen Absatz auf Blocksatz formatieren"
+     21116,    "Aktuellen Absatz auf Zentrieren"
+     21117,    "Aktuellen Absatz linksbuendig formatieren"
+     21118,    "Aktuellen Absatz rechtsbuendig formatieren"
+     21119,    "Selektierte Zeichen fett drucken"
+     21120,    "Selektierte Zeichen unterstrichen drucken"
+     21121,    "Selektierte Zeichen durchgestrichen drucken"
+     21122,    "Selektierte Zeichen kursiv drucken"
+     21123,    "Bildschaerfung durch gleichzeitige Hoch- und Tiefpassanwendung"
+     21124,    "Medianfilter (= Rauschunterdrueckung)"
+     21125,    "Sobelfilter (= Kantenhervorhebung, ev. nachfogende Kontrastanpassung noetig)"
+     21126,    "Eingabe des Erfassungsdatums (bsp: R�ntgendatum)"
+     21127,    "Ein / Ausschalten eines Lineales"
+     21128,    "Druck des Dokumentes"
+     21129,    "Neuzusammenstellung / Neuberechnung der Texte"
+     21130,    "Weiterspringen zum naechsten Punkt"
+     21131,    "Zureck zum vorherigen Punkt"
+     21132,    "Daten abspeichern"
+     21133,    "Anzeige des aktuellen Punkte (Druecken Sie den Knopf fuer die Liste)"
+     21134,    "Darstellung des unberabeiteten Bildes"
+     21135,    "Vergroesserte Darstellung eines Bildausschnittes"
+     21136,    "Schliessen des Bildschausschnittes"
+     21137,    "Einstellen des Vergroesserungsfaktors im Bildausschnitt"
+     21138,    "Schliessen des Eingabefensters (mit Abspeichern)"
+     21139,    "Schliessen des Eingabefensters (ohne Abspeichern)"
+     21140,    "Caret zum n�chsten Feld setzen"
+     21141,    "Caret zum vorherigen Feld setzen"
+     21142,    "Schliessen des Sub - Formulares"
+     21143,    "Schliessen des Hilfe - Fenster"
+     21144,    "Schliessen des Graphik - Fensters"
+     21145,    "Wahlweise Darstellung in Fenstergr�sse oder Orginalgr�sse"
+     21146,    "Anzeige der n�chsten Seite"
+     21147,    "Anzeige der vorhergehenden Seite"
+     21148,    "Auswahl des Patienten (Abhaengig vom aktiven Dokument)"
+     21149,    "Auswahl des Datensatzes (Abhaengig vom aktiven Dokument)"
+     21150,    "Deaktiveren / Aktivieren der Eingabe bzw. Ein-/Ausschalten der Graphik mit den eingegeben Punkten"
+     21151,    "Ein / Ausschalten des Punktnamens bei der Mouse"
+     21152,    "Dargestellte Daten schreibsch�tzen"
+
+/*     ; Zuordung Knopf - Idents - Erklaerungsstrings*/
+     22000 + IDC_TR_SCROLL      ,  "21101"
+     22000 + IDC_TR_PRINT       ,        "21128"
+     22000 + IDC_TR_RULER       ,  "21127"
+     22000 + IDC_TR_RESCALE     ,        "21113"
+     22000 + IDC_TR_XFACT       ,        "21106"
+     22000 + IDC_TR_XDATE       ,        "21126"
+     22000 + IDC_TR_FIX         ,        "21152"
+     22000 + IDC_TR_COMMENT     ,        "21102"
+     22000 + IDC_TR_PATIENT     ,        "21100"
+
+/*     ; Numerische Analyse*/
+     22000 + IDC_NM_PRINT       ,        "21128"
+     22000 + IDC_NM_HELP        ,  "21105"
+     22000 + IDC_NM_GAUSS       ,  "21104"
+     22000 + IDC_NM_BSIZE       ,        "21112"
+     22000 + IDC_NM_TXTSC       ,        "21114"
+     22000 + IDC_NM_XFACT       ,        "21106"
+     22000 + IDC_NM_XDATE       ,        "21126"
+     22000 + IDC_NM_FIX         ,        "21152"
+     22000 + IDC_NM_COMMENT     ,        "21102"
+     22000 + IDC_NM_PATIENT     ,        "21100"
+
+/*     ; Graphische Analyse*/
+     22000 + IDC_GR_HELP        ,  "21105"
+     22000 + IDC_GR_BSIZE       ,        "21112"
+     22000 + IDC_GR_TXTSC       ,        "21114"
+     22000 + IDC_GR_XFACT       ,        "21106"
+     22000 + IDC_GR_XDATE       ,        "21126"
+     22000 + IDC_GR_COMMENT     ,        "21102"
+     22000 + IDC_GR_PATIENT     ,        "21100"
+
+/*     ; Textausgabe*/
+     22000 + IDC_TX_PRINT       ,        "21128"
+     22000 + IDC_TX_CENTER      ,        "21116"
+     22000 + IDC_TX_BLOCK       ,        "21115"
+     22000 + IDC_TX_RIGHT       ,        "21118"
+     22000 + IDC_TX_LEFT        ,        "21117"
+     22000 + IDC_TX_STRIKEOUT   ,        "21121"
+     22000 + IDC_TX_UNDERLINE   ,        "21120"
+     22000 + IDC_TX_ITALIC      ,        "21122"
+     22000 + IDC_TX_BOLD        ,        "21119"
+     22000 + IDC_TX_TXTSC       ,        "21114"
+     22000 + IDC_TX_RESET       ,        "21129"
+     22000 + IDC_TX_FORMAT      ,        "21107"
+     22000 + IDC_TX_XFACT       ,        "21106"
+     22000 + IDC_TX_XDATE       ,        "21126"
+     22000 + IDC_TX_COMMENT     ,        "21102"
+     22000 + IDC_TX_PATIENT     ,        "21100"
+
+/*     ; Eingabe*/
+     22000 + IDC_EN_SCROLL      ,  "21101"
+     22000 + IDC_EN_NEXT        ,  "21130"
+     22000 + IDC_EN_PREV        ,  "21131"
+     22000 + IDC_EN_HELP        ,        "21105"
+     22000 + IDC_EN_STORE       ,        "21132"
+     22000 + IDC_EN_PTLIST      ,        "21133"
+     22000 + IDC_EN_XFACT       ,        "21106"
+     22000 + IDC_EN_XDATE       ,        "21126"
+     22000 + IDC_EN_FIX         ,        "21152"
+     22000 + IDC_EN_COMMENT     ,        "21102"
+     22000 + IDC_EN_PATIENT     ,        "21100"
+
+/*     ; Image*/
+     22000 + IDC_IM_NEW         ,        "21108"
+     22000 + IDC_IM_INSERT      ,        "21109"
+     22000 + IDC_IM_NEXT        ,        "21130"
+     22000 + IDC_IM_PREV        ,        "21131"
+     22000 + IDC_IM_HELP        ,        "21105"
+     22000 + IDC_IM_STORE       ,        "21132"
+     22000 + IDC_IM_RESET       ,        "21134"
+     22000 + IDC_IM_HISTO       ,        "21110"
+     22000 + IDC_IM_KONTRAST    ,        "21111"
+     22000 + IDC_IM_CRISP       ,        "21123"
+     22000 + IDC_IM_MEDIAN      ,        "21124"
+     22000 + IDC_IM_SOBEL       ,        "21125"
+     22000 + IDC_IM_ZOOM        ,        "21135"
+     22000 + IDC_IM_SHOWNAM     ,        "21151"
+     22000 + IDC_IM_ENTPT       ,        "21150"
+     22000 + IDC_IM_PTLIST      ,        "21133"
+     22000 + IDC_IM_XFACT       ,        "21106"
+     22000 + IDC_IM_XDATE       ,        "21126"
+     22000 + IDC_IM_FIX         ,        "21152"
+     22000 + IDC_IM_COMMENT     ,        "21102"
+     22000 + IDC_IM_PATIENT     ,        "21100"
+     
+/*     ; Zoom - Fenster*/
+     22000 + IDC_ZI_ABBRUCH     ,        "21136"
+     22000 + IDC_ZI_RESET       ,        "21134"
+     22000 + IDC_ZI_MAL4        ,        "21137"
+     22000 + IDC_ZI_MAL2        ,        "21137"
+     22000 + IDC_ZI_MAL1        ,        "21137"
+     22000 + IDC_ZI_HISTO       ,        "21110"
+     22000 + IDC_ZI_KONTRAST    ,        "21111"
+     22000 + IDC_ZI_CRISP       ,        "21123"
+     22000 + IDC_ZI_MEDIAN      ,        "21124"
+     22000 + IDC_ZI_SOBEL       ,        "21125"
+
+/*     ; Kommentar*/
+     22000 + IDC_CT_CENTER      ,        "21116"
+     22000 + IDC_CT_BLOCK       ,        "21115"
+     22000 + IDC_CT_RIGHT       ,        "21118"
+     22000 + IDC_CT_LEFT        ,        "21117"
+     22000 + IDC_CT_STRIKEOUT   ,        "21121"
+     22000 + IDC_CT_UNDERLINE   ,        "21120"
+     22000 + IDC_CT_ITALIC      ,        "21122"
+     22000 + IDC_CT_BOLD        ,        "21119"
+     22000 + IDC_CT_TXTSC       ,        "21114"
+     22000 + IDC_CT_OK          ,        "21138"
+     22000 + IDC_CT_ABBRUCH     ,        "21139"
+     22000 + IDC_CT_FORMAT      ,        "21107"
+
+/*     ; Subformular*/
+     22000 + IDC_SF_PREVFIELD   ,        "21141"
+     22000 + IDC_SF_NEXTFIELD   ,        "21140"
+     22000 + IDC_SF_BSIZE       ,        "21112"
+     22000 + IDC_SF_TXTSC       ,        "21114"
+     22000 + IDC_SF_OK          ,        "21142"
+
+/*     ; Formular (Stammdatenblatt)*/
+     22000 + IDC_FR_PRINT       ,        "21128"
+     22000 + IDC_FR_PREVFIELD   ,        "21141"
+     22000 + IDC_FR_NEXTFIELD   ,        "21140"
+     22000 + IDC_FR_BSIZE       ,        "21112"
+     22000 + IDC_FR_TXTSC       ,        "21114"
+     22000 + IDC_FR_STORE       ,  "21132"
+     22000 + IDC_FR_XDATE       ,        "21126"
+     22000 + IDC_FR_ACTDATE     ,        "21103"
+     22000 + IDC_FR_FIX         ,        "21152"
+     22000 + IDC_FR_COMMENT     ,        "21102"
+     22000 + IDC_FR_PATIENT     ,  "21100"
+
+     22000 + IDC_HL_TXTSC       ,        "21114"
+     22000 + IDC_HL_ABBRUCH     ,        "21143"
+
+     22000 + IDC_DG_ABBRUCH     ,        "21144"
+
+     22000 + IDC_LW_ZOOM        ,        "21145"
+     22000 + IDC_LW_PRINT       ,        "21128"
+     22000 + IDC_LW_NEXTPAGE    ,        "21146"
+     22000 + IDC_LW_PREVPAGE    ,        "21147"
+     22000 + IDC_LW_COMMENT     ,        "21102"
+     22000 + IDC_LW_PATIENT     ,        "21100"
+
+/*     ; Formular - Editor*/
+     25000 , "String"
+     25001 , "Liste"
+     25002 , "Checkbox"
+     25003 , "Linie"
+     25004 , "Decimalzahl"
+     25005 , "Datumsfeld"
+     25006 , "Datensatzliste"
+     25007 , "WMF - Bild"
+     25008 , "END"
+
+     25020 , "stringvar"
+     25021 , "strlist"
+     25022 , "dec"
+     25023 , "flag"
+     25024 , "long"
+     25025 , "END"
+
+     25040 , "Log. Twips"
+     25041 , "mm"
+     25042 , "Punkt"
+     25043 , "END"
+
+     25060 , "Haarstrich"
+     25061 , "� Punkt"
+     25062 , "1 Punkt"
+     25063 , "1� Punkt"
+     25064 , "2 Punkt"
+     25065 , "3 Punkt"
+     25066 , "4 Punkt"
+     25067 , "5 Punkt"
+     25068 , "� Punkt Grau"
+     25069 , "� Punkt Hellblau"
+     25070 , "END"
+
+     25080 , "%.1f"
+     25081 , "%.2f"
+     25082 , "%.0f"
+     25083 , "%+.1f"
+     25084 , "END"
+
+     27000 , "\r\n#define RASTER_X %d\r\n"
+     27001 , "#define RASTER_Y %d\r\n"
+     27002 , "\r\n  local obj frmed["
+     27003 , "];\r\n"
+     27004 , ");\r\n"
+     27005 , "  DefFrmField (__frmed"
+     27006 , ",<(0.0,0.0)>,"
+     27007 , "  DefFrmLine (__frmed"
+     27008 , ")>);\r\n"
+     27009 , "  DefCheckBox (__frmed"
+     27010 , "  DefFrmShortStrList"
+     27011 , "  DefFrmStrList"
+     27012 , " (__frmed"
+     27013 , ",<(0.0,0.0)>,"
+     27014 , """>,<"
+     27015 , ">);\r\n"
+     27016 , "  DefFrmSLDec (__frmed"
+     27017 , "  DefFrmDec (__frmed"
+     27018 , ",<(0.0,0.0)>,"
+     27019 , """>,<"""
+     27020 , """>);\r\n"
+     27021 , "  DefFrmDate (__frmed"
+     27022 , """>);\r\n"
+     27023 , "  uFrmShowObject (__frmed"
+     27024 , "  DefFrmRecInd"
+
+     27999  , "????"
+     28000  , "2 Lateral"
+     28001  , "3 Frontal"
+     28002  , "10 Schiebelehre"
+     28003  , "END"
+
+     30000 , "Typ 11"          /* ; Die ganzen Namen fuer die Extradaten*/
+     30001 , "Typ 12"
+     30002 , "Typ 13"
+     30003 , "Typ 14"
+     30004 , "Typ 15"
+     30005 , "Typ 16"
+     30006 , "Typ 17"
+     30007 , "Typ 18"
+     30008 , "Typ 19"
+     30009 , "Typ 20"
+     30010 , "Typ 21"
+     30011 , "Typ 22"
+     30012 , "Typ 23"
+     30013 , "Typ 24"
+     30014 , "Typ 25"
+     30015 , "Typ 26"
+     30016 , "Typ 27"
+     30017 , "Typ 28"
+     30018 , "Typ 29"
+     30019 , "Typ 30"
+     30020 , "Typ 31"
+     30021 , "Typ 32"
+     30022 , "Typ 33"
+     30023 , "Typ 34"
+     30024 , "Typ 35"
+     30025 , "Typ 36"
+     30026 , "Typ 37"
+     30027 , "Typ 38"
+     30028 , "Typ 39"
+     30029 , "Typ 40"
+     30030 , "Typ 41"
+     30031 , "Typ 42"
+     30032 , "Typ 43"
+     30033 , "Typ 44"
+     30034 , "Typ 45"
+     30035 , "Typ 46"
+     30036 , "Typ 47"
+     30037 , "Typ 48"
+     30038 , "Typ 49"
+     30039 , "Typ 50"
+     30040 , "Typ 51"
+     30041 , "Typ 52"
+
+   End
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "DDS.EXE\0"
+            VALUE "InternalName", "DDS\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+END
+

@@ -1,0 +1,7 @@
+ddsseq+opseq
+ddsseq.dll
+ddsseq.map
+libw.lib+ldllcew.lib+..\ddsmem.lib+..\compile.lib+
+..\dmwapi.lib+..\dbhelp.lib
+ddsse.def
+

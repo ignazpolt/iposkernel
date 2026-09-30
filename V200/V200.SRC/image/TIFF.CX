@@ -1,0 +1,1886 @@
+/*
+// $Header:   P:/marille/clinicum/image/rev/tiff.c_v   1.0   24 Jun 1994 16:50:52   HANNES  $
+// $Log:   P:/marille/clinicum/image/rev/tiff.c_v  $
+ * 
+ *    Rev 1.0   24 Jun 1994 16:50:52   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.1   03 Dec 1992 13:06:48   HANNES
+ * PVCS Kommentare
+ * 
+ *    Rev 1.0   02 Dec 1992 16:25:12   HANNES
+ * Initial revision.
+******************************************************************************
+**	Filename:   	Tiff.c
+**	Purpose:     	This is the TIFF interpreter.
+**	Authors:    	Mike Niquette, Patty Lopez, and Jim Grahaam
+**	Environment:	Portable code, Originally designed 
+**	             	for MAC, DOS, and MS-Windows, and now HP-UX
+**	Library:     	DosIO.c and DosMem.c on DOS
+**					WinIO.c and WinMem.c on MS-Windows
+**					MacIO.c and MacMem.c on Macintosh
+**					UNIXIO.c and UNIXMem.c on HP-UX
+**	History:
+**	Version:    	2.0
+**
+**	(c) Copyright Hewlett-Packard Company, 1988, 1989, 1990
+**	All rights are reserved. Copying or other reproduction of
+**	this program except for archival purposes is prohibited
+**	without the prior written consent of Hewlett-Packard Company.
+**
+**			  RESTRICTED RIGHTS LEGEND
+**
+**	Use, duplication, or disclosure by the Government
+**	is subject to restrictions as set forth in
+**	paragraph (b) (3) (B) of the Rights in Technical
+**	Data and Computer Software clause in
+**	DAR 7-104.9(a).
+**
+**	HEWLETT-PACKARD COMPANY
+**	Greeley, Colorado
+******************************************************************************/
+#include <windows.h>
+
+/**----------------------------------------------------------------------------
+					Include Files and Type Defines
+----------------------------------------------------------------------------**/
+#include "Tiff.h"
+#include "HostIO.h"
+
+/**----------------------------------------------------------------------------
+					  Public Function Prototypes
+----------------------------------------------------------------------------**/
+/* File Access Procedures 
+INT16 _export PASCAL CloseTiff( PTIFFFILE pTiff );
+INT16 _export PASCAL CreateTiff( PTIFFFILE pTiff, PUINT8 pName, UINT16 Format );
+INT16 _export PASCAL OpenTiff( PTIFFFILE pTiff, PUINT8 pName );
+
+Subfile Access Procedures 
+void  CreateSubfile( PTIFFFILE pTiff, PUINT8 pBuffer, INT32 size );
+INT16 GetSubfile( PTIFFFILE pTiff, INT16 Subfile );
+INT16 PutSubfile( PTIFFFILE pTiff );
+
+Entry Access Procedures 
+INT16 DeleteEntry( PTIFFFILE pTiff, UINT16 Tag );
+INT16 GetEntry( PTIFFFILE pTiff, UINT16 Tag, INT16 Index, PINT16 pKind, 
+		PINT32 Length, PINT32 pValue );
+INT16 GetEntryData( PTIFFFILE pTiff, UINT16 Tag, INT32 Start, INT32 Items, 
+		INT32 MaxBytes, PINT16 pKind, PINT32 pLength, PUINT8 pData );
+INT16 IndexEntry( PTIFFFILE pTiff, INT16 Index, PTIFFENTRY pEntry );
+INT16 PutEntry( PTIFFFILE pTiff, UINT16 Tag, INT16 Kind, INT32 Value );
+INT16 PutEntryData( PTIFFFILE pTiff, UINT16 Tag, INT16 Kind, 
+		PUINT8 pValue, INT32 Length );
+
+Image Access Procedures 
+INT16 GetImage( PTIFFFILE pTiff, INT16 Plane, INT32 Start, INT32 Lines, 
+		PUINT8 pData, INT32 Count );
+INT16 PutImage( PTIFFFILE pTiff, INT16 Plane, INT32 Start, INT32 Lines, 
+		PUINT8 pData, INT32 Count );
+
+*/
+
+
+/**----------------------------------------------------------------------------
+						Private Prototypes
+----------------------------------------------------------------------------**/
+
+#ifdef __UNIX__
+
+static INT32 GetNumberStrips( /* PTIFFFILE pTiff */);
+static INT16 IndexSubfile( /* PTIFFFILE pTiff, INT16 Subfile, PINT32 pOffset */  );
+static INT16 WriteINT16( /* PTIFFFILE pTiff, PINT16 pINT16, INT32 Length, INT16 bConvert */ );
+static INT16 WriteINT32( /* PTIFFFILE pTiff, PINT32 pINT32, INT32 Length, INT16 bConvert */ );
+
+#ifdef __READ__
+static INT16 ReadINT16( /* PTIFFFILE pTiff, PINT16 pINT16, INT32 Length */ );
+static INT16 ReadINT32( /* PTIFFFILE pTiff, PINT32 pINT32, INT32 Length */ );
+#endif
+
+static void ConvertEntries( /* UINT16 Format, PUINT8 pData, INT16 Entries, 
+                                      BOOL bNative */ );
+static void ConvertEntry( /* UINT16 Format, PTIFFENTRY pEntry, BOOL bNative*/ );
+static INT16 ConvertINT16( /* UINT16 Format, PUINT8 pData, INT32 Count */ ); 
+static INT16 ConvertINT32( /* UINT16 Format, PUINT8 pData, INT32 Count */ ); 
+
+static INT16 PutStripInfo( /* PTIFFFILE pTiff */ );
+
+static INT16 MakeEntry   ( /* PTIFFFILE pTiff, UINT16 Tag, INT16 Kind, INT32 Value,
+       						INT32 Length */ );
+static INT16 UpdateEntry ( /* PTIFFFILE pTIff, INT16 Tag, INT16 Kind, 
+							INT32 Value, INT32 Location, INT32 Count */ );
+static INT16 GetTagData( /* PTIFFFILE pTiff, UINT16 Tag, PTIFFENTRY pEntry */ );
+						
+#else /* DOS and Mac */
+
+static INT32 GetNumberStrips( PTIFFFILE pTiff );
+static INT16 IndexSubfile( PTIFFFILE pTiff, INT16 Subfile, PINT32 pOffset );
+static INT16 WriteINT16( PTIFFFILE pTiff, PINT16 pINT16, INT32 Length, INT16 bConvert );
+static INT16 WriteINT32( PTIFFFILE pTiff, PINT32 PINT32, INT32 Length, INT16 bConvert );
+
+#ifdef __READ__
+static INT16 ReadINT16( PTIFFFILE pTiff, PINT16 pINT16, INT32 Length );
+static INT16 ReadINT32( PTIFFFILE pTiff, PINT32 pINT32, INT32 Length );
+#endif
+
+static void ConvertEntries( UINT16 Format, PUINT8 pData, INT16 Entries, 
+				BOOLEAN bNative );
+static void ConvertEntry( UINT16 Format, PTIFFENTRY pEntry, BOOLEAN bNative );
+static INT16 ConvertINT16( UINT16 Format, PUINT8 pData, INT32 Count ); 
+static INT16 ConvertINT32( UINT16 Format, PUINT8 pData, INT32 Count ); 
+
+static INT16 PutStripInfo( PTIFFFILE pTiff );
+
+static INT16 MakeEntry   ( PTIFFFILE pTiff, UINT16 Tag, INT16 Kind, INT32 Value,
+       						INT32 Length );
+static INT16 UpdateEntry ( PTIFFFILE pTIff, INT16 Tag, INT16 Kind, 
+				INT32 Value, INT32 Location, INT32 Count );
+static INT16 GetTagData( PTIFFFILE pTiff, UINT16 Tag, PTIFFENTRY pEntry );
+							
+#endif
+
+/**----------------------------------------------------------------------------
+						   Global Data
+----------------------------------------------------------------------------**/
+
+/* allow room for file type, version, offset of 0th IFD */
+static UINT8    	Moto_Header[]  = { 'M', 'M', 0, 42, 0, 0, 0, 0 };
+static UINT8    	Intel_Header[] = { 'I', 'I', 42, 0, 0, 0, 0, 0 };
+
+static INT32		KindLengths[] = { 0, 1, 1, 2, 4, 8 }; /* length of values */
+
+static INT8			IDString[]="Hewlett-Packard, TIFF Library Version2.0\n";
+
+/**----------------------------------------------------------------------------
+					Module Entry Point Code
+----------------------------------------------------------------------------**/
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL CloseTiff(pTiff)
+PTIFFFILE	pTiff;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the file memory data structure.
+**	Globals      	None.
+**	Operation:   	
+**	    This procedure closes the currently opened TIFF file.
+**	Return:
+**	    status   	OKAY, the TIFF file was closed successfully.
+**	             	CLOSEEERROR, could not close the file.
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+
+	if (pTiff->Handle != -1 && FileClose(pTiff->Handle) == OKAY)
+		pTiff->Handle = -1;
+	else status = CLOSEERROR;
+	return status;
+}	/* CloseTiff */
+
+/*---------------------------------------------------------------------------*/
+void  FAR PASCAL CreateSubfile(pTiff, pBuffer, size)
+PTIFFFILE	pTiff;
+PUINT8  	pBuffer;
+UINT32   	size;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure in memory.
+**	    pBuffer 	pointer to the memory area used for disc buffering.
+**	    Size    	size of the buffer in bytes.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure initializes the buffer and header information in
+**	    the TIFFFILE data structure. The buffer which is allocated by the
+**	    host application is used for both creating the in memory subfile
+**	    directory as well as a data buffer for reading and writing image
+**	    data to the file.
+**	Return:     	None.
+**	History:
+*/
+
+{
+	int i;
+
+/* initialize the buffer information */
+	pTiff->pBuffer           = pBuffer;
+	pTiff->Offset            = 0L;
+	pTiff->Size              = size;
+	pTiff->Row               = 0L;
+
+/* initialize the header information */
+	pTiff->Entries           = 0;
+	pTiff->KindOffsets       = TIFFLONG;
+	pTiff->KindCounts        = TIFFLONG;
+	pTiff->KindLength        = TIFFSHORT;
+	pTiff->KindWidth         = TIFFSHORT;
+	pTiff->KindRowsPer       = TIFFLONG;
+
+/* initialize default tag information */
+	pTiff->NewSubfile        = 0L;
+	pTiff->ImageLength		 = 0L;
+	pTiff->ImageWidth		 = 0L;
+	pTiff->RowsPerStrip      = -1L;
+	pTiff->SamplesPerPixel   = 1;
+	pTiff->Compression       = 1;
+	pTiff->PhotoInterpret    = 0;
+	pTiff->PlanarConfig      = 1;
+	pTiff->XResolution.n     = 300;
+	pTiff->XResolution.d     = 1;
+	pTiff->YResolution.n     = 300;
+	pTiff->YResolution.d     = 1;
+	pTiff->ResolutionUnit    = 2;
+	for ( i = 0; i < MAXSAMPLES; i++ )
+		pTiff->BitsPerSample[i]  = 1;
+
+}	/* CreateSubfile */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL CreateTiff(pTiff, pName, Format)	
+PTIFFFILE	pTiff;
+PUINT8  	pName;
+UINT16  	Format;
+
+/*
+**	Parameters:
+**	    pTiff        	pointer to the file data structure.
+**	    pName        	pointer to the filename of the file to be created.
+**	    Format        	type of file to create, INTEL or MOTO.
+**	Globals:
+**	    Moto_Header 	pointer to the motorola file header.
+**	    Intel_Header	pointer to the intel file header.
+**	Operation:
+**	    This procedure will create a file with the requested name. Once
+**	    the file has been created the proper file header is placed in
+**	    it. The file information in the TIFFFILE data structure is
+**	    updated to reflect the file open.
+**	Return:
+**	    status      	OKAY, valid TIFF file with at least one directory.
+**	                	CREATEERROR, could not create the file.
+**	                	WRITEERROR, could not write the file header.
+**	History:
+*/
+
+{
+	PUINT8	ptr = pTiff->Name;
+	INT16	status = OKAY;
+	UINT16	count;
+
+/* copy the name to the file structure, terminates on null character */
+	for (count = MAXPATHLENGTH; count && (*ptr++ = *pName++); count--);
+
+
+/* try to open the file for an append operation */
+	if ((pTiff->Handle = FileCreate(pTiff->Name)) != -1)
+	{
+		pTiff->Format = Format;
+		ptr = (Format == MOTO)? Moto_Header : Intel_Header;
+		if (FileWrite(pTiff->Handle, ptr, 8L) != 8L)
+			{ status = WRITEERROR; CloseTiff(pTiff); }
+	}
+	else status = CREATEERROR;
+	
+/* make sure the buffer is NULL */
+	pTiff->pBuffer = NULL;
+	
+	return status;
+}	/* CreateTiff */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL DeleteEntry(pTiff, Tag)
+PTIFFFILE 	pTiff;
+UINT16    	Tag;
+
+/*
+**	Parameters:
+**	    pTiff   	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure deletes a Tiff entry described by the parameters
+**	    to the memory IFD found in the pTiff structure.  If no matching 
+**	    entry is found, the procedure returns TAGERROR.
+**	Return:
+**	    status  	OKAY, entry deleted from the directory successfully.
+**	            	TAGERROR, no such entry was found.
+**	History:
+*/
+
+{
+	INT16		moves;
+	INT16		status;
+	INT16		index=0;
+	TIFFENTRY	entry;
+	PTIFFENTRY	plastone, pmoveto;
+
+/* try to locate the tag in the memory directory */
+
+	while (((status = IndexEntry(pTiff, index, (PTIFFENTRY)&entry))==OKAY) 
+		&& entry.Tag < Tag) 
+		index++;
+
+/* delete entry */
+
+	if (status==OKAY) { /* entry exists, delete it */
+
+		/* index is zero if entry not found */
+		pTiff->Entries--;
+		moves = pTiff->Entries - index;
+		pmoveto = &((PTIFFENTRY)pTiff->pBuffer)[index];
+		plastone = pmoveto+1;
+		while (moves--) *pmoveto++ = *plastone++; 
+		status = OKAY;
+	}
+	return status;
+
+}	/* DeleteEntry */
+
+#ifdef __READ__
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL GetEntry(pTiff, Tag, Index, pKind, pLength, pValue)
+PTIFFFILE 	pTiff;
+UINT16    	Tag;
+INT32		Index;
+PINT16		pKind;
+PINT32		pLength;
+PINT32		pValue;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**		Index		index to the desired value in the tag.
+**		pKind		pointer to a location to place the Kind of the tag.
+**		pLength		pointer to location for the number of value in the tag.
+**		pValue		pointer to an INT32 for the value
+**	Globals:    	None.
+**	Operation:
+**	    This procedure searches the memory buffer which contains the
+**	    image of the subfile directory for an entry which matches the
+**	    specified tag. This procedure assumes that the memory buffer
+**	    currently contains the subfile directory. The status returned
+**	    is OKAY if the entry is found and TAGERROR if not.
+**	Return:
+**	    status  	OKAY, a matching entry has been found in the buffer.
+**	            	TAGERROR, no matching entry was found.
+**	History:
+*/
+{
+	INT16		status;
+	
+	status=GetEntryData(pTiff,Tag,Index,1L,4L,pKind,pLength,(PUINT8)pValue);
+	
+	return(status);
+	
+}	/* GetEntry */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL GetEntryData( pTiff, Tag, Start, Items, MaxBytes, pKind, pLength, pData )
+PTIFFFILE	pTiff;
+UINT16 		Tag;
+INT32    	Start;
+INT32    	Items;
+INT32		MaxBytes;
+PINT16    	pKind;
+PINT32		pLength;
+PUINT8    	pData;
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**	    Start    	first item to be read, zero relative.
+**	    Items    	number of items to read.
+**		MaxBytes	number of bytes available in pData.
+**	    pKind    	entry kind from the tag.
+**		pLength		number of value in the tag.
+**	    pData    	pointer to the buffer to be loaded with the items.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure reads the items from the specified Tag. The Start 
+**		and Items parameters can be used to access specific items from 
+**		the list. The Start parameter is zero relative.
+**	Return:
+**	    status  	OKAY, the directory size was read successfully.
+**	            	READERROR, disk error reading the directory.
+**					TAGERROR, tag was not found
+**	            	TIFFEOF, no open file or no directory.
+**	History:
+*/
+{
+	INT16		status=OKAY;
+	INT32		i;
+	TIFFENTRY	entry;
+	INT16		Kind;
+	INT32		Length;
+	TIFFVALUE	Value;
+	INT32		Offset;
+	
+/* find the correct tag */
+
+	if (GetTagData(pTiff, Tag, &entry)!=OKAY) return(TAGERROR);
+	
+/* set Kind and Length and check for index beyond tag values*/
+
+	Kind=entry.Kind;
+	Length=entry.Length;
+	Value.l=entry.Value.l;
+	
+	if (pKind!=NULL) *pKind=Kind;
+	if (pLength!=NULL) *pLength=Length;
+	
+	if (Start>Length) return(READERROR);
+
+/* set Items based on Length and MaxBytes */
+
+	if (Items==-1) Items=Length-Start; /* read all values from Start */
+	
+	if ((Start+Items)>Length) /* limit based on number of available values */
+		Items=Length-Start;
+	
+	if ((KindLengths[Kind]*Items)>MaxBytes) /* limit based on available memory */
+		Items=MaxBytes/KindLengths[Kind];
+	
+/* move data from tag into pData */
+
+	if (pData!=NULL) {
+		if ((KindLengths[Kind]*Length)<=4) { /* values are in the tag */
+	
+			switch (Kind) {
+			case TIFFBYTE:
+			case TIFFASCII:
+				for (i=Start;i<(Start+Items);i++) 
+					*pData++ =(UINT8)(Value.b[(INT16)i]);
+				break;
+			case TIFFSHORT:
+				for (i=Start;i<(Start+Items);i++) {
+					*(PUINT16)pData=(UINT16)(Value.s[(INT16)i]);
+					pData+=2;
+				}
+				break;
+			case TIFFLONG:
+				if (Start==0) *((PUINT32)pData)=Value.l;
+				break;
+			case TIFFRATIONAL: /* will never fit in tag */
+				break;
+			}
+		}
+		else { /* values are in file and tag contains the offset */
+	
+			if (pTiff->Handle != -1)
+			{
+				Offset = Value.o+Start*KindLengths[Kind];
+				if (FileSeek(pTiff->Handle, (UINT8) SEEK_SET, Offset) != Offset)
+					{ status=READERROR; goto xit; }
+	
+				switch (Kind) {
+				case TIFFBYTE:
+				case TIFFASCII:
+					if (FileRead(pTiff->Handle, pData, Items) != Items) 
+						status = READERROR;
+					break;
+				case TIFFSHORT:
+					status = ReadINT16(pTiff, (PINT16)pData, Items);
+					break;
+				case TIFFLONG:		
+					status = ReadINT32(pTiff, (PINT32)pData, Items);
+					break;
+				case TIFFRATIONAL:
+					status = ReadINT32(pTiff, (PINT32)pData, Items*2);
+					break;
+				}	/* switch */
+			}
+			else status = TIFFEOF;
+		}
+	}
+xit:
+	return status;
+}	/* GetEntryData */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL GetImage(pTiff, Plane, Start, Lines, pData, Count)
+PTIFFFILE       	pTiff;
+INT16           	Plane;
+register INT32    	Start;
+register INT32    	Lines;
+register PUINT8    	pData;
+register INT32    	Count;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Plane    	image plane of interest.
+**	    Start    	raster row of interest in the plane.
+**	    Lines    	number of raster rows to be read.
+**	    pData    	pointer to the location where the data is loaded.
+**	    Count    	byte count of a raster row in the buffer. This
+**	            	may be different than the width in bytes of the
+**	            	raster data stored in the file.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure reads raster data from the TIFF file.
+**	Return:
+**	    status  	OKAY, the directory size was read successfully.
+**	            	READERROR, disk error reading the directory.
+**	            	TIFFEOF, no open file or no directory.
+*/
+
+{
+	register INT16	status = OKAY;	/* return value */
+
+	INT32	row;         	/* row within strip for start of read */
+	INT32	RowCount;   	/* determined according to conversion */
+	INT32	offset;     	/* offset within the file at which to read */
+	INT32	length;
+	INT32	lines;
+	INT32	strip;
+	INT16	temp16;
+	INT32	temp32;
+	
+/* calculate the width in bits of the sample only if not contiguous */
+
+	if (pTiff->PlanarConfig != CONTIGUOUS) {
+	
+		pTiff->BitsPerPixel = pTiff->BitsPerSample[Plane];
+		pTiff->WidthBytes = (pTiff->BitsPerPixel * pTiff->ImageWidth + 7)/ 8;
+	}
+	
+/* set up index for fast conversion */
+
+	if (pTiff->BitsPerPixel <= 8) RowCount = Count; 
+	else if (pTiff->BitsPerPixel <= 16) RowCount = Count/2L;
+	else if (pTiff->BitsPerPixel <= 32) RowCount = Count/4L; 
+
+/* check to see if rows per strip was changed to the default */
+
+	if ( pTiff->RowsPerStrip == -1 )
+		pTiff->RowsPerStrip = pTiff->ImageLength;
+
+/* copy lines from the file to the buffer provided */
+
+	while (Lines) {
+
+		strip=0;
+		if (pTiff->RowsPerStrip != -1 && pTiff->RowsPerStrip < pTiff->ImageLength )
+		{	/* there are multiple strip offsets */
+			strip = Start/ pTiff->RowsPerStrip + Plane * ((pTiff->ImageLength + 
+				pTiff->RowsPerStrip - 1) / pTiff->RowsPerStrip);
+		}
+		status=GetEntry(pTiff,STRIP_OFFSETS,strip,&temp16,&temp32,&offset);
+		if (status!=OKAY) { status = READERROR; goto xit; }
+		
+		if (temp16==TIFFSHORT) offset=offset>>16;
+		
+		row = Start % pTiff->RowsPerStrip;	/* calculate the row index within the strip */
+
+		if ( pTiff->Compression == NOCOMPRESSION ) 	/* streamlined for uncompressed files -- can seek directly to the desired row */
+		{
+			lines = pTiff->RowsPerStrip - row; 	/* calculate the desired or available number of lines (whichever is smaller) */
+			if (Lines < lines) lines = Lines;
+
+			offset += row*pTiff->WidthBytes; /* get the offset to the desired row */
+		}
+		else {
+			lines = pTiff->RowsPerStrip; /* compressed files must start at the beginning of each strip */
+			if (row+Lines < lines) lines = row+Lines;
+		}
+
+		if (pTiff->Compression==NOCOMPRESSION) /* using ifs because MSC dies on switch */
+			status=UnpackTight(pTiff, pData, (PINT32)&offset, lines, Count );
+		else if (pTiff->Compression==CCITT)
+			status=UnpackCCITT(pTiff, pData, (PINT32)&offset, lines, Count );
+		else if (pTiff->Compression==LZW)
+			status=UnpackLZW(pTiff, pData, (PINT32)&offset, lines, Count );
+		else if (pTiff->Compression==PACKBITS)
+			status=UnpackBITS(pTiff, pData, (PINT32)&offset, lines, Count );
+		if (status != OKAY)	goto xit;
+	
+		pData+=Count*lines;
+		offset+=Count*lines;
+		Start+=lines;
+		Lines-=lines;
+
+	}	/* while */
+
+xit:	return status;
+}	/* GetImage */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL GetSubfile(pTiff, Subfile )
+PTIFFFILE	pTiff;
+INT16    	Subfile;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Subfile 	the subfile to be accessed.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure finds the desired subfile on disk, loads the
+**	    tag directory into memory in the Buffer provided, and fills
+**	    the TIFFFILE data structure with actual or default values.
+**	    The subfile index is zero relative. The TIFF file must have
+**	    an entry for IMAGE_WIDTH, IMAGE_LENGTH, STRIP_OFFSETS and
+**	    STRIP_COUNTS to be accepted as a valid TIFF file.
+**	Return:
+**	    status  	OKAY, the directory size was read successfully.
+**	            	NOTTIFF, not a valid TIFF file.
+**	            	READERROR, disk error reading the directory.
+**	            	TIFFEOF, no open file or no directory.
+**	History:
+*/
+
+{
+	INT16    	i;
+	INT16    	status = OKAY;
+	INT32    	offset;
+	INT32    	size;
+	TIFFENTRY	entry;
+	BOOLEAN		strip_count=TRUE;
+	TIFFVALUE	value;
+	
+	if (pTiff->Handle != -1)
+	{
+
+		/* find the specified subfile and seek to the first entry */
+
+		if (!IndexSubfile( pTiff, Subfile, (PINT32) &offset) 
+			|| FileSeek(pTiff->Handle, (UINT8) SEEK_SET, offset) != offset
+			|| ReadINT16(pTiff, (PINT16)&pTiff->Entries, 1L) != OKAY)
+				{ status = READERROR; goto xit; }
+
+		/* read the subfile directory entries */
+		size = (INT32)pTiff->Entries * ENTRYSIZE;
+		if (FileRead(pTiff->Handle, pTiff->pBuffer, size) != size)
+			{ status = READERROR; goto xit; }
+
+		/* convert the subfile directory entries to the native format */
+		ConvertEntries( pTiff->Format, pTiff->pBuffer, pTiff->Entries,FALSE );
+
+		/* load the image width, this value must be available */
+
+		if (GetImageWidth(pTiff,&pTiff->KindWidth,NULL,(PINT32)&value)==OKAY) {
+			if (pTiff->KindWidth==TIFFSHORT) pTiff->ImageWidth=value.s[0];
+			else pTiff->ImageWidth=value.l;
+		}
+		else { status = NOTTIFF; goto xit; }
+
+		/* load the image length, this value must be available */
+		if (GetImageLength(pTiff,&pTiff->KindLength,NULL,(PINT32)&value)==OKAY) {
+			if (pTiff->KindLength==TIFFSHORT) pTiff->ImageLength=value.s[0];
+			else pTiff->ImageLength=value.l;
+		}
+		else { status = NOTTIFF; goto xit; }
+
+/* load the strip offsets, this value must be available */
+
+		if (GetTagData(pTiff, STRIP_OFFSETS, (PTIFFENTRY)&entry)==OKAY) {
+			pTiff->KindOffsets = entry.Kind;
+		}
+		else { status = NOTTIFF; goto xit; }
+
+/* load the strip counts, this value must be available (well not really, if there
+	is only one strip and no compression this tag is optional) */
+
+		if (GetTagData(pTiff, STRIP_COUNTS, (PTIFFENTRY)&entry)==OKAY) {
+			pTiff->KindCounts = entry.Kind;
+		}
+		else { strip_count=FALSE; }
+
+/* load the TIFFFILE data structure with actual or default values */
+/* errors are ignored here as the GetTagData() call above will catch them */
+
+		if (GetNewSubfile(pTiff,NULL,NULL,(PINT32)&pTiff->NewSubfile)!=OKAY)
+			pTiff->NewSubfile = 0L;	
+
+		GetBitsPerSample(pTiff,(INT32)(MAXSAMPLES*2),NULL,NULL,
+			(PUINT8)&pTiff->BitsPerSample[0]);
+		
+		GetCompression(pTiff,NULL,NULL,(PINT32)&pTiff->Compression);
+		GetPhotoInterpret(pTiff,NULL,NULL,(PINT32)&pTiff->PhotoInterpret);
+		GetSamplesPerPixel(pTiff,NULL,NULL,(PINT32)&pTiff->SamplesPerPixel);
+
+		if (GetRowsPerStrip(pTiff,&pTiff->KindRowsPer,NULL,(PINT32)&value)==OKAY) {
+			if (pTiff->KindRowsPer==TIFFSHORT) pTiff->RowsPerStrip=value.s[0];
+			else pTiff->RowsPerStrip=value.l;
+			if ( pTiff->RowsPerStrip < 0L || pTiff->RowsPerStrip > pTiff->ImageLength ) 
+				pTiff->RowsPerStrip = pTiff->ImageLength;
+		}
+		else pTiff->RowsPerStrip = pTiff->ImageLength;
+
+		GetXResolution(pTiff,8L,NULL,NULL,(PUINT8)&pTiff->XResolution);
+		GetYResolution(pTiff,8L,NULL,NULL,(PUINT8)&pTiff->YResolution);
+		GetPlanarConfig(pTiff,NULL,NULL,(PINT32)&pTiff->PlanarConfig);
+		GetResolutionUnit(pTiff,NULL,NULL,(PINT32)&pTiff->ResolutionUnit);
+
+/* compute width of the image in bytes */
+
+		pTiff->BitsPerPixel = 0;
+		if ( pTiff->PlanarConfig != CONTIGUOUS ) { /* get the width in bits per sample */
+			pTiff->BitsPerPixel = pTiff->BitsPerSample[0]; /* assume first bitspersample */
+		}
+		else { /* get the width in bits per pixel */
+			for (i = 0; i < pTiff->SamplesPerPixel; i++)
+				pTiff->BitsPerPixel += pTiff->BitsPerSample[i];
+		}
+		pTiff->WidthBytes = (pTiff->BitsPerPixel*pTiff->ImageWidth + 7)/8;
+	}
+	else status = TIFFEOF;
+ xit:	return status;
+}	/* GetSubfile */
+#endif
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL IndexEntry(pTiff, Index, pEntry)
+PTIFFFILE 	pTiff;
+INT16    	Index;
+PTIFFENTRY	pEntry;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Index    	the entry number to be searched for.
+**	    pEntry  	pointer to where the converted entry is stored.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure returns the entry located in the data buffer at
+**	    the specified index. The index is zero relative. The entry will
+**	    be converted to the __NATIVE__ machine format. This procedure
+**	    assumes that the buffer currently contains the subfile directory.
+**	    If the entry is located a TRUE value is returned otherwise a
+**	    FALSE value is returned.
+**	Return:
+**	    status  	OKAY, entry exists.
+**	            	TAGERROR, entry doesn't exist.
+**	History:
+*/
+
+{
+	INT16	status = TAGERROR;
+
+	if (pTiff->Entries > 0 && Index < pTiff->Entries)
+	{
+		*pEntry = ((PTIFFENTRY)pTiff->pBuffer)[Index];
+		status = OKAY;
+	}	/* if */
+	return status;
+}	/* IndexEntry */
+
+#ifdef __READ__
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL OpenTiff(pTiff, pName)
+PTIFFFILE	pTiff;
+PUINT8    	pName;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    pName    	name of an existing tiff file to be opened.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure opens a tiff file. The file is checked to make 
+**	    sure that it is a tiff file and the file format is recorded in
+**	    the TIFFFILE data structure.
+**	Return:
+**	    status  	OKAY, valid TIFF file with at least one directory.
+**	            	NOTTIFF, not a valid TIFF file.
+**	            	OPENERROR, could not open the file.
+**	History:
+*/
+
+{
+	PUINT8	ptr = pTiff->Name;
+	INT16	count;
+	INT16	version;
+	INT16	status = OKAY;
+
+/* copy the name to the file structure */
+	for (count = MAXPATHLENGTH; count && (*ptr++ = *pName++); count--);
+
+/* open the file found in the structure */
+	if ((pTiff->Handle = FileOpen(pTiff->Name)) != -1)
+	{
+
+/* verify it is a Tiff file */
+		if (FileSeek(pTiff->Handle, (UINT8) SEEK_SET, 0L) != 0L
+		|| FileRead(pTiff->Handle, (PUINT8)&pTiff->Format, 2L) != 2L
+		|| (pTiff->Format != INTEL && pTiff->Format != MOTO)
+		|| ReadINT16(pTiff, (PINT16)&version, 1L) != OKAY
+		|| version != 42)
+			{ status = NOTTIFF;	CloseTiff(pTiff); goto xit; }
+	}
+	else status = OPENERROR;
+	
+/* make sure the buffer is like reset to null, you know? */
+	pTiff->pBuffer=NULL;
+	
+xit: 	return status;
+}	/* OpenTiff */
+#endif
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PutEntry(pTiff, Tag, Kind, Value)
+PTIFFFILE	pTiff;
+UINT16    	Tag;
+INT16    	Kind;
+INT32    	Value;
+/*
+**	Parameters:
+**	    pTiff   	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**	    Kind    	directory entry kind, TIFFBYTE, TIFFASCII,
+**	            	TIFFSHORT, TIFFLONG, TIFFRATIONAL.
+**	    Value   	value or offset of the value array.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure adds a Tiff entry described by the parameters
+**	    to the memory IFD found in the pTiff structure. If the
+**	    entry already exists in the IFD, it is updated with this new
+**	    one. If no matching entry is found an attempt is made to add
+**	    it to the IFD. If unsuccessful, the procedure returns TIFFEOF.
+**	Return:
+**	    status  	OKAY, entry add to the directory successfully
+**	            	TIFFEOF, no room for the entry.
+**	History:
+*/
+{
+	return(MakeEntry(pTiff,Tag,Kind,Value,1L));
+	
+} /* PutEntry */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PutEntryData(pTiff, Tag, Kind, pValue, Length)
+PTIFFFILE	pTiff;
+UINT16    	Tag;
+INT16    	Kind;
+PUINT8    	pValue;
+INT32    	Length;
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**	    Kind    	directory entry kind, TIFFBYTE, TIFFASCII,
+**	            	TIFFSHORT, TIFFLONG, TIFFRATIONAL.
+**	    pValue  	pointer to a tiff VALUE array.
+**	    Length  	number of values stored in this entry.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure updates or creates a new directory entry. If this
+**	    is a multi-value entry, the values will be appended to the end of
+**	    the currently opened file. Then the memory IFD will be updated
+**	    with the new entry information.
+**	Return:
+**	    status  	OKAY, entry written successfully.
+**	            	WRITEERROR, could not write the entry to disk.
+**	            	TIFFEOF, no file open or no memory IFD present.
+**	History:
+*/
+
+{
+	PUINT8	pstring = pValue;
+	INT32	value;
+	INT32	count;
+	INT16	status = OKAY;
+	INT32	i;
+	
+	if (pTiff->Handle != -1) {
+
+		/* if this is a multi-value entry, then seek to the current end of the file */
+
+		if ((KindLengths[Kind]*Length)>4) {
+
+			if ((value = FileSeek(pTiff->Handle, (UINT8) SEEK_END, 0L)) == -1)
+				{ status = WRITEERROR; goto xit; }
+		}
+		switch (Kind) {
+
+		case TIFFBYTE:
+			if (Length<=4L) { /* if bytes fit in tag, move them into value */
+				value=0;
+				for (i=0;i<Length;i++) value=(value<<8)|((PUINT8)pValue)[i];
+			}
+			else { /* else, write out bytes to file */
+
+				if (FileWrite(pTiff->Handle, pValue, Length) != Length)
+					status = WRITEERROR;
+			}	
+			break;
+
+		case TIFFASCII: /* if chars fit in tag, move them into value */
+			if (Length == 0L) {	Length = 1L; while (*pstring++) Length++; }
+			count = (Length & 1L)? Length+1L : Length;
+
+			if (Length<=4L) { /* if bytes fit in tag, move them into value */
+				value=0;
+				for (i=0;i<Length;i++) value=(value<<8)|((PUINT8)pValue)[i];
+			}
+			else { /* else, write out bytes to file */
+
+				if ((value = FileSeek(pTiff->Handle, (UINT8) SEEK_END, 0L)) == -1)
+					{ status = WRITEERROR; goto xit; }
+
+				if (FileWrite(pTiff->Handle, pValue, count) != count)
+					status = WRITEERROR;
+			}
+			break;
+
+		case TIFFSHORT:
+			if (Length<=2L) { /* if shorts fit in tag, move them into value */
+				value=0;
+				for (i=0;i<Length;i++) value=(value<<16)|((PUINT16)pValue)[i];
+			}
+			else { /* else, write out bytes to file */
+
+				status = WriteINT16(pTiff, (PINT16)pValue, Length, TRUE);
+			}	
+			break;
+
+		case TIFFLONG:		
+			if (Length <= 1L) value = *(PINT32)pValue;
+			else status = WriteINT32(pTiff, (PINT32)pValue, Length, TRUE);
+			break;
+
+		
+		case TIFFRATIONAL: /* by definition this is multi-valued */
+			status = WriteINT32(pTiff, (PINT32)pValue, Length*2L, TRUE);
+			break;
+		}	/* switch */
+		if (status == OKAY) status = MakeEntry(pTiff,Tag,Kind,value,Length);
+	}
+	else	status = TIFFEOF;
+ xit:	return status;
+}	/* PutEntryData */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PutImage(pTiff, Plane, Start, Lines, pData, Count)
+PTIFFFILE       	pTiff;
+INT16           	Plane;
+register INT32    	Start;
+register INT32    	Lines;
+register PUINT8    	pData;
+register INT32    	Count;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Plane    	image plane of interest.
+**	    Start    	raster row of interest in the plane.
+**	    Lines    	number of raster rows to be written.
+**	    pData    	pointer to the location where the data is located.
+**	    Count    	byte count of a raster row in the buffer. This
+**	            	may be different than the width in bytes of the
+**	            	raster data stored in the file.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure writes raster data to the TIFF file.
+**	Return:
+**	    status  	OKAY, the directory size was read successfully.
+**	            	WRITEERROR, disk error writing.
+**	            	TIFFEOF, no open file or no directory.
+*/
+
+{
+	INT16	status = OKAY;		/* return value */
+	INT32	lines = Lines; 		/* number of lines within strip to read */
+
+	INT32	Offset;             /* file offset value */
+	INT32	strip_count;		/* number of bytes written to current strip */
+	INT32	length;				
+	INT32	strip;
+	INT32	NumStrips;
+	
+/* get the number of strips in the image */
+
+	NumStrips=GetNumberStrips(pTiff);
+	
+/* get width bytes if not contiguous */
+
+	if (pTiff->PlanarConfig != CONTIGUOUS) { 
+		pTiff->BitsPerPixel = pTiff->BitsPerSample[Plane];
+		pTiff->WidthBytes = (pTiff->BitsPerPixel * pTiff->ImageWidth + 7)/ 8;
+	}
+	
+/* write out lines provided to the file */
+
+	while (Lines) {
+
+/* calculate the new strip information */
+
+		pTiff->Row = Start % pTiff->RowsPerStrip;
+		
+		if ( pTiff->Row == 0 ) { /* only write offset if start of a new strip */
+			Offset = FileSeek( pTiff->Handle,(UINT8) SEEK_END,0L );
+			strip = Start/ pTiff->RowsPerStrip + Plane * ((pTiff->ImageLength + 
+				pTiff->RowsPerStrip - 1) / pTiff->RowsPerStrip);
+			UpdateEntry( pTiff, STRIP_OFFSETS, pTiff->KindOffsets, Offset, strip, 
+				NumStrips );
+			strip_count=0;
+		}
+		lines = pTiff->RowsPerStrip - pTiff->Row;	
+		if (Lines < lines) lines = Lines;
+
+/* Write the data out to the file */ 
+
+		if (pTiff->Compression==NOCOMPRESSION) 
+			status=PackTight(pTiff, pData, lines, Count, &length);
+		else if (pTiff->Compression==CCITT)    
+			status=PackCCITT(pTiff, pData, lines, Count, &length);
+		else if (pTiff->Compression==LZW)      
+			status=PackLZW(pTiff, pData, lines, Count, &length);
+		else if (pTiff->Compression==PACKBITS) 
+			status=PackBITS(pTiff, pData, lines, Count, &length);
+		if (status != OKAY)	goto xit;
+
+/* update strip count */
+
+		strip_count += length;
+		if (pTiff->Row==0) { /* write count if start of new strip */
+			
+			if ((pTiff->Compression==NOCOMPRESSION)&&
+				(pTiff->RowsPerStrip==pTiff->ImageLength))
+				strip_count=pTiff->WidthBytes*pTiff->RowsPerStrip;
+			UpdateEntry( pTiff, STRIP_COUNTS, pTiff->KindCounts, strip_count,
+				 strip, NumStrips );
+		}
+			
+/* update loop variables */
+
+		pData+=Count*lines;
+		Start+=lines;
+		Lines-=lines;
+	}	
+
+xit:	return status;
+}	/* PutImage */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PutSubfile(pTiff)
+PTIFFFILE	pTiff;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure updates the current memory IFD with the standard
+**	    tiff values contained in the TIFFFILE data structure and then
+**	    writes the memory IFD to disk. This procedure uses the TIFFILE
+**	    data structure data buffer. The newly created disk subfile will
+**	    be linked at the end of the subfile chain.
+**	Return:
+**	    status  	OKAY, directory written to disk successfully.
+**	            	WRITEERROR, could not write the directory to disk.
+**	            	TIFFEOF, no file open or no memory IFD present.
+**	History:
+*/
+
+{
+	INT32		size;
+	INT32		link = 0L;
+	INT32		offset;
+	INT16		status = OKAY;
+	INT16		i;
+	UINT16		subfile;
+	
+	if (pTiff->Handle != -1)
+	{
+/* convert old SubfileType entry to NewSubfileType and delete it if it exists */
+
+		if ( GetSubfileType(pTiff, NULL,NULL,(PINT32)&subfile)==OKAY ) {
+
+			/* keep default NewSubfile subfile 0 for full resolution image */
+
+			if ( subfile > 1 && subfile < 4 )	/* 1 == full */
+				pTiff->NewSubfile = 1 << (subfile-1);	/* 2 == reduced */
+			DeleteEntry( pTiff,SUBFILE_TYPE );               	/* 3 == multi-page*/
+		}
+
+/* put tag data to IFD, errors cannot occur as this is all memory-based */
+
+		PutNewSubfile(pTiff, pTiff->NewSubfile);
+		PutImageWidth(pTiff, pTiff->KindWidth, pTiff->ImageWidth);
+		PutImageLength(pTiff, pTiff->KindLength, pTiff->ImageLength);
+		PutBitsPerSample(pTiff, pTiff->BitsPerSample, pTiff->SamplesPerPixel);
+		PutCompression(pTiff, pTiff->Compression);
+		PutPhotoInterpret(pTiff, pTiff->PhotoInterpret);
+		PutSamplesPerPixel(pTiff, pTiff->SamplesPerPixel);
+		PutRowsPerStrip(pTiff, pTiff->KindRowsPer, pTiff->RowsPerStrip);
+		PutStripInfo(pTiff); /* make space for strip offsets and counts */
+		PutXResolution(pTiff, &pTiff->XResolution);
+		PutYResolution(pTiff, &pTiff->YResolution);
+
+		if (pTiff->SamplesPerPixel > 1) PutPlanarConfig(pTiff, pTiff->PlanarConfig);
+
+		PutResolutionUnit(pTiff, pTiff->ResolutionUnit);
+
+		/* convert the subfile directory entries to the output TIFF format */
+
+		ConvertEntries( pTiff->Format, pTiff->pBuffer, pTiff->Entries,TRUE );
+
+		/* determine the size of the subfile directory in bytes */
+
+		size = (INT32)pTiff->Entries * ENTRYSIZE;
+
+		/* seek to the end of the file, make sure its on a word boundary */
+
+		if ((offset = FileSeek(pTiff->Handle, (UINT8) SEEK_END, 0L)) == -1 || 
+			(offset&1L  && (offset = FileSeek(pTiff->Handle,(UINT8) SEEK_END,1L)) == -1))
+			{ status = WRITEERROR; goto xit; }
+
+		/* write the directory */
+
+		else if (WriteINT16(pTiff, (PINT16)&pTiff->Entries, 1L, TRUE) != OKAY
+			|| FileWrite(pTiff->Handle, pTiff->pBuffer, size) != size
+			|| WriteINT32(pTiff, (PINT32)&link, 1L, TRUE) != OKAY)
+				{ status = WRITEERROR; goto xit; }
+
+		/* link the subfile with the rest of the file by updating the directory offset*/
+		else  if (!IndexSubfile(pTiff, -1, (PINT32)&link)
+			|| FileSeek(pTiff->Handle, (UINT8) SEEK_SET, link) == -1
+			|| WriteINT32(pTiff, (PINT32)&offset, 1L, TRUE) != OKAY)
+				{ status = WRITEERROR; }
+		
+		/* save the offset of the subfile in case subfields need to be updated */
+
+		pTiff->Offset = offset;
+
+		/* convert the subfile directory entries back to the native format */
+
+		ConvertEntries( pTiff->Format, pTiff->pBuffer, pTiff->Entries,FALSE );
+
+		/* calculate the WidthBytes and BitsPerPixel */
+
+		pTiff->BitsPerPixel = 0;
+		if ( pTiff->PlanarConfig != CONTIGUOUS ) {
+
+			/* get the width in bits per sample */
+			pTiff->BitsPerPixel = pTiff->BitsPerSample[0]; /* assume first plane */
+		}
+		else {
+			/* get the width in bits per pixel */
+			for (i = 0; i < pTiff->SamplesPerPixel; i++)
+				pTiff->BitsPerPixel += pTiff->BitsPerSample[i];
+		}
+		pTiff->WidthBytes = (pTiff->BitsPerPixel*pTiff->ImageWidth + 7)/8; 
+	}
+	else	status = TIFFEOF;
+
+xit:	return status;
+
+}	/* PutSubfile */
+
+/**----------------------------------------------------------------------------
+						  Private Code
+----------------------------------------------------------------------------**/
+/*---------------------------------------------------------------------------*/
+static void ConvertEntries( Format, pBuffer, Entries, bNative)
+UINT16	Format;
+PUINT8	pBuffer;
+INT16	Entries;
+BOOLEAN  	bNative;
+
+/*
+**	Parameters:
+**	    Format  	type of conversion, INTEL or MOTO.
+**	    pBuffer 	pointer to the IFD entries.
+**	    Entries 	number of the IFD entries.
+**	    bNative 	Boolean which designates whether the entry is 
+**	            	already in native format (TRUE) or not (FALSE).
+**	Globals:    	None.
+**	Operation:
+**	    This procedure converts the IFD entry from one byte format
+**	    to the other. 
+**	Return:
+**	    status  	TRUE, if the conversion is completed.
+**	            	FALSE, if the conversion is not completed.
+**	History:
+*/
+
+{
+	INT16    	index;
+	PTIFFENTRY	pEntry;
+
+/* convert the buffer information from one file format to another */
+
+	for ( index = 0; index < Entries*ENTRYSIZE; index += ENTRYSIZE ) {
+		pEntry = (PTIFFENTRY) &pBuffer[index];
+		ConvertEntry( Format,(PTIFFENTRY) pEntry,bNative );
+	}
+	
+}	/* ConvertEntries */
+
+/*---------------------------------------------------------------------------*/
+static void ConvertEntry(Format, pEntry, bNative)
+UINT16    	Format;
+PTIFFENTRY	pEntry;
+BOOLEAN     bNative;
+
+/*
+**	Parameters:
+**	    Format  	type of file to create, INTEL or MOTO.
+**	    pEntry  	pointer to an IFD entry.
+**	    bNative 	Boolean value, when FALSE, converts to Format specified
+**	            	before interpreting the fields; when TRUE, converts
+**	            	after field interpretation.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure converts the IFD entry from one byte format
+**	    to the other. 
+**	Return:     	None.
+**	History:
+*/
+
+{
+/* can safely convert tag without fear of retribution */
+		ConvertINT16(Format, (PUINT8)&pEntry->Tag, 1L);
+
+/* if not in native format, convert Kind and Length so that Value 
+   can be interpreted */
+
+		if ( bNative == FALSE ) {
+			ConvertINT16(Format, (PUINT8)&pEntry->Kind, 1L);
+			ConvertINT32(Format, (PUINT8)&pEntry->Length, 1L);
+		}
+		if ((KindLengths[pEntry->Kind]*pEntry->Length)>4) {
+			ConvertINT32(Format, (PUINT8)&pEntry->Value.o, 1L);
+		}
+		else {
+			switch (pEntry->Kind) {
+			case TIFFASCII:
+			case TIFFBYTE: /* already in correct order */
+				break;
+			case TIFFSHORT:
+				ConvertINT16(Format, (PUINT8)&pEntry->Value.s[0], 1L);
+				ConvertINT16(Format, (PUINT8)&pEntry->Value.s[1], 1L);
+				break;
+			case TIFFLONG:
+				ConvertINT32(Format, (PUINT8)&pEntry->Value.l, 1L);
+				break;
+			case TIFFRATIONAL:
+				break;
+			}	/* switch */
+		}
+
+/* if in native format, convert entry to be written to target format */
+		if ( bNative == TRUE ) {
+			ConvertINT16(Format, (PUINT8)&pEntry->Kind, 1L);
+			ConvertINT32(Format, (PUINT8)&pEntry->Length, 1L);
+		}
+
+}	/* ConvertEntry */
+
+/*---------------------------------------------------------------------------*/
+static INT16 ConvertINT16(Format, pByte, Length)
+register	UINT16	Format;
+register	PUINT8	pByte;
+register	INT32	Length;
+
+/*
+**	Parameters:
+**	    Format  	type of file to create, INTEL or MOTO.
+**	    pByte   	pointer to the INT16 array to convert.
+**	    Length  	number of INT16 values to convert.
+**	Globals:
+**	    __NATIVE__	defines the host computer system, INTEL or MOTO.
+**	Operation:
+**	    This procedure compares the Format value with __NATIVE__ to
+**	    determine if the bytes need to be reversed. __NATIVE__ defines
+**	    the host computer system as either INTEL or MOTO.  
+**	Return:     	OKAY in all cases.
+*/
+
+{
+	register UINT8	temp;
+
+	if (Format != __NATIVE__)
+	{
+		while (Length--)
+		{ 
+			temp = *pByte++;
+			*(pByte-1) = *pByte; 
+			*pByte++ = temp; 
+		}	
+	}	
+	return( OKAY );
+
+}	/* ConvertINT16 */
+
+/*---------------------------------------------------------------------------*/
+static INT16 ConvertINT32(Format, pByte, Length)
+UINT16	Format;
+PUINT8	pByte;
+INT32	Length;
+
+/*
+**	Parameters:
+**	    Format  	type of file to create, INTEL or MOTO.
+**	    pByte   	pointer to the INT32 array to convert.
+**	    Length  	number of INT32 values to convert.
+**	Globals:
+**	    __NATIVE__	defines the host computer system, INTEL or MOTO.
+**	Operation:
+**	    This procedure compares the Format value with __NATIVE__ to
+**	    determine if the bytes need to be reversed. __NATIVE__ defines
+**	    the host computer system as either INTEL or MOTO.
+**	Return:     	None.
+*/
+
+{
+	UINT8	temp1;
+	UINT8	temp2;
+
+	if (Format != __NATIVE__)
+	{
+		while (Length--)
+		{
+			temp1 = *pByte++;
+			temp2 = *pByte++;
+			*(pByte-1) = *pByte;
+			*pByte++ = temp2;
+			*(pByte-3) = *pByte;
+			*pByte++ = temp1;
+		}	/* while */
+	}	/* if */
+
+	return( OKAY );
+
+}	/* ConvertINT32 */
+
+/*---------------------------------------------------------------------------*/
+static INT32 GetNumberStrips( pTiff )
+PTIFFFILE	pTiff;
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	Globals:    	None.
+**	Operation:
+**	    Returns the number of strips in a TIFF image. 
+**	Return:     	None.
+**	History:
+*/
+
+{
+	INT32		Strips;
+	
+	if (pTiff->RowsPerStrip==-1) Strips=1;
+	else
+	{
+		Strips = (pTiff->ImageLength + pTiff->RowsPerStrip - 1)/pTiff->RowsPerStrip;
+
+		if (pTiff->PlanarConfig!=CONTIGUOUS) 
+			Strips *= (INT32) pTiff->SamplesPerPixel; /* looks good eh? */
+	}
+	return(Strips);
+}
+/*---------------------------------------------------------------------------*/
+static INT16 GetTagData(pTiff, Tag, pEntry)
+PTIFFFILE 	pTiff;
+UINT16    	Tag;
+PTIFFENTRY	pEntry;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**	    pEntry  	pointer to where the Tiff entry is to be loaded.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure searches the memory buffer which contains the
+**	    image of the subfile directory for an entry which matches the
+**	    specified tag. This procedure assumes that the memory buffer
+**	    currently contains the subfile directory. The status returned
+**	    is TRUE if the entry is found and FALSE if not.
+**	Return:
+**	    status  	OKAY, a matching entry has been found in the buffer.
+**	            	TAGERROR, no matching entry was found.
+**	History:
+*/
+
+{
+	INT16	status;
+	INT16	index = 0;
+
+	while (((status = IndexEntry(pTiff, index++, pEntry))==OKAY) && pEntry->Tag < Tag);
+	
+	if ((status==TAGERROR)||(status == OKAY && pEntry->Tag != Tag)) status = TAGERROR;
+	else status = OKAY;
+	
+	return status;
+}	/* GetTagData */
+
+/*---------------------------------------------------------------------------*/
+static INT16 IndexSubfile(pTiff, Subfile, pOffset)
+PTIFFFILE	pTiff;
+INT16    	Subfile;
+PINT32    	pOffset;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the TIFFFILE data structure.
+**	    Subfile 	the subfile to be accessed.
+**	    pOffset 	pointer to where the file offset is to be loaded.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure follows the subfile links and locates the directory
+**	    of the requested subfile. The subfile index is zero relative. If
+**	    the requested subfile is found the file offset is returned to the
+**	    location indicated and TRUE is returned. If the subfile is not
+**	    found a zero file offset is returned with a FALSE value. A negative
+**	    subfile index will cause the procedure to seek to the last subfile
+**	    link and return the offset of that location with a TRUE value.
+**	Return:
+**	    status  	TRUE, if the requested subfile is located.
+**	            	FALSE, if the subfile is not located.
+**	History:
+*/
+
+{
+	INT16	status = FALSE;
+	INT16	entries = 0;
+	INT32	link = 4L;
+
+/* if a file exists then follow the subfile chain */
+	*pOffset = 0L;
+	if (pTiff->Handle != -1)
+	{
+		for (;;)
+		{
+			if (FileSeek(pTiff->Handle, (UINT8) SEEK_SET, link) != link
+			|| ReadINT32(pTiff,  pOffset, 1L) != OKAY)
+				{ *pOffset = 0L; break; }
+			else if (*pOffset == 0L)
+			{
+				if (Subfile < 0) { *pOffset = link; status = TRUE; }
+				break;
+			}
+			else if (Subfile == 0) { status = TRUE; break; }
+			else if (FileSeek(pTiff->Handle, (UINT8) SEEK_SET, *pOffset) != *pOffset
+			|| ReadINT16(pTiff, (PINT16)&entries, 1L) != OKAY)
+				{ *pOffset = 0L; break; }
+			else link = *pOffset + (INT32)entries * ENTRYSIZE + 2;
+			if (Subfile >= 0) Subfile--;
+		}	/* for */
+	}	/* if */
+
+	return status;
+}	/* IndexSubfile */
+
+/*---------------------------------------------------------------------------*/
+static INT16 MakeEntry(pTiff, Tag, Kind, Value, Length)
+PTIFFFILE	pTiff;
+UINT16    	Tag;
+INT16    	Kind;
+INT32    	Value;
+INT32    	Length;
+/*
+**	Parameters:
+**	    pTiff   	pointer to the TIFFFILE data structure.
+**	    Tag     	directory entry tag.
+**	    Kind    	directory entry kind, TIFFBYTE, TIFFASCII,
+**	            	TIFFSHORT, TIFFLONG, TIFFRATIONAL.
+**	    Length  	number of values stored in this entry.
+**	    Value   	value or offset of the value array.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure adds a Tiff entry described by the parameters
+**	    to the memory IFD found in the pTiff structure. If the
+**	    entry already exists in the IFD, it is updated with this new
+**	    one. If no matching entry is found an attempt is made to add
+**	    it to the IFD. If unsuccessful, the procedure returns TIFFEOF.
+**	Return:
+**	    status  	OKAY, entry add to the directory successfully
+**	            	TIFFEOF, no room for the entry.
+**	History:
+*/
+{
+	INT16		index = 0;
+	INT16		status;
+	TIFFENTRY	entry;
+	PTIFFENTRY	plastone, pmoveto;
+	INT32		i;
+	
+/* try to locate the tag in the memory directory */
+
+	while (((status = IndexEntry(pTiff, index, (PTIFFENTRY)&entry))==OKAY) 
+		&& entry.Tag < Tag) 
+		index++;
+	
+/* assign the correct type of value and format */
+
+	entry.Kind = Kind;
+	entry.Length = Length;
+	entry.Value.o = Value; /* setup offset as default */
+
+	if ((KindLengths[Kind]*Length)<=4) { /* change value if data fits in tag */
+		switch( entry.Kind ) { 
+		case TIFFASCII:
+		case TIFFBYTE:
+			entry.Value.l=0L;
+			for (i=0;i<Length;i++) entry.Value.b[(INT16)i]=(UINT8)(Value>>((Length-1-i)*8));
+			break;
+		case TIFFSHORT:
+			entry.Value.l=0L;
+			for (i=0;i<Length;i++) entry.Value.s[(INT16)i]=(UINT16)(Value>>((Length-1-i)*16));
+			break;
+		case TIFFLONG:
+			entry.Value.l=Value;
+			break;
+		case TIFFRATIONAL:
+			break;
+		}
+	}
+
+/* update existing entry or try to create a new one */
+
+	if (status == OKAY && entry.Tag == Tag) { /* entry exists, update it */
+		((PTIFFENTRY) pTiff->pBuffer)[index] = entry;
+	}
+	else { /* this is a new entry, can it be added to the list? */
+		if (pTiff->Size >= (INT32)(pTiff->Entries+1) * ENTRYSIZE) {
+			/* yes, move the entries to create an empty spot and add the new one */
+			/* index is zero if entry not found */
+			entry.Tag = Tag;
+			pTiff->Entries++;
+			index = pTiff->Entries - index;
+			pmoveto = &((PTIFFENTRY)pTiff->pBuffer)[pTiff->Entries];
+			plastone = pmoveto-1;
+			while (index--) *pmoveto-- = *plastone--; 
+			*pmoveto = entry;
+			status = OKAY;
+		}
+		else 
+			status = TIFFEOF; /* not enough room to add entry */
+	}
+	return status;
+
+}	/* MakeEntry */
+
+/*---------------------------------------------------------------------------*/
+static INT16 PutStripInfo( pTiff )
+PTIFFFILE	pTiff;
+
+/*
+**	Parameters:
+**	    pTiff    	pointer to the file data structure.
+**	Globals:    	None.
+**	Operation:
+**	Return:
+**	    status    	OKAY, strip offsets and counts successfully written.
+**	            	WRITEERROR, error occurred while seeking or writing.
+**	            	NOTTIFF, not SHORT or LONG in field type (kind).
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	i;          	/* loop variable */
+	INT32	Strips;     	/* number of strips to be written */
+	INT32	value;      	/* zero for now */
+	INT32	StripOffsets;	
+	INT32	StripCounts;
+	
+/* if multiple strips, then write out a zero-valued strip offset and
+   count arrays ; they will be updated later in PutImage */
+
+	if ( pTiff->RowsPerStrip != -1 
+	&& pTiff->RowsPerStrip < pTiff->ImageLength ) {
+
+		/* compute the number of strips in the image */
+
+		Strips=GetNumberStrips(pTiff);
+		
+		/* write out the strip offset array */
+
+		StripOffsets = FileSeek( pTiff->Handle,(UINT8)SEEK_END,0L );
+
+		if ( pTiff->KindOffsets == TIFFSHORT ) {
+			for ( i = 0; i < Strips && status == OKAY; i++ ) {
+				if ( (value = FileSeek(pTiff->Handle,(UINT8)SEEK_END,0L)) == -1
+				|| WriteINT16( pTiff,(PINT16)&value,1L,TRUE ) != OKAY )
+					status = WRITEERROR; 
+			}
+		}
+		else if ( pTiff->KindOffsets == TIFFLONG ) {
+			for ( i = 0; i < Strips && status == OKAY; i++ ) {
+				if ( (value = FileSeek(pTiff->Handle,(UINT8)SEEK_END,0L)) == -1
+				|| WriteINT32( pTiff,(PINT32)&value,1L,TRUE ) != OKAY )
+					status = WRITEERROR; 
+			}
+		}
+		else { status = NOTTIFF; goto xit; } 
+
+		/* write out the strip count array */
+
+		StripCounts = FileSeek( pTiff->Handle,(UINT8)SEEK_END,0L );
+
+		if ( pTiff->KindCounts == TIFFSHORT ) {
+			for ( i = 0; i < Strips && status == OKAY; i++ ) {
+				if ( (value = FileSeek(pTiff->Handle,(UINT8)SEEK_END,0L)) == -1
+				|| WriteINT16( pTiff,(PINT16)&value,1L,TRUE ) != OKAY )
+					status = WRITEERROR; 
+			}
+		}
+		else if ( pTiff->KindCounts == TIFFLONG ) {
+			for ( i = 0; i < Strips && status == OKAY; i++ ) {
+				if ( (value = FileSeek(pTiff->Handle,(UINT8)SEEK_END,0L)) == -1
+				|| WriteINT32( pTiff,(PINT32)&value,1L,TRUE ) != OKAY )
+					status = WRITEERROR; 
+			}
+		}
+		else { status = NOTTIFF; goto xit; } 
+	}
+	else Strips = 1L;
+
+/* update the tag buffer information, including length */
+
+	MakeEntry( pTiff, 273,pTiff->KindOffsets,StripOffsets,Strips );
+	MakeEntry( pTiff, 279,pTiff->KindCounts,StripCounts,Strips );
+
+xit:	return( status );
+
+} /* PutStripInfo */
+
+#ifdef __READ__
+/*---------------------------------------------------------------------------*/
+static INT16 ReadINT16(pTiff, pINT16, Length)
+PTIFFFILE	pTiff;
+PINT16    	pINT16;
+INT32    	Length;
+
+/*
+**	Parameters:
+**	    pTiff   	pointer to the file data structure.
+**	    pINT32  	pointer to the INT16 array to read.
+**	    Length  	number of INT16 values to read.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure reads an array of INT16 values from the disk.
+**	    The values will be converted from the file format to the
+**	    __NATIVE__	machine format.
+**	Return:
+**	    status  	OKAY, array written successfully.
+**	            	READERROR, disk read error occurred.
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	size = Length * sizeof(INT16);
+
+	if (pTiff->Handle != -1
+	&& FileRead(pTiff->Handle, (PUINT8)pINT16, size) == size) 
+		ConvertINT16(pTiff->Format, (PUINT8)pINT16, Length);
+	else status = READERROR;
+
+	return status;
+}	/* ReadINT16 */
+
+/*---------------------------------------------------------------------------*/
+static INT16 ReadINT32(pTiff, pINT32, Length)
+PTIFFFILE	pTiff;
+PINT32    	pINT32;
+INT32    	Length;
+
+/*
+**	Parameters:
+**	    pTiff   	pointer to the file data structure.
+**	    pINT32  	pointer to the INT32 array to read.
+**	    Length  	number of INT32 values to read.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure reads an array of INT32 values from the disk.
+**	    The values will be converted from the file format to the
+**	    __NATIVE__	machine format.
+**	Return:
+**	    status  	OKAY, array written successfully.
+**	            	READERROR, disk read error occurred.
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	size = Length * sizeof(INT32);
+
+	if (pTiff->Handle != -1
+	&& FileRead(pTiff->Handle, (PUINT8)pINT32, size) == size)
+		ConvertINT32(pTiff->Format, (PUINT8)pINT32, Length);
+	else status = READERROR;
+
+	return status;
+}	/* ReadINT32 */
+#endif
+
+/*---------------------------------------------------------------------------*/
+static INT16 UpdateEntry(pTiff, Tag, Kind, Value, Location, Count)
+PTIFFFILE	pTiff;
+INT16		Tag;
+INT16		Kind;
+INT32		Value;
+INT32		Location;
+INT32		Count;
+
+/*
+**	Parameters:
+**	    pTiff   	pointer to the file data structure.
+**	    Tag  		Tag number to update
+**	    Kind		Kind of data in tag value
+**	    Value		Data to update tag value with
+**		Location	Location into tag data for multi-value tags
+**		Count		Number of data items in tag data
+**
+**	Globals:    	None.
+**	Operation:
+**	    Updates the file being written with the specified value.
+**
+**	Return:
+**	    status  	OKAY, array written successfully.
+**					ERROR, structure not initialized.
+**					TAGERROR, tag was not found
+**	            	WRITEERROR, disk write error occurred.
+**	History:
+*/
+
+{
+	INT16		status = OKAY;
+	INT16		Index=0;
+	TIFFENTRY	entry;
+	INT32		offset;
+	INT16		Value16;
+	
+	if (pTiff->Handle==-1) return(ERROR);
+	
+/* find data tag in file */
+
+	while(((IndexEntry(pTiff,Index,(PTIFFENTRY)&entry))==OKAY) && entry.Tag < Tag) 
+		 Index++;
+	if ( entry.Tag != Tag ) { status = TAGERROR; goto xit; }
+
+	/* offset is subfile offset (pTiff->Offset) + index of tagged entry + 8 + 2 */
+
+	offset = pTiff->Offset + Index*12L + 10L; 
+
+	if ( FileSeek( pTiff->Handle,(UINT8)SEEK_SET,offset ) != offset )
+		{ status = WRITEERROR; goto xit; }
+	
+/* write out data for single value tag */
+
+	if (Count<=1) 
+	{
+		MakeEntry( pTiff, Tag, Kind, Value, 1L ); /* update IFD */
+
+		if ( Kind == TIFFSHORT ) 
+		{
+			Value16=(INT16)Value;
+			if(WriteINT16(pTiff,(PINT16)&Value16,1L,TRUE)!=OKAY)
+				{ status = WRITEERROR; goto xit; }
+		}
+		else 
+		{
+			if(WriteINT32(pTiff,(PINT32)&Value,1L,TRUE)!=OKAY)
+				{ status = WRITEERROR; goto xit; }
+		}
+	}
+	
+/* write out data for multiple value tag */
+
+	else
+	{
+		if (ReadINT32(pTiff,&offset,1L)!=OKAY) { status = READERROR; goto xit; }
+			
+		if (Kind == TIFFSHORT) { /* write strip as short */
+			offset += Location*2L;
+			Value16=(INT16)Value;
+			if (FileSeek(pTiff->Handle, (UINT8) SEEK_SET, offset) != offset
+				|| WriteINT16(pTiff, (PINT16)&Value16, 1L, TRUE ) != OKAY)
+				status = WRITEERROR;
+		}
+
+		else { /* write strip as long */
+			offset += Location*4L;
+			if (FileSeek(pTiff->Handle, (UINT8) SEEK_SET, offset) != offset
+				|| WriteINT32(pTiff, (PINT32)&Value, 1L, TRUE ) != OKAY)
+				status = WRITEERROR;
+		}	
+	}
+
+xit:return status;
+}	/* UpdateEntry */
+/*---------------------------------------------------------------------------*/
+static INT16 WriteINT16(pTiff, pINT16, Length, bConvert)
+PTIFFFILE	pTiff;
+PINT16    	pINT16;
+INT32    	Length;
+INT16    	bConvert;
+
+/*
+**	Parameters:
+**	    pTiff   	pointer to the file data structure.
+**	    pINT16  	pointer to the INT16 array to write.
+**	    Length  	number of INT16 values to write.
+**	    bConvert	TRUE, reconvert the values back to __NATIVE__ format.
+**	            	FALSE, leave the converted data as is.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure writes an array of INT16 values, which have
+**	    been properly converted, to the disk. After writing the
+**	    values the data is returned to the __NATIVE__ machine format
+**	    if the bConvert flag is TRUE.
+**	Return:
+**	    status  	OKAY, array written successfully.
+**	            	WRITEERROR, disk write error occurred.
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	size = Length * sizeof(INT16);
+
+	ConvertINT16(pTiff->Format, (PUINT8)pINT16, Length);
+	if (pTiff->Handle == -1
+	|| FileWrite(pTiff->Handle, (PUINT8)pINT16, size) != size)
+		status = WRITEERROR;
+	if (bConvert) ConvertINT16(pTiff->Format, (PUINT8)pINT16, Length);
+
+	return status;
+}	/* WriteINT16 */
+
+/*---------------------------------------------------------------------------*/
+static INT16 WriteINT32(pTiff, pINT32, Length, bConvert)
+PTIFFFILE	pTiff;
+PINT32    	pINT32;
+INT32    	Length;
+INT16    	bConvert;
+
+/*
+**	Parameters:
+**	    pTiff   	pointer to the file data structure.
+**	    pINT32  	pointer to the INT32 array to write.
+**	    Length  	number of INT32 values to write.
+**	    bConvert	TRUE, reconvert the values back to __NATIVE__ format.
+**	            	FALSE, leave the converted data as is.
+**	Globals:    	None.
+**	Operation:
+**	    This procedure writes an array of INT32 values, which have
+**	    been properly converted, to the disk. After writing the
+**	    values the data is returned to the __NATIVE__ machine format
+**	    if the bConvert flag is TRUE.
+**	Return:
+**	    status  	OKAY, array written successfully.
+**	            	WRITEERROR, disk write error occurred.
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	size = Length * sizeof(INT32);
+
+	ConvertINT32(pTiff->Format, (PUINT8)pINT32, Length);
+	if (pTiff->Handle == -1
+	|| FileWrite(pTiff->Handle, (PUINT8)pINT32, size) != size)
+		status = WRITEERROR;
+	if (bConvert) ConvertINT32(pTiff->Format, (PUINT8)pINT32, Length);
+
+	return status;
+}	/* WriteINT32 */
+
+/* end tiff.c */

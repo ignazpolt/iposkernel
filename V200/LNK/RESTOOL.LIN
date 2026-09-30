@@ -1,0 +1,5 @@
+COPY ..\..\%ACTVERS%.SRC\RESTOOL\restool.LNK
+COPY ..\..\%ACTVERS%.SRC\RESTOOL\restool.DEF
+
+link /co /noe /nod /map /seg:300 /li @restool.lnk
+rc -T -K restool.res restool.exe

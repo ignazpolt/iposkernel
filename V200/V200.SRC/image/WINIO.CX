@@ -1,0 +1,269 @@
+/*
+// $Header:   P:/marille/clinicum/image/rev/winio.c_v   1.0   24 Jun 1994 16:50:56   HANNES  $
+// $Log:   P:/marille/clinicum/image/rev/winio.c_v  $
+ * 
+ *    Rev 1.0   24 Jun 1994 16:50:56   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.1   03 Dec 1992 13:04:46   HANNES
+ * PVCS - Kommentare
+ * 
+ *    Rev 1.0   02 Dec 1992 16:26:00   HANNES
+ * Initial revision.
+ ******************************************************************************
+**	Filename:		winio.c
+**  Purpose:     	Windows file IO procedures
+**	Author:			Mike Niquette and Dave Formanek
+**	Environment:	Microsoft (R) Windows Version 3.0
+**	Library:		For use with HP-TIFF 5.0 Library.
+**	History:		Created: 12/12/89, dlf.
+**					Updated: 04/25/90, mln, MS Windows 3.0 compatible.
+**	Version:	  	2.0
+**	 
+**	(c) Copyright Hewlett-Packard Company, 1989-1990.
+**	All rights are reserved. Copying or other reproduction of this
+**	program except for archival purposes is prohibited without the
+**	prior written consent of Hewlett-Packard Company.
+**
+**	Note:	To U.S. Government Users:
+**
+**					RESTRICTED RIGHTS LEGEND
+**
+**	Use, duplication, or disclosure by the Government is subject to
+**	restrictions as set forth in paragraph (b) (3) (B) of the Rights
+**	in Technical Data and Computer Software clause in DAR 7-104.9(a).
+**
+**	Use, duplication, or disclosure by the Government is subject to
+**	restrictions as set forth in paragraph (c) (1) (ii) of the Rights
+**	in Technical Data and Computer Software clause in DFARS 252.227-7013.
+**
+**	HEWLETT-PACKARD COMPANY
+**	Greeley, Colorado
+******************************************************************************/
+
+
+/**----------------------------------------------------------------------------
+						Include Files and Type Defines
+----------------------------------------------------------------------------**/
+#include <windows.h>
+#include "host.h"
+
+
+/**----------------------------------------------------------------------------
+						Public Function Prototypes
+----------------------------------------------------------------------------**/
+INT16 FileClose(INT16 Handle);
+INT16 FileCreate(PUINT8 pName);
+INT16 FileDelete(PUINT8 pName);
+INT32 FileSeek(INT16 Handle, UINT8 Mode, INT32 Offset);
+INT32 FileWrite(INT16 Handle, PUINT8 pBuffer, INT32 Length);
+INT16 FileOpen(PUINT8 pName);
+INT32 FileRead(INT16 Handle, PUINT8 pBuffer, INT32 Length);
+
+/**----------------------------------------------------------------------------
+						Private Function Prototypes
+----------------------------------------------------------------------------**/
+static void SetRawMode(INT16 handle);
+void FP DOS3Call(void);
+
+/**----------------------------------------------------------------------------
+			  		Global Data Definitions and Declarations
+----------------------------------------------------------------------------**/
+
+/**----------------------------------------------------------------------------
+						 		Public Code
+----------------------------------------------------------------------------**/
+/*---------------------------------------------------------------------------*/
+INT16 FileClose(INT16 Handle)
+
+/*
+**	Parameters:
+**		Handle		handle to the file or device.
+**	Globals:		None.
+**	Operation:
+**		This procedure closes the file specified by Handle.
+**	Return:		
+**		status		0 file closed successfully.
+**					-1 if an error occurred.
+**	History:
+*/
+
+{
+	return _lclose(Handle);
+}	/* FileClose */
+
+
+/*---------------------------------------------------------------------------*/
+INT16 FileCreate(PUINT8 pName)
+
+/*
+**	Parameters:
+**		pName		pointer to a null terminated ascii
+**					string containing the file or device name.
+**	Globals:		None.
+**	Operation:
+**		Creates a file using the name specified.
+**	Return:		
+**		handle		handle to the file or device
+**					-1 if the operation failed.
+**	History:
+*/
+
+{
+	return _lcreat(pName, 0);
+}	/* FileCreate */
+
+
+/*---------------------------------------------------------------------------*/
+INT16 FileDelete(PUINT8 pName)
+
+/*
+**	Parameters:
+**		pName		pointer to a null terminated ascii
+**					string containing the file or device name.
+**	Globals:		None.
+**	Operation:
+**		This procedure deletes the file specified by Handle.
+**	Return:		
+**		status		Non-Zero, if file deleted successfully.
+**					-1 if an error occurred.
+**	History:
+*/
+
+{
+	OFSTRUCT	ofstruct;
+
+	return OpenFile(pName, &ofstruct, OF_DELETE);
+}	/* FileDelete */
+
+
+/*---------------------------------------------------------------------------*/
+INT16 FileOpen(PUINT8 pName)
+
+/*
+**	Parameters:
+**		pName		pointer to a null terminated ascii
+**					string containing the file or device name.
+**	Globals:		None.
+**	Operation:
+**		Opens a file using the specified file name.
+**	Return:		
+**		handle		handle to the open file or device.
+**					-1 if the operation failed.
+**	History:
+*/
+
+{
+	INT16	handle;
+
+	if ((handle = _lopen(pName, OF_READWRITE)) != -1) SetRawMode(handle);
+	return handle;
+}	/* FileOpen */
+
+
+/*---------------------------------------------------------------------------*/
+INT32 FileRead(INT16 Handle, PUINT8 pBuffer, INT32 Length)
+
+/*
+**	Parameters:
+**		Handle		handle to the file or device.
+**		pBuffer		pointer to the data buffer.
+**		Length		the size of the data buffer in bytes.
+**	Globals:		None.
+**	Operation: 
+**		Reads data from a file. Reads <= 64K bytes at a time.
+**	Return:		
+**		count		long integer indicating the bytes read.
+**					-1 if an error occurred.
+**	History:
+*/
+
+{
+	return _lread(Handle, pBuffer, (INT16)Length);
+}	/* FileRead */
+
+
+/*---------------------------------------------------------------------------*/
+INT32 FileSeek(INT16 Handle, UINT8 Mode, INT32 Offset)
+
+/*
+**	Parameters:
+**		Handle		handle to the file.
+**		Mode		determines how to handle the offset.
+**		Offset		the number of bytes -/+
+**	Globals:		None.
+**	Operation:
+**		This procedure positions the file pointer relative to the mode selected.
+**	Return:		
+**		position	the final position
+**		        	-1, if an error occurred.
+**	History:
+*/
+
+{
+	return _llseek(Handle, Offset, Mode);
+}	/* FileSeek */
+
+
+/*---------------------------------------------------------------------------*/
+INT32 FileWrite(INT16 Handle, PUINT8 pBuffer, INT32 Length)
+
+/*
+**	Parameters:
+**		Handle		handle to the file or device.
+**		pBuffer		pointer to the data buffer.
+**		Length		the size of the data buffer in bytes.
+**	Globals:		None.
+**	Operation:
+**		Writes data to a file. Writes <= 64K bytes at a time.
+**	Return:		
+**		count		long integer indicating the bytes written.
+**					-1 if an error occurred.
+**	History:
+*/
+
+{
+	return _lwrite(Handle, pBuffer, (INT16)Length);
+}	/* FileWrite */
+
+
+/**----------------------------------------------------------------------------
+							Private Code
+----------------------------------------------------------------------------**/
+/*---------------------------------------------------------------------------*/
+void SetRawMode(INT16 handle)
+
+/*
+**	Parameters:
+**		Handle		Handle to the currently opened file.
+**	Globals:		None.
+**	Operation:
+**		This procedure sets the open handle to raw mode.
+**	Return:
+**		ax		 value of the AX register after the interrupt
+**	History:
+*/
+
+{
+	_asm
+	{
+		mov		ax,4400h			;get the current device information
+		mov		bx,handle
+;		call	DOS3Call
+		int 21h
+		jc		xit
+
+		test	dx,80h				;make sure that this is a character device
+		jz		xit
+
+		xor		dh,dh				;set the raw mode bit (bit 5)
+		or		dl,20h
+		mov		ax,4401h
+;		call	DOS3Call
+		int	21h
+		jc		xit
+		xor		ax,ax
+	xit:
+	}
+}
+

@@ -1,0 +1,607 @@
+0: "Feldname"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+1: "Feldinhalt"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+2: "unwichtiger Text"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+3: "wichtiger Text"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+4: "Standardlisteneintrag"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+5: "Button"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+6: "Gruppenüberschrift"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+7: "Überschrift Liste"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+8: "Diagnoseüberschrift"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 63; 63
+9: "Therapieüberschrift"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 63; 63; 255
+10: "Formulartext, zentriert 12 Pkt."; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11: "Auftragsbeschreibung"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 0
+12: "10 Pkt. Fett"; ""; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+13: "Formularüberschrift"; ""; "Arial"; 120; -16; Zentriert; 28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+14: "Formulartext, grün"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+15: "Standardtext 10 Pkt._r"; ""; "Arial"; 90; -12; Rechtsbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+16: "Flappentext"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+17: "Standardtext 12 Pkt._c"; "für "; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+18: "Stammdaten / normal"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+19: "Stammdaten / fett"; "Kopi"; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+20: "Fett und Kursiv"; "Kopi"; ""; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 1; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0
+21: "Klein, kursiv"; ""; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+22: "Groß, für Belichtung"; "Kopi"; "Arial"; 160; 0; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+23: "Geplante Therapie"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 63; 255; 63
+24: "Fetter Listeneintrag"; "Kopi"; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+25: "Rechter Listeneintrag"; ""; "Arial"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+25: "Neues Format"; "Kopi"; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+26: "Groß, für Belichtung_c"; "Kopi"; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+27: "Wert, im Normbereich 12 Pkt."; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+28: "Wert, 1 Abweichung, 12 Pkt"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+29: "Wert, gr. Abweichung 12 Pkt."; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+30: "standard 6 rechts"; ""; "Arial"; 60; -8; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+31: "standard 8 links"; ""; "Arial"; 80; -11; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+32: "standard 7 links"; ""; "Arial"; 70; -9; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+33: "standard 8 rechts"; ""; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+34: "standard 7 rechts"; ""; "Arial"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+35: "standard 4 rechts"; ""; "Arial"; 40; -5; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+36: "standard 5 rechts"; ""; "Arial"; 50; -7; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+37: "standard 5 zentr."; ""; "Arial"; 50; -7; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+38: "standard 6 zentr."; ""; "Arial"; 60; -8; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+39: "standard 4 zentr."; ""; "Arial"; 40; -5; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+40: "standard 10 links, fett, kursiv"; ""; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 700; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+41: "Groß, für Belichtung_c"; "Kopi"; "Arial"; 140; 0; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+42: "Standard 10 zentr., fett"; ""; "Arial"; 90; -12; Zentriert; 28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+43: "st.10 links, fett-kursiv, ustr."; ""; "Arial"; 100; -13; Linksbündig; 28; 0; 0; 0; 0; 700; 255; 1; 0; 0; 3; 2; 1; 34; 0; 0; 0
+44: "Neues Format"; "Kopi"; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+45: "Neues Format"; "Kopi"; "MT Symbol"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 2; 3; 2; 2; 82; 0; 0; 0
+46: "Wert, im Normbereich_c"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+47: "Neues Format"; "Kopi"; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+48: "standard 9, zentr."; "Kopi"; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+49: "standard 10 links, kursiv"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+50: "7Pkt Arial fett linksb."; "Kopi"; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+51: "7 Pkt Arial fett rechtsb."; "Kopi"; "Arial"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+52: "wingding 10, zentr."; ""; "Wingdings"; 100; -17; Zentriert; 28; 0; 0; 0; 0; 400; 0; 0; 0; 2; 3; 2; 1; 2; 0; 0; 0
+53: "linksbündige Überschrift_b"; ""; "Arial"; 180; -24; Blocksatz; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+54: "Neues Format"; "Kopi"; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+55: "7 Pkt Arial fett    *zentriert*"; "Kopi"; "Arial"; 70; -9; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+56: "7 Pkt rot für Liste"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+57: "7 Pkt Symbolschrift linksb."; "Kopi"; "Symbol"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 2; 3; 2; 1; 18; 0; 0; 0
+58: "Neues Format"; "Kopi"; "Arial"; 100; -13; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+59: "Arial 9Pkt zentriert"; "Kopi"; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+60: "7 Pkt Arial standart zentriert"; "Kopi"; "Arial"; 70; -9; Zentriert; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+61: "st. 10 links, fett, unterstrich"; "Kopi"; "Arial"; 100; -13; Linksbündig; 28; 0; 0; 0; 0; 700; 0; 1; 0; 0; 3; 2; 1; 34; 0; 0; 0
+62: "test copy !!!"; "Kopi"; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+63: "Zentriete Überschrift, 14 Pkt"; "Kopi"; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+64: "Neues Format"; "Kopi"; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+65: "Listeneintrag AL11"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+66: "Listeneintrag AL12"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+67: "Listeneintrag AL14"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+68: "Listeneintrag AL16"; ""; "Arial"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+69: "Listeneintrag AL18"; ""; "Arial"; 180; -24; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+70: "Listeneintrag AR11"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+71: "Listeneintrag AR12"; ""; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+72: "Listeneintrag AR14"; ""; "Arial"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+73: "Listeneintrag AR16"; ""; "Arial"; 160; -21; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+74: "Listeneintrag AR18"; ""; "Arial"; 180; -24; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+75: "Listeneintrag AZ11"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+76: "Listeneintrag AZ12"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+77: "Listeneintrag AZ14"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+78: "Listeneintrag AZ16"; ""; "Arial"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+79: "Listeneintrag AZ18"; ""; "Arial"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+80: "Patientenname in Toolbar"; ""; "Arial"; 180; -24; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+81: "Hinweis der Zahnarbeit"; ""; "Arial"; 140; -19; Linksbündig; 0; 567; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+85: "Dialog AL9"; ""; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+86: "Dialog AL10"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+87: "Dialog AL11"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+88: "Dialog AL12"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+89: "Dialog AL14"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+90: "Dialog AR9"; ""; "Arial"; 90; -12; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+91: "Dialog AR10"; ""; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+92: "Dialog AR11"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+93: "Dialog AR12"; ""; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+94: "Dialog AR14"; ""; "Arial"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+95: "Dialog AZ9"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+96: "Dialog AZ10"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+97: "Dialog AZ11"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+98: "Dialog AZ12"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+99: "Dialog AZ14"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+100: "F21 untereZeile"; "Beschriftung"; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+101: "F21 mittlereZeile"; "Patientendaten"; "Arial"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+102: "F21 obereZeile"; "Art der Zu-/Überweisung"; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+103: "F21 Geschlecht"; "M/W"; "Arial"; 130; -17; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+120: "F18 Titelzeile"; ""; "Arial"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+121: "F18 Eingabetexte"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+122: "F18 FixtexteAllgemein"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+123: "F18 Kleinsttext"; ""; "Arial"; 60; -8; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+124: "F18 Ueberschriften"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+130: "F13 Titelzeile"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+131: "F13 Eingabetexte"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+132: "F13 Fixtexte"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+140: "F20 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+141: "F20 BeschriftungHorizontal"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+142: "F20 BeschriftungVertikal1"; ""; "Arial"; 80; -11; Zentriert; 102; -11; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+143: "F20 BeschriftungVertikal2"; ""; "Arial"; 100; -13; Zentriert; 119; -17; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+144: "F20 Eingabetexte,zentriert"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+145: "F20 Eingabetexte,linksbündig"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+150: "F1 Titelzeile"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+151: "F1 Kleinstschrift"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+152: "F1 Eingabetext & Fixtex normal"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+153: "F1 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+154: "F1 UnterUeberschrift"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+155: "F1 Fixtext kursiv"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+156: "F1 Fixtext Zahnfach"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+157: "F1 Zahleneingabe"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+160: "F2 Titelzeile"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+161: "F2 Kleinstschrift"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+162: "F2 Eingabetext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+163: "F2 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+170: "F3 F14 Titelzeile"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+171: "F3 F14 Eingabetext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+172: "F3 F14 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+173: "F3 F14 recall-Datum"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+180: "-- F5 F6 F7 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+181: "F4 F5 F6 F7 Kleinsttext"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+182: "F4 F5 F6 F7 Eingabetext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+183: "F4 F5 F6 F7 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+184: "F4 F5 F6 F7 Spaltenbeschriftung"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+185: "F4 F5 F6 F7 Zeilenbeschriftung"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+186: "F4 F5 F6 F7 Papilaerer Blutungs"; "ganzzahlig, klein"; "Arial"; 60; -8; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+187: "F4 F5 F6 F7 Taschentiefe"; "float, klein"; "Arial"; 50; -7; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+188: "F4 F5 F6 F7 Tabelleneintraege"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+189: "F4 F5 F6 F7 Okklusion-Eintraege"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+190: "F4 F5 F6 F7 Tabelleneintraege 2"; "float, groß"; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+191: "F4 Titelzeile"; ""; "Arial"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+200: "F8 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+201: "F8 Eingabetext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+202: "F8 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+203: "F8 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+204: "F8 Fixtext kursiv"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+205: "F8 Dynamik-Symbole"; ""; "Wingdings"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 2; 3; 2; 1; 2; 0; 0; 0
+210: "F9 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+211: "F9 Kleinstschrift"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+212: "F9 Eingabezeilen"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+213: "F9 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+214: "F9 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+215: "F9 Fixtext kursiv"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+216: "F9 Zahnfaecher"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+220: "F11 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+221: "F11 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+222: "F11 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+223: "F11 Eingabezeile"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+224: "F11 Zahnfaecher"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+230: "F12 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+231: "F12 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+232: "F12 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+233: "F12 Eingabezeile"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+234: "F12 Eingabe zentriert"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+235: "F12 Zahnfaecher"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+236: "F12 Kleinstschrift"; ""; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+240: "F15 Titelzeile"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+241: "F15 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+242: "F15 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+243: "F15 Eingabezeile"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+244: "F15 Eingabezeile zentriert"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+245: "F15 Unterueberschrift"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+250: "F16 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+251: "F16 Fixtext"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+252: "F16 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+253: "F16 Unterueberschrift"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 1; 0; 0; 3; 2; 1; 34; 0; 0; 0
+254: "F16 Kleinstschrift"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+255: "F16 Zahnfach"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+256: "F16 Fixtext"; "Zahlenausgabe"; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+257: "F16 PDI-Eintraege"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+258: "F16 Attach-Eintraege"; ""; "Arial"; 70; -9; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+259: "F16 Lock- und API-Eintraege"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+260: "F16 PBI-Eintraege"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+270: "F17 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+271: "F17 Eingabezeile"; "Datumeingabe"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+272: "F17 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+273: "F17 Tabellenbeschriftung"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+274: "F17 Zahnfach"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+275: "F17 Tabelleneintrag"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+280: "F19 Titelzeile"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+281: "F19 Eingabezeile"; "Datumeingabe"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+282: "F19 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+290: "F24 Titelzeile"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+291: "F24 Eingabezeile"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+292: "F24 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+293: "F24 Fixtext fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+294: "F24 Ambulblt OP-Termin"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 128
+295: "F24 Ambulblt fett"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+296: "F24 frei"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+300: "F25 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+301: "F25 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+302: "F25 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+303: "F25 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+304: "F25 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+305: "F25 Fixtext fett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+310: "L09 Gesamtaufstellung"; ""; "Courier New"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 49; 0; 0; 0
+320: "HYG Mundhygiene"; ""; "Arial"; 70; -9; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+321: "HYG Mundhygiene"; "rot"; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+450: "TB - Monatsname/Kopfzeile"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+476: "TB - Patient/Bemerkg-klein/blau"; "Terminbeschriftung"; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+477: "TB - Patient/Bemerkg-mittel/bla"; "Terminbeschriftung"; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+478: "TB - Patient/Bemerkg-gross/blau"; "Terminbeschriftung"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+479: "TB"; "frei"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+480: "TB - Uhrzeit"; "Uhrzeit/linke Spalte"; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+481: "TB- Datum/Kopfzeile"; "Datum/Kopfzeile"; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+482: "TB - Kalendercode"; "Kalender-Code / 2. Kopfzeile"; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+483: "TB - Datum/Datemover"; "Datum im Date-Mover"; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+484: "TB"; "frei"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+485: "TB - Tagesterminliste/Uhrzeit1"; "Uhrzeit1"; "Arial"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+486: "TB - Tagesterminliste/Uhrzeit2"; "Uhrzeit2"; "Times New Roman"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 18; 0; 0; 0
+487: "TB - Tagesterminliste/Text"; "Patientenname, Bemerkung etc."; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+488: "TB - Text hervorgehoben"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+489: "TB - Patient/Bemerkg-klein"; "Terminbeschriftung"; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+490: "TB - Patient/Bemerkg-mittel"; "Terminbeschriftung"; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+491: "TB - Patient/Bemerkg-gross"; "Terminbeschriftung"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+492: "TB"; "frei"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+493: "TB - Kalenderausnahme - klein"; "Terminbeschriftung"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+494: "TB - Kalenderausnahme - mittel"; "Terminbeschriftung"; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+495: "TB - Kalenderausnahme - gross"; "Terminbeschriftung"; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+496: "TB - Kalenderwoche"; "Kalenderwoche-Anzeige"; "Times New Roman"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 18; 0; 0; 0
+497: "TB - "; "frei"; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+498: "TB - "; "frei"; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+499: "TB - "; "frei"; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+500: "DurchZeichGruen"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+501: "DurchZeichBlau"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+502: "DurchZeichRot"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+503: "DurchZeichText"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+504: "TRCTEXTFORMAT"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+505: "TRCTEXTFORMAT1"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+506: "XCFORMAT"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+507: "XHFORMAT"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+508: "FONTHEADLINE"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+509: "FONTNORMAL"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+510: "DurchZeich510"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+520: "AmboTabelle"; ""; "Courier New"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 49; 0; 0; 0
+521: "Stammdaten / rot"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+522: "AmboTabelle / rot"; ""; "Courier New"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 49; 255; 0; 0
+523: "STGKK Host Inaktiv"; ""; "Arial"; 360; -48; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 1; 2; 1; 34; 255; 0; 0
+600: "Laborbefund Monospaced"; ""; "Courier New"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 49; 0; 0; 0
+601: "Laborverlauf Monospaced"; ""; "Courier New"; 120; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 49; 0; 0; 0
+700: "DIAG: Standardtext 12 Pkt."; "für "; "Arial"; 120; -16; Zentriert; 56; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+701: "DIAG: Standard 12 Pkt Fett"; "für "; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+702: "DIAG: Standardtext 10 Pkt."; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+703: "DIAG: Standard 10 Pkt Fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+704: "DIAG: linksbündige Überschrift"; ""; "Arial"; 180; -24; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+705: "DIAG: zentrierte Überschrift"; ""; "Arial"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+706: "DIAG: Lineal, horizontale Besch"; ""; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+707: "DIAG: Lineal, veritikale Beschr"; "Kopi"; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+708: "DIAG: Wert, im Normbereich"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+709: "DIAG: Wert, eine Abweichung"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+710: "DIAG: Wert, zwei Abweichungen"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+711: "DIAG: rechtsbündige Ziffer"; ""; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+712: "DIAG: Neues Format"; "Kopi"; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+713: "DIAG: 10 Punkt, Blocksatz, Einz"; "Wird"; "Arial"; 100; -13; Blocksatz; 28; 283; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+714: "DIAG: Neues Format_r"; "Kopi"; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+715: "DIAG: Standardtext 10 Pkt._r"; ""; "Arial"; 100; -13; Rechtsbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+716: "DIAG: Standardtext 10 Pkt._c"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+717: "DIAG: Standardtext 12 Pkt._c"; "für "; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+718: "DIAG: Neues Format"; "Kopi"; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+719: "DIAG: Neues Format"; "Kopi"; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+720: "DIAG: Fett und Kursiv"; "Kopi"; ""; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 1; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0
+721: "DIAG: Klein, kursiv"; ""; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+722: "DIAG: Groß, für Belichtung"; "Kopi"; "Arial"; 160; 0; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+723: "DIAG: Neues Format"; "Kopi"; "Arial"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+724: "DIAG: Neues Format"; "Kopi"; "Arial"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+725: "DIAG: Neues Format"; "Kopi"; "Arial"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+726: "DIAG: Groß, für Belichtung_c"; "Kopi"; "Arial"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+727: "DIAG: Wert, im Normbereich 12 P"; ""; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+728: "DIAG: Wert, 1 Abweichung, 12 Pk"; ""; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+729: "DIAG: Wert, gr. Abweichung 12 P"; ""; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+730: "DIAG: standard 6 rechts"; ""; "Arial"; 60; -8; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+731: "DIAG: standard 8 links"; ""; "Arial"; 80; -11; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+732: "DIAG: standard 7 links"; ""; "Arial"; 70; -9; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+733: "DIAG: standard 8 rechts"; ""; "Arial"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+734: "DIAG: standard 7 rechts"; ""; "Arial"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+735: "DIAG: standard 4 rechts"; ""; "Arial"; 40; -5; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+736: "DIAG: standard 5 rechts"; ""; "Arial"; 50; -7; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+737: "DIAG: standard 5 zentr."; ""; "Arial"; 50; -7; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+738: "DIAG: standard 6 zentr."; ""; "Arial"; 60; -8; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+739: "DIAG: standard 4 zentr."; ""; "Arial"; 40; -5; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+740: "DIAG: standard 10 links, fett, "; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+741: "DIAG: Groß, für Belichtung_c"; "Kopi"; "Arial"; 160; 0; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+742: "DIAG: Standard 10 zentr., fett"; ""; "Arial"; 100; -13; Zentriert; 28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+743: "DIAG: st.10 links, fett-kursiv,"; ""; "Arial"; 100; -13; Linksbündig; 28; 0; 0; 0; 0; 700; 255; 1; 0; 0; 3; 2; 1; 34; 0; 0; 0
+744: "DIAG: Neues Format"; "Kopi"; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+745: "DIAG: Neues Format"; "Kopi"; "MT Symbol"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 2; 3; 2; 2; 82; 0; 0; 0
+746: "DIAG: Wert, im Normbereich_c"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+747: "DIAG: Neues Format"; "Kopi"; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+748: "DIAG: standard 9, zentr."; "Kopi"; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+749: "DIAG: standard 10 links, kursiv"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+750: "DIAG: 7Pkt Arial fett linksb."; "Kopi"; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+751: "DIAG: 7 Pkt Arial fett rechtsb."; "Kopi"; "Arial"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+752: "DIAG: wingding 10, zentr."; ""; "Wingdings"; 100; -17; Zentriert; 28; 0; 0; 0; 0; 400; 0; 0; 0; 2; 3; 2; 1; 2; 0; 0; 0
+753: "DIAG: linksbündige Überschrift_"; ""; "Arial"; 180; -24; Blocksatz; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+754: "DIAG: Neues Format"; "Kopi"; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+755: "DIAG: 7 Pkt Arial fett    *zent"; "Kopi"; "Arial"; 70; -9; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+756: "DIAG: 7 Pkt rot für Liste"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+757: "DIAG: 7 Pkt Symbolschrift links"; "Kopi"; "Symbol"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 2; 3; 2; 1; 18; 0; 0; 0
+758: "DIAG: Neues Format"; "Kopi"; "Arial"; 100; -13; Linksbündig; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+759: "DIAG: Arial 9Pkt zentriert"; "Kopi"; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+760: "DIAG: 7 Pkt Arial standart zent"; "Kopi"; "Arial"; 70; -9; Zentriert; 28; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+761: "DIAG: st. 10 links, fett, unter"; "Kopi"; "Arial"; 100; -13; Linksbündig; 28; 0; 0; 0; 0; 700; 0; 1; 0; 0; 3; 2; 1; 34; 0; 0; 0
+762: "DIAG: test copy !!!"; "Kopi"; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+763: "DIAG: Zentriete Überschrift, 14"; "Kopi"; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+764: "DIAG: Neues Format"; "Kopi"; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+765: "DIAG: McGann Header 19 fz"; "Header 19 Pts fett zentriert"; "Arial"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+766: "DIAG: McGann SH 14 fl"; "McGann SubHeader 14pts fett linksb."; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+767: "DIAG: McGann SSH 8 fl"; "McGann SubSubHeader 8pts fett linksb."; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+768: "DIAG: McGann Tab 8 l"; "McGann Table 8pts linksb."; "Arial"; 80; -11; Linksbündig; -56; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+769: "DIAG: McGann TH 8 fz"; "McGann Table Header 8 fz"; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+770: "DIAG: McGann Tab 8 z"; "McGann Table 8pts zz"; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+771: "DIAG: Standardtext 10 Pkt._c ro"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+772: "DIAG: Überschrift HKP"; ""; "Arial"; 220; -24; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+773: "DIAG: Überschrift SL"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+774: "DIAG: Gesamtplatz SL"; ""; "Arial"; 140; -16; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+775: "DIAG: Gesamtplatz (Zahlen) SL"; ""; "Arial"; 120; -13; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+776: "DIAG: McGann in Norm"; "McGann Wert innerhalb Norm"; "Arial"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+777: "DIAG: McGann ex Norm"; "McGann Wert außerhalb Norm"; "Arial"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+778: "DIAG: HKP linksb."; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+779: "DIAG: HKP linksb. Fett"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+780: "DIAG: HKP rechtsb. Fett"; ""; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+781: "DIAG: HKP linksb. Kursiv"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 255; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+782: "DIAG: rechtsbündige Ziffer rot"; ""; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+1000: "RI - Definition"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+1100: "Barcode"; ""; "Code 3of9"; 280; -37; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+1101: "Listensonderzeichen"; ""; "Wingdings"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 2; 3; 2; 1; 2; 0; 0; 0
+9900: "Verweis schwarz"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9901: "Verweis rot"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 0
+9902: "Verweis gruen"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+9903: "Verweis blau"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+9904: "Verweis braun"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 128; 0
+9905: "Verweis violett"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 128
+9906: "Verweis tuerkis"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 128
+9907: "Verweis grau"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 128; 128
+9908: "Verweis hellrot"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+9909: "Verweis hellgruen"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 0
+9910: "Verweis hellblau"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+9911: "Verweis gelb"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 255; 0
+9912: "Verweis hellviolett"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 255
+9913: "Verweis helltuerkis"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 255
+9914: "Verweis hellgrau"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 192; 192; 192
+9919: "Verweis Symbol"; ""; "Symbol"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9800: "kl. Verweis schwarz"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9801: "kl. Verweis rot"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 0
+9802: "kl. Verweis gruen"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+9803: "kl. Verweis blau"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+9804: "kl. Verweis braun"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 128; 0
+9805: "kl. Verweis violett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 128
+9806: "kl. Verweis tuerkis"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 128
+9807: "kl. Verweis grau"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 128; 128; 128
+9808: "kl. Verweis hellrot"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+9809: "kl. Verweis hellgruen"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 0
+9810: "kl. Verweis hellblau"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+9811: "kl. Verweis gelb"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 255; 0
+9812: "kl. Verweis hellviolett"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 255
+9813: "kl. Verweis helltuerkis"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 255
+9814: "kl. Verweis hellgrau"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 192; 192; 192
+9819: "kl. Verweis Symbol"; ""; "Symbol"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9704: "kl. Standardlisteneintrag"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9705: "kl. Button"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9708: "kl. Diagnoseüberschrift"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 255; 63; 63
+9709: "kl. Therapieüberschrift"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 63; 63; 255
+9711: "kl. Auftragsbeschreibung"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 0
+9920: "Zahnarbeit weiss"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 255; 255
+9921: "Zahnarbeit blau"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+9922: "Zahnarbeit schwarz"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9923: "Zahnarbeit violett"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 128
+9931: "Leistung schwarz"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9932: "Leistung rot"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 0
+9933: "Leistung gruen"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 0
+9934: "Leistung blau"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+9935: "Leistung braun"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 128; 128; 0
+9936: "Leistung violett"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 128; 0; 128
+9937: "Leistung tuerkis"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 128; 128
+9938: "Leistung grau"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 128; 128; 128
+9939: "Leistung hellrot"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+9940: "Leistung hellgruen"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 0
+9941: "Leistung hellblau"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 255
+9942: "Leistung gelb"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 255; 0
+9943: "Leistung hellviolett"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 255
+9944: "Leistung helltuerkis"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 255; 255
+9945: "Leistung weiss"; ""; "Arial"; 100; -13; Zentriert; -28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 255; 255
+9998: "Listendruck"; ""; "Arial"; 120; -16; Zentriert; 28; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+9999: "Listendruck"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10000: "AL8"; ""; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10001: "AL9"; ""; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10002: "AL10"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10003: "AL11"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10004: "AL12"; ""; "Arial"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10005: "AL13"; ""; "Arial"; 130; -17; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10006: "AL14"; ""; "Arial"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10007: "AL16"; ""; "Arial"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10008: "AL18"; ""; "Arial"; 180; -24; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10009: "AL24"; ""; "Arial"; 240; -32; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10010: "AR8"; ""; "Arial"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10011: "AR9"; ""; "Arial"; 90; -12; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10012: "AR10"; ""; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10013: "AR11"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10014: "AR12"; ""; "Arial"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10015: "AR13"; ""; "Arial"; 130; -17; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10016: "AR14"; ""; "Arial"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10017: "AR16"; ""; "Arial"; 160; -21; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10018: "AR18"; ""; "Arial"; 180; -24; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10019: "AR24"; ""; "Arial"; 240; -32; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10020: "AZ8"; ""; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10021: "AZ9"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10022: "AZ10"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10023: "AZ11"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10024: "AZ12"; ""; "Arial"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10025: "AZ13"; ""; "Arial"; 130; -17; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10026: "AZ14"; ""; "Arial"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10027: "AZ16"; ""; "Arial"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10028: "AZ18"; ""; "Arial"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10029: "AZ24"; ""; "Arial"; 240; -32; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10030: "TL8"; ""; "Times New Roman"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10031: "TL9"; ""; "Times New Roman"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10032: "TL10"; ""; "Times New Roman"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10033: "TL11"; ""; "Times New Roman"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10034: "TL12"; ""; "Times New Roman"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10035: "TL13"; ""; "Times New Roman"; 130; -17; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10036: "TL14"; ""; "Times New Roman"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10037: "TL16"; ""; "Times New Roman"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10038: "TL18"; ""; "Times New Roman"; 180; -24; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10039: "TL24"; ""; "Times New Roman"; 240; -32; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10040: "TR8"; ""; "Times New Roman"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10041: "TR9"; ""; "Times New Roman"; 90; -12; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10042: "TR10"; ""; "Times New Roman"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10043: "TR11"; ""; "Times New Roman"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10044: "TR12"; ""; "Times New Roman"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10045: "TR13"; ""; "Times New Roman"; 130; -17; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10046: "TR14"; ""; "Times New Roman"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10047: "TR16"; ""; "Times New Roman"; 160; -21; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10048: "TR18"; ""; "Times New Roman"; 180; -24; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10049: "TR24"; ""; "Times New Roman"; 240; -32; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10050: "TZ8"; ""; "Times New Roman"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10051: "TZ9"; ""; "Times New Roman"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10052: "TZ10"; ""; "Times New Roman"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10053: "TZ11"; ""; "Times New Roman"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10054: "TZ12"; ""; "Times New Roman"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10055: "TZ13"; ""; "Times New Roman"; 130; -17; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10056: "TZ14"; ""; "Times New Roman"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10057: "TZ16"; ""; "Times New Roman"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10058: "TZ18"; ""; "Times New Roman"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+10059: "TZ24"; ""; "Times New Roman"; 240; -32; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11000: "AL4"; ""; "Arial"; 40; -5; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11001: "AL5"; ""; "Arial"; 50; -7; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11002: "AL6"; ""; "Arial"; 60; -8; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11003: "AL7"; ""; "Arial"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11004: "AR4"; ""; "Arial"; 40; -5; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11005: "AR5"; ""; "Arial"; 50; -7; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11006: "AR6"; ""; "Arial"; 60; -8; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11007: "AR7"; ""; "Arial"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11008: "AZ4"; ""; "Arial"; 40; -5; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11009: "AZ5"; ""; "Arial"; 50; -7; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11010: "AZ6"; ""; "Arial"; 60; -8; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11011: "AZ7"; ""; "Arial"; 70; -9; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11012: "TL4"; ""; "Times New Roman"; 40; -5; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11013: "TL5"; ""; "Times New Roman"; 50; -7; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11014: "TL6"; ""; "Times New Roman"; 60; -8; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11015: "TL7"; ""; "Times New Roman"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11016: "TR4"; ""; "Times New Roman"; 40; -5; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11017: "TR5"; ""; "Times New Roman"; 50; -7; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11018: "TR6"; ""; "Times New Roman"; 60; -8; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11019: "TR7"; ""; "Times New Roman"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11020: "TZ4"; ""; "Times New Roman"; 40; -5; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11021: "TZ5"; ""; "Times New Roman"; 50; -7; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11022: "TZ6"; ""; "Times New Roman"; 60; -8; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11023: "TZ7"; ""; "Times New Roman"; 70; -9; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11024: "AB8"; ""; "Arial"; 80; -11; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11025: "AB9"; ""; "Arial"; 90; -12; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11026: "AB10"; ""; "Arial"; 100; -13; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11027: "AB11"; ""; "Arial"; 110; -15; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11028: "AB12"; ""; "Arial"; 120; -16; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11029: "AB14"; ""; "Arial"; 140; -19; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11030: "AB16"; ""; "Arial"; 160; -21; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11031: "AB18"; ""; "Arial"; 180; -24; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11032: "AB24"; ""; "Arial"; 240; -32; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11033: "Arial 11 RF Schwarz"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11034: "Arial 11 RF Rot"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+11101: "Ergebnisse ohne Norm"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+11102: "Ergebnisse pat"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 255; 0; 0
+11103: "Ergebnisse normal"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 128
+11104: "Ergebnisse pat Printer"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 700; 255; 1; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12000: "AL4"; ""; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12001: "AL5"; ""; "Arial"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12002: "AL6"; ""; "Arial"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12003: "AL7"; ""; "Arial"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12010: "AR4"; ""; "Arial"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12011: "AR5"; ""; "Arial"; 90; -12; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12012: "AR6"; ""; "Arial"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12013: "AR7"; ""; "Arial"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12020: "AR4"; ""; "Arial"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12021: "AR5"; ""; "Arial"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12022: "AR6"; ""; "Arial"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12023: "AR7"; ""; "Arial"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12030: "AB4"; ""; "Arial"; 80; -11; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12031: "AB5"; ""; "Arial"; 90; -12; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12032: "AB6"; ""; "Arial"; 100; -13; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12033: "AB7"; ""; "Arial"; 110; -15; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12050: "AB8"; ""; "Arial"; 80; -11; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12051: "AB9"; ""; "Arial"; 90; -12; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12052: "AB10"; ""; "Arial"; 100; -13; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12053: "AB11"; ""; "Arial"; 110; -15; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12054: "AB12"; ""; "Arial"; 120; -16; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12055: "AB13"; ""; "Arial"; 130; -17; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12056: "AB14"; ""; "Arial"; 140; -19; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12057: "AB16"; ""; "Arial"; 160; -21; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12058: "AB18"; ""; "Arial"; 180; -24; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12059: "AB24"; ""; "Arial"; 240; -32; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12100: "TL4"; ""; "Times New Roman"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12101: "TL5"; ""; "Times New Roman"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12102: "TL6"; ""; "Times New Roman"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12103: "TL7"; ""; "Times New Roman"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12110: "TR4"; ""; "Times New Roman"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12111: "TR5"; ""; "Times New Roman"; 90; -12; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12112: "TR6"; ""; "Times New Roman"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12113: "TR7"; ""; "Times New Roman"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12120: "TR4"; ""; "Times New Roman"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12121: "TR5"; ""; "Times New Roman"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12122: "TR6"; ""; "Times New Roman"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12123: "TR7"; ""; "Times New Roman"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12130: "TB4"; ""; "Times New Roman"; 80; -11; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12131: "TB5"; ""; "Times New Roman"; 90; -12; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12132: "TB6"; ""; "Times New Roman"; 100; -13; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12133: "TB7"; ""; "Times New Roman"; 110; -15; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12150: "TB8"; ""; "Times New Roman"; 80; -11; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12151: "TB9"; ""; "Times New Roman"; 90; -12; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12152: "TB10"; ""; "Times New Roman"; 100; -13; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12153: "TB11"; ""; "Times New Roman"; 110; -15; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12154: "TB12"; ""; "Times New Roman"; 120; -16; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12155: "TB13"; ""; "Times New Roman"; 130; -17; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12156: "TB14"; ""; "Times New Roman"; 140; -19; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12157: "TB16"; ""; "Times New Roman"; 160; -21; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12158: "TB18"; ""; "Times New Roman"; 180; -24; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12159: "TB24"; ""; "Times New Roman"; 240; -32; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12200: "CourierL4"; ""; "Courier New"; 40; -5; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12201: "CourierL5"; ""; "Courier New"; 50; -7; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12202: "CourierL6"; ""; "Courier New"; 60; -8; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12203: "CourierL7"; ""; "Courier New"; 70; -9; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12204: "CourierL8"; ""; "Courier New"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12205: "CourierL9"; ""; "Courier New"; 90; -12; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12206: "CourierL10"; ""; "Courier New"; 100; -13; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12207: "CourierL11"; ""; "Courier New"; 110; -15; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12208: "CourierL12"; ""; "Courier New"; 120; -16; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12209: "CourierL13"; ""; "Courier New"; 130; -17; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12210: "CourierL14"; ""; "Courier New"; 140; -19; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12211: "CourierL16"; ""; "Courier New"; 160; -21; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12212: "CourierL20"; ""; "Courier New"; 190; -25; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12213: "CourierL24"; ""; "Courier New"; 240; -32; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12214: "CourierR4"; ""; "Courier New"; 40; -5; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12215: "CourierR5"; ""; "Courier New"; 50; -7; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12216: "CourierR6"; ""; "Courier New"; 60; -8; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12217: "CourierR7"; ""; "Courier New"; 70; -9; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12218: "CourierR8"; ""; "Courier New"; 80; -11; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12219: "CourierR9"; ""; "Courier New"; 90; -12; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12220: "CourierR10"; ""; "Courier New"; 100; -13; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12221: "CourierR11"; ""; "Courier New"; 110; -15; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12222: "CourierR12"; ""; "Courier New"; 120; -16; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12223: "CourierR13"; ""; "Courier New"; 130; -17; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12224: "CourierR14"; ""; "Courier New"; 140; -19; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12225: "CourierR16"; ""; "Courier New"; 160; -21; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12226: "CourierR18"; ""; "Courier New"; 180; -24; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12227: "CourierR24"; ""; "Courier New"; 240; -32; Rechtsbündig; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12228: "CourierZ4"; ""; "Courier New"; 40; -5; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12229: "CourierZ5"; ""; "Courier New"; 50; -7; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12230: "CourierZ6"; ""; "Courier New"; 60; -8; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12231: "CourierZ7"; ""; "Courier New"; 70; -9; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12232: "CourierZ8"; ""; "Courier New"; 80; -11; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12233: "CourierZ9"; ""; "Courier New"; 90; -12; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12234: "CourierZ10"; ""; "Courier New"; 100; -13; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12235: "CourierZ11"; ""; "Courier New"; 110; -15; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12236: "CourierZ12"; ""; "Courier New"; 120; -16; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12237: "CourierZ13"; ""; "Courier New"; 130; -17; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12238: "CourierZ14"; ""; "Courier New"; 140; -19; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12239: "CourierZ16"; ""; "Courier New"; 160; -21; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12240: "CourierZ18"; ""; "Courier New"; 180; -24; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12241: "CourierZ24"; ""; "Courier New"; 240; -32; Zentriert; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12242: "CourierB4"; ""; "Courier New"; 40; -5; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12243: "CourierB5"; ""; "Courier New"; 50; -7; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12244: "CourierB6"; ""; "Courier New"; 60; -8; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12245: "CourierB7"; ""; "Courier New"; 70; -9; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12246: "CourierB8"; ""; "Courier New"; 80; -11; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12247: "CourierB9"; ""; "Courier New"; 90; -12; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12248: "CourierB10"; ""; "Courier New"; 100; -13; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12249: "CourierB11"; ""; "Courier New"; 110; -15; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12250: "CourierB12"; ""; "Courier New"; 120; -16; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12251: "CourierB13"; ""; "Courier New"; 130; -17; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12252: "CourierB14"; ""; "Courier New"; 140; -19; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12253: "CourierB16"; ""; "Courier New"; 160; -21; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12254: "CourierB18"; ""; "Courier New"; 180; -24; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+12255: "CourierB24"; ""; "Courier New"; 240; -32; Blocksatz; 0; 0; 0; 0; 0; 400; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+30000: "Arial 8 LF "; ""; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 700; 0; 0; 0; 0; 3; 2; 1; 34; 0; 0; 0
+30001: "Arial 8 L Rot durchgestr"; ""; "Arial"; 80; -11; Linksbündig; 0; 0; 0; 0; 0; 400; 0; 0; 1; 0; 3; 2; 1; 34; 255; 0; 0
+ 

@@ -1,0 +1,659 @@
+////////////////////////////////////////////////////////////////////////
+//  Arbeiten mit Datadictionarys
+////////////////////////////////////////////////////////////////////////
+//  $Header:   P:/marille/clinicum/restool/rev/dictlist.cpv   1.5   02 Feb 1996 10:50:10   GERHOLD  $
+//  $Log:   P:/marille/clinicum/restool/rev/dictlist.cpv  $
+// 
+//    Rev 1.5   02 Feb 1996 10:50:10   GERHOLD
+// 1.Umstellung auf 32 Bit
+// 
+//    Rev 1.4   31 Mar 1995 12:48:48   GERHOLD
+// IniFile verwendet jetzt makeIni um zum RESTOOL.INI zu kommen
+// 
+//    Rev 1.3   02 Jan 1995 09:29:36   GERHOLD
+// Umstellung auf MDI
+// 
+//    Rev 1.2   09 Aug 1994 10:07:50   HANNES
+// Time eingebaut
+// 
+//    Rev 1.1   25 Jul 1994 09:35:36   GERHOLD
+// 
+//    Rev 1.0   24 Jun 1994 16:54:44   HANNES
+// Neuuebernahme clinicum
+//
+#include <windows.h>
+#include <stdio.h>
+#include "dds32.h"
+
+#include "globmem.h"
+#include "restool.hpp"
+//#include "subclass.hpp"
+#include "dlladmin.h"
+#include "dlladmin.hpp"
+#include "tbdef.hpp"
+#include "commdlg.h"
+#define MODULENUM 86
+#include "winass.hpp"
+#include "btrieve.hpp"
+#include "hash.hpp"
+#include "compile.hpp"
+
+#include "drdrop.hpp"
+
+extern HANDLE MyInstance;
+LPTABLEDEF ActTable;
+
+extern DLLExport LPSTR _export FAR PASCAL makeIni (LPSTR name);
+
+LPSTR IniFile() { return makeIni("restool.ini") ; }
+
+LPSTR PreViewName() { return "PreView" ; }
+void ReadCpPos (int FAR *x,int FAR *y,int FAR *w,int FAR *h)
+  {
+  *x = GetPrivateProfileInt (PreViewName(),"_X",100,IniFile());
+  *y = GetPrivateProfileInt (PreViewName(),"_Y",100,IniFile());
+  *w = GetPrivateProfileInt (PreViewName(),"_Width",500,IniFile());
+  *h = GetPrivateProfileInt (PreViewName(),"_Height",300,IniFile());
+  }
+
+void WriteCpPos (HWND hWnd)
+  {
+  RECT r;
+  GetWindowRect (hWnd,&r);
+  char outstring[64];
+  wsprintf (outstring,"%d",r.left);
+  WritePrivateProfileString (PreViewName(),"_X",outstring,IniFile());
+  wsprintf (outstring,"%d",r.top);
+  WritePrivateProfileString (PreViewName(),"_Y",outstring,IniFile());
+  int h = r.bottom - r.top  + 1;
+  int w = r.right  - r.left + 1;
+  wsprintf (outstring,"%d",w);
+  WritePrivateProfileString (PreViewName(),"_Width",outstring,IniFile());
+  wsprintf (outstring,"%d",h);
+  WritePrivateProfileString (PreViewName(),"_Height",outstring,IniFile());
+  }
+
+int TakeInt (LPSTR FAR *h)
+  {
+  int res = 0;
+  int sign = 1 ;
+  for ( ; ((**h) && (**h != ',')) ; (*h) ++ ) {
+    if (**h == '-') sign = -1 ;
+    else            res = res * 10 + **h - '0';
+    }
+  (*h) ++ ;
+  return res * sign;
+  }
+
+void ReadFontInfo (LPSTR Template,LPLOGFONT lf)
+  {
+  lmemset (lf,'\0',sizeof(*lf));
+  char instring[256];
+  GetPrivateProfileString (PreViewName(),Template,"Arial,-100,400,0,0,0",
+                                    instring,sizeof(instring),IniFile());
+  LPSTR h = instring;
+  for (int i = 0 ; ((*h) && (*h != ',')) ; i++ , h++)
+    lf->lfFaceName[i] = *h;
+  h++ ;
+  lf->lfHeight        = TakeInt (&h);
+  lf->lfWeight        = TakeInt (&h);
+  lf->lfItalic        = BYTE (TakeInt (&h));
+  lf->lfUnderline     = BYTE (TakeInt (&h));
+  lf->lfStrikeOut     = BYTE (TakeInt (&h));
+  }
+
+void WriteFontInfo (LPSTR Template,LPLOGFONT lf)
+  {
+  char outstring[256];
+  wsprintf (outstring,"%s,%d,%d,%d,%d,%d",lf->lfFaceName,lf->lfHeight,
+                                          lf->lfWeight,lf->lfItalic,
+                                          lf->lfUnderline,lf->lfStrikeOut);
+
+  WritePrivateProfileString (PreViewName(),Template,outstring,IniFile());
+  }
+
+void GetFontInfo (LPSTR Template,HWND hWnd)
+  {
+  LOGFONT lf;
+  CHOOSEFONT cf;
+  ReadFontInfo (Template,&lf);
+  lmemset (&cf,'\0',sizeof(cf));
+  cf.lStructSize    = sizeof( CHOOSEFONT ) ;
+  cf.hwndOwner      = hWnd ;
+  cf.hDC            = NULL ;
+  cf.rgbColors      = 0 ;
+  cf.lpLogFont      = &lf ;
+  cf.Flags          = CF_SCREENFONTS | CF_EFFECTS | CF_INITTOLOGFONTSTRUCT ;
+  cf.lCustData      = NULL ;
+  cf.lpfnHook       = NULL ;
+  cf.lpTemplateName = NULL ;
+  cf.hInstance      = MyInstance ;
+
+  if (ChooseFont (&cf))
+    WriteFontInfo (Template,&lf);
+  }
+
+DLLExport LONG _export FAR PASCAL CPProc (HWND hWnd,unsigned msg,WPARAM wP,LONG lP)
+  {
+  LONG RetVal = 0;
+  switch (msg) {
+    case WM_PAINT :
+      {
+      PAINTSTRUCT ps;
+      HDC hDC = BeginPaint (hWnd, &ps) ;
+        EndPaint (hWnd, &ps) ;
+      }
+      break ;
+    case WM_SIZE :
+    case WM_MOVE :
+      WriteCpPos (hWnd);
+      break ;
+    case WM_COMMAND :
+      switch (wP) {
+        case MI_HDFONT :
+          GetFontInfo ("HeadLine",hWnd);
+          break ;
+        case MI_LIFONT :
+          GetFontInfo ("Table",hWnd);
+          break ;
+        }
+      break ;
+    default :
+      RetVal = DefWindowProc (hWnd,msg,wP,lP);
+      break ;
+    }
+  return RetVal;
+  }
+
+void RegisterPrintWindow ()
+  {
+  static BOOL Registered;
+  if (!Registered) {
+    WNDCLASS wndclass;
+    wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
+    wndclass.lpfnWndProc   = CPProc ;
+    wndclass.cbClsExtra    = 0 ;
+    wndclass.cbWndExtra    = 0 ;
+    wndclass.hInstance     = MyInstance ;
+    wndclass.hIcon         = NULL ;
+    wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
+    wndclass.hbrBackground = GetStockObject (WHITE_BRUSH) ;
+    wndclass.lpszMenuName  = "CPMENU" ;
+    wndclass.lpszClassName = "CPWND" ;
+
+    RegisterClass (&wndclass) ;
+    Registered = TRUE ;
+    }
+  }
+
+void ShowPrintWindow (HWND hDlg)
+  {
+  RegisterPrintWindow();
+  HMENU hMenu = LoadMenu(MyInstance,"CPMENU");
+
+  int x,y,w,h;
+  ReadCpPos (&x,&y,&w,&h);
+
+  char caption[256];
+  wsprintf (caption,"%s",ActTable->GetName());
+  HWND hPrintWindow = CreateWindow (
+                                    "CPWND",                
+                                      caption,
+                                    WS_POPUPWINDOW | WS_CAPTION | 
+                                    WS_THICKFRAME | WS_CLIPCHILDREN,
+                                    x,y,w,h,
+                                    hDlg,
+                                    hMenu,                   
+                                    MyInstance,              
+                                      NULL
+                                   ) ;
+  ShowWindow (hPrintWindow,SW_NORMAL);
+  UpdateWindow (hPrintWindow) ;
+  }
+
+int actTableSel;
+HWND TableDlg;
+static LPACCESSLISTENTRY ZList;
+void FreeList ()
+  {
+  for ( ; ZList != NULL ; ) {
+    LPACCESSLISTENTRY n = ZList->Next;
+    FreeGlobMem (ZList->Name);
+    if (ZList->Description != NULL) FreeGlobMem (ZList->Description);
+    FreeGlobMem (ZList);
+    ZList = n;
+    }
+  }
+
+LPACCESSLISTENTRY GetAccess (int Nr)
+  {
+  int i = 0;
+  for (LPACCESSLISTENTRY h = ZList ; h != NULL ; h = h->Next) {
+    if (i++ == Nr) return h;
+    }
+  return NULL;
+  }
+
+void FillAccessList (HWND hDlg)
+  {
+  for (LPACCESSLISTENTRY h = ZList ; h != NULL ; h = h->Next)
+    SendDlgItemMessage (hDlg,ID_LIST,LB_ADDSTRING,0,LONG(h->Name));
+  }
+
+static char DescStr[64];
+void SetDescStr (HWND hDlg)
+  {
+  if (*DescStr == '\0')
+    GetDlgItemText (hDlg,ID_DESCHEAD,DescStr,sizeof(DescStr));
+  char outtxt[128];
+  LPACCESSLISTENTRY act = 
+     GetAccess (int(SendDlgItemMessage(hDlg,ID_LIST,LB_GETCURSEL,0,0L)));
+  wsprintf (outtxt,DescStr,(act != NULL) ? act->Name : LPSTR(""));
+  SetDlgItemText (hDlg,ID_DESCHEAD,outtxt);
+  if (act->Description != NULL)
+    SetDlgItemText (hDlg,ID_DESC,act->Description);
+  else
+    SetDlgItemText (hDlg,ID_DESC,LPSTR(""));
+  }
+
+DLLExport BOOL FAR PASCAL _export AccessDialog (HWND hDlg, UINT msg, WORD wP, LONG lP)
+  {
+  BOOL RetVal = FALSE ;
+  switch (msg) {
+    case WM_INITDIALOG :
+      // Ueberschrift setzen
+      ActTable = GetTableAdmin()->GetTableDefByNr (actTableSel);
+      ZList = ActTable->GetAccessList ();
+//      SubClassElements (hDlg,MyInstance);
+      RetVal = TRUE ;
+      FillAccessList (hDlg);
+      SendDlgItemMessage (hDlg,ID_LIST,LB_SETCURSEL,0,0L);
+      SetDescStr (hDlg);
+      break ;
+/*
+    case WM_CTLCOLOR :
+      {
+      LONG lres = GetCtlColor (hDlg,wP,lP,RetVal);
+      if (RetVal)
+        return BOOL (lres);   // ??? !!!! ???
+      }
+*/
+    case WM_COMMAND :
+      switch (wP) {
+        case IDOK :
+          FreeList ();
+          GetTableAdmin()->FreeTable (ActTable->GetTableID());
+          EndDialog (hDlg,TRUE);
+          break ;
+        case ID_LIST :
+          if (HIWORD(lP) == LBN_SELCHANGE)
+            SetDescStr (hDlg);
+          break ;
+        }
+      break ;
+    }
+  return RetVal;
+  }
+
+#define ACCESS  "Access"
+#define SELECT  "Select"
+void FillCombo (HWND hDlg)
+  {
+  ZList = ActTable->GetAccessList ();
+  for (LPACCESSLISTENTRY h = ZList ; h != NULL ; h = h->Next)
+    SendDlgItemMessage (hDlg,ID_COMBO,CB_ADDSTRING,0,LONG(h->Name));
+  int Sel = GetPrivateProfileInt (ActTable->GetName(),ACCESS,0,IniFile());
+  SendDlgItemMessage (hDlg,ID_COMBO,CB_SETCURSEL,Sel,0L);
+  }
+
+void StoreComboSelection (HWND hDlg)
+  {
+  int Sel = int(SendDlgItemMessage (hDlg,ID_COMBO,CB_GETCURSEL,0,0L));
+  char outtxt[64];
+  wsprintf (outtxt,"%d",Sel);
+  WritePrivateProfileString (ActTable->GetName(),ACCESS,outtxt,IniFile());
+  }
+
+void StoreColumnSelection (HWND hDlg)
+  {
+  int AnzSelections = int(SendDlgItemMessage(hDlg,ID_LIST,LB_GETSELCOUNT,0,0L));
+  if (AnzSelections > 0) {
+    LPINT Sels = LPINT(GetGlobMem (sizeof(int) * AnzSelections));
+    SendDlgItemMessage (hDlg,ID_LIST,LB_GETSELITEMS,AnzSelections,LONG(Sels));
+    char outtxt[256];
+    LPSTR h = outtxt;
+    for (int i = 0 ; i < AnzSelections ; i++)
+      wsprintf (h,"%d,",Sels[i]) , h += lstrlen(h);
+    wsprintf (h,"-1");
+    WritePrivateProfileString (ActTable->GetName(),SELECT,outtxt,IniFile());
+    }
+  else
+    WritePrivateProfileString (ActTable->GetName(),SELECT,"-1",IniFile());
+  }
+
+BOOL IsMTypeAllowed(WORD mType)
+  {
+  WORD mTypeSupported[] = { VAR_OBJ , VAR_DEC , VAR_FLAG , VAR_STRARR , VAR_DATE , VAR_STR , VAR_LONG , VAR_DWORD , VAR_POINT , VAR_TIME } ;
+  for (int i = 0 ; i < sizeof(mTypeSupported) / sizeof(WORD) ; i++)
+    if (mType == mTypeSupported[i]) return TRUE ;
+  return FALSE ;
+  }
+
+LPINT GetSels(HWND hDlg)
+  {
+  LPINT Sels;
+  int AnzSelections = int(SendDlgItemMessage(hDlg,ID_LIST,LB_GETSELCOUNT,0,0L));
+  if (AnzSelections > 0) {
+    Sels = LPINT(GetGlobMem (sizeof(int) * AnzSelections));
+    SendDlgItemMessage (hDlg,ID_LIST,LB_GETSELITEMS,AnzSelections,LONG(Sels));
+    }
+  else
+    Sels = NULL;
+  return Sels;
+  }
+
+void CheckColumnSelection (HWND hDlg)
+  {
+  int AnzSelections = int(SendDlgItemMessage(hDlg,ID_LIST,LB_GETSELCOUNT,0,0L));
+  if (AnzSelections > 0) {
+    LPINT Sels = LPINT(GetGlobMem (sizeof(int) * AnzSelections));
+    SendDlgItemMessage (hDlg,ID_LIST,LB_GETSELITEMS,AnzSelections,LONG(Sels));
+    int j = 0;
+    for (int i = 0 ; i < AnzSelections ; i++) {
+      LPVARDEF v = ActTable->GetVarDef(Sels[i]);
+      LPDLLADMIN dlladmin = GetDLLAdmin();
+      if ((v != NULL) && (IsMTypeAllowed(
+              dlladmin->GetDLLEntry(ActTable->GetDLLHandle())->
+                      DataDict_GetMType(v->GetDLLData())
+                                       )))
+        // Selektion zugelassen
+        j ++ ;
+      else
+        SendDlgItemMessage (hDlg,ID_LIST,LB_SETSEL,FALSE,MAKELPARAM(Sels[i],0));
+      }
+    if ((j > 0) && (ZList != NULL))
+      EnableWindow (GetDlgItem (hDlg,ID_VIEW),TRUE);
+    else
+      EnableWindow (GetDlgItem (hDlg,ID_VIEW),FALSE);
+    }
+  else
+    EnableWindow (GetDlgItem (hDlg,ID_VIEW),FALSE);
+  }
+
+int RemoveInt (LPSTR FAR *h,BOOL FAR *correct)
+  {
+  int res = 0 ;
+  *correct = FALSE ;
+  for ( ; ((**h >= '0') && (**h <= '9')) ; (*h)++)
+    res = res * 10 + **h - '0' , *correct = TRUE ;
+  if (**h == ',') (*h) ++ ;
+  return res ;
+  }
+
+void SetColumnSelection (HWND hDlg)
+  {
+  char instring[256];
+  GetPrivateProfileString (ActTable->GetName(),SELECT,"-1",instring,sizeof(instring),IniFile());
+  LPSTR h = instring;
+  BOOL correct;
+  for ( ; ; ) {
+    int snr = RemoveInt (&h,&correct);
+    if (correct) 
+      SendDlgItemMessage (hDlg,ID_LIST,LB_SETSEL,TRUE,MAKELPARAM(snr,0));
+    else
+      break ;
+    }
+  }
+
+VarDropData vd;
+BOOL ddvalid;
+LPVOID GetDropData(HWND hWnd)
+  {
+  if (!ddvalid) {
+    lstrcpy (vd.TableName,ActTable->GetName());
+    int Sel = int(SendMessage (hWnd,LB_GETCURSEL,0,0L));
+    lstrcpy (vd.VarName,ActTable->GetVarDef(Sel)->GetName() );
+    ddvalid = TRUE ;
+    }
+  return &vd;
+  }
+
+void DelDropData ()
+  {
+  ddvalid = FALSE ;
+  }
+
+BOOL OnLButtonDown (HWND hWnd,LONG lP)
+  {
+  POINT pt;
+  pt.x = LOWORD(lP);
+  pt.y = HIWORD(lP);
+  if (DDOnMouseMove (DDTYPE_VAR, GetDropData(hWnd),&pt,hWnd,FALSE))
+    return TRUE ;
+  else
+    return FALSE ;
+  }
+
+void OnMouseMove (HWND hWnd,LONG lP)
+  {
+  POINT pt;
+  pt.x = LOWORD(lP);
+  pt.y = HIWORD(lP);
+  DDOnMouseMove (DDTYPE_VAR, GetDropData(hWnd),&pt,hWnd,FALSE);
+  }
+
+void OnLButtonUp (HWND hWnd,LONG lP)
+  {
+  POINT pt;
+  pt.x = LOWORD (lP);
+  pt.y = HIWORD (lP);
+  DDOnMouseMove (DDTYPE_VAR, GetDropData(hWnd),&pt,hWnd,TRUE);
+  DelDropData ();
+  }
+
+WNDPROC oProc;
+//-----------------------------------------------------------------
+// Dialog-Prozedur um einer Listbox ein Drag&Drop zu ermoeglichen
+//-----------------------------------------------------------------
+DLLExport LONG _export FAR PASCAL DDFormatListWndProc (HWND hWnd,unsigned msg,WORD wP,LONG lP)
+  {
+  LONG RetVal = 0L;
+  static BOOL CaptureDone;
+  switch (msg) {
+    case WM_LBUTTONDOWN :
+      RetVal = CallWindowProc (FARPROC(oProc),hWnd,msg,wP,lP);
+      if (CaptureDone = OnLButtonDown (hWnd,lP))
+        SetCapture (hWnd);
+      break ;
+    case WM_MOUSEMOVE :
+      if (CaptureDone)
+        OnMouseMove (hWnd,lP);
+      else
+        RetVal = CallWindowProc (FARPROC(oProc),hWnd,msg,wP,lP);
+      break;
+    case WM_LBUTTONUP :
+      if (CaptureDone) {
+        OnLButtonUp (hWnd,lP);
+        ReleaseCapture ();
+        SendMessage (GetParent(hWnd),WM_COMMAND,IDOK,0L);
+        }
+      else
+        RetVal = CallWindowProc (FARPROC(oProc),hWnd,msg,wP,lP);
+      CaptureDone = FALSE;
+      break ;  
+    default :
+      RetVal = CallWindowProc (FARPROC(oProc),hWnd,msg,wP,lP);
+    }
+  return RetVal ;
+  }
+
+BOOL forDrop;              // wird in ShowTableList gesetzt
+extern HWND hwndMDIClient;
+//---------------------------------------------//
+// wird im ColumnDialog bei ID_VIEW aufgerufen //
+//---------------------------------------------//
+extern void ShowTable (LPTABLEDEF tdef,HWND hParent,LPSTR AccessName,LPINT ColumnNums);
+DLLExport BOOL FAR PASCAL _export ColumnDialog (HWND hDlg, UINT msg, WORD wP, LONG lP)
+  {
+  static int cmstops[] = { 39 , 147 , 201 } ;
+  BOOL RetVal = FALSE ;
+  switch (msg) {
+    case WM_INITDIALOG :
+      {
+      // Ueberschrift setzen
+      ActTable = GetTableAdmin()->GetTableDefByNr (actTableSel);
+      char DlgTxt[128];
+      char DlgTxt1[128];
+      SendMessage (hDlg,WM_GETTEXT,sizeof(DlgTxt),LONG(LPSTR(DlgTxt)));
+      wsprintf (DlgTxt1,DlgTxt,ActTable->GetName());
+      SendMessage (hDlg,WM_SETTEXT,0,LONG(LPSTR(DlgTxt1)));
+
+      // Spalten laden und selektieren
+      SendDlgItemMessage (hDlg,ID_LIST,LB_SETTABSTOPS,3,LONG(LPINT(cmstops)));
+      ActTable->FillColumnDlg (hDlg,ID_LIST);
+//      SubClassElements (hDlg,MyInstance);
+      RetVal = TRUE ;
+      SendDlgItemMessage (hDlg,ID_LIST,LB_SETCURSEL,0,0L);
+      if (!forDrop) {                      // Drag & Drop wird nicht gewuenscht
+        SetColumnSelection (hDlg);
+
+        // Combobox mit Accessliste laden
+        FillCombo (hDlg);
+
+        // Die Selektionen setzen
+        CheckColumnSelection (hDlg);
+        }
+      else {                               // Drag & Drop verwenden => Subclassing der Liste
+        oProc = WNDPROC (SetWindowLong (GetDlgItem (hDlg,ID_LIST),GWL_WNDPROC,LONG(DDFormatListWndProc)));
+        SetWindowPos (hDlg,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE);
+        }
+      }
+      break ;
+/*
+    case WM_CTLCOLOR :
+      {
+      LONG lres = GetCtlColor (hDlg,wP,lP,RetVal);
+      if (RetVal)
+        return BOOL (lres);   // ??? !!!! ???
+      }
+*/
+    case WM_COMMAND :
+      switch (wP) {
+        case IDOK :
+          if (!forDrop) {
+            StoreColumnSelection (hDlg);
+            StoreComboSelection (hDlg);
+            }
+          FreeList ();
+          GetTableAdmin()->FreeTable (ActTable->GetTableID());
+          EndDialog (hDlg,FALSE);
+          break ;
+        case ID_VIEW :
+          {
+          StoreColumnSelection (hDlg);
+          StoreComboSelection (hDlg);
+
+          char access[56];
+          GetDlgItemText (hDlg,ID_COMBO,access,sizeof(access));
+          ShowTable (ActTable,hwndMDIClient,access,GetSels(hDlg));
+          EndDialog (hDlg,TRUE);
+          }
+          break ;
+        case ID_PRINTVIEW :
+          ShowPrintWindow (hDlg);
+          break ;
+        case ID_LIST :
+          if ((HIWORD(lP) == LBN_SELCHANGE) && (!forDrop))
+            CheckColumnSelection (hDlg);
+          break ;
+        }
+      break ;
+    }
+  return RetVal;
+  }
+
+DLLExport BOOL FAR PASCAL _export TableDialog (HWND hDlg, UINT msg, WORD wP, LONG lP)
+  {
+  static int tbstops[] = { 99 , 126 , 171 } ;
+  BOOL RetVal = FALSE ;
+  switch (msg) {
+    case WM_INITDIALOG :
+      TableDlg = hDlg;
+      SendDlgItemMessage (hDlg,ID_LIST,LB_SETTABSTOPS,3,LONG(LPINT(tbstops)));
+      GetTableAdmin()->FillTableDlg (hDlg,ID_LIST);
+//      SubClassElements (hDlg,MyInstance);
+      RetVal = TRUE ;
+      SendDlgItemMessage (hDlg,ID_LIST,LB_SETCURSEL,0,0L);
+      SetWindowPos (hDlg,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE);
+      break ;
+/*
+    case WM_CTLCOLOR :
+      {
+      LONG lres = GetCtlColor (hDlg,wP,lP,RetVal);
+      if (RetVal)
+        return BOOL (lres);   // ??? !!!! ???
+      }
+*/
+    case WM_COMMAND :
+      switch (wP) {
+        case IDOK :
+          EndDialog (hDlg,TRUE);
+          TableDlg = 0;
+          break ;
+        case ID_COLUMN :
+          actTableSel = int (SendDlgItemMessage (hDlg,ID_LIST,LB_GETCURSEL,0,0L));
+          if (actTableSel >= 0) {
+            DLGPROC dlgProc = DLGPROC (MakeProcInstance (FARPROC(ColumnDialog),MyInstance));
+            BOOL res;
+            if (!forDrop)
+              res = DialogBox (MyInstance,"Column",hDlg,dlgProc);
+            else
+              res = DialogBox (MyInstance,"ColumnDrop",hDlg,dlgProc);
+            FreeProcInstance (dlgProc);
+            if ((res) || (forDrop)) {
+              EndDialog (hDlg,FALSE);
+              TableDlg = 0;
+              }
+            }
+          break ;
+        case ID_ACCESS :
+          actTableSel = int (SendDlgItemMessage (hDlg,ID_LIST,LB_GETCURSEL,0,0L));
+          if (actTableSel >= 0) {
+            DLGPROC dlgProc = DLGPROC (MakeProcInstance (FARPROC(AccessDialog),MyInstance));
+            DialogBox (MyInstance,"AccessList",hDlg,dlgProc);
+            FreeProcInstance (dlgProc);
+            }
+          break ;
+        case ID_LIST :
+          if (HIWORD(lP) == LBN_DBLCLK)
+            SendMessage (hDlg,WM_COMMAND,ID_COLUMN,0L);
+          break ;
+        }
+      break ;
+    }
+  return RetVal;
+  }
+
+void InitializeTables ()
+  {
+  GetTableAdmin()->Initialize();
+  }
+
+void DestroyTables ()
+  {
+  GetTableAdmin()->OnExit();
+  GetDLLAdmin()->ResetDLLAdmin();
+  }
+
+void ShowTableList (HWND hwnd,BOOL fD)
+  {
+  forDrop = fD;
+  if (TableDlg)
+    ShowWindow (TableDlg,SW_SHOW);
+  else {
+    DLGPROC dlgProc = DLGPROC (MakeProcInstance (FARPROC(TableDialog),MyInstance));
+    DialogBox (MyInstance,"Table",hwnd,dlgProc);
+    FreeProcInstance (dlgProc);
+    }
+  }
+

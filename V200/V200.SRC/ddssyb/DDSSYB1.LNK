@@ -1,0 +1,8 @@
+ddssyb+
+opsyb
+ddssyb1.dll
+ddssyb.map
+libw.lib+ldllcew.lib+..\restool\ddsmem1.lib+
+..\restool\dmwapi1.lib+..\restool\dbhelp1.lib+wctlib.lib+wcslib.lib
+ddss1.def
+

@@ -1,0 +1,9 @@
+COPY ..\..\%ACTVERS%.SRC\MUSCROLL\muscroll.LNK
+COPY ..\..\%ACTVERS%.SRC\MUSCROLL\muscroll.DEF
+
+link /nod /noe /co /li /map @muscroll.lnk
+rc -r -v -z -fomuscroll.res ..\..\%ACTVERS%.SRC\MUSCROLL\muscroll.rc
+rc -T -K muscroll.res muscroll.dll
+implib muscroll.lib muscroll.dll
+copy muscroll.lib ..\restool
+copy muscroll.dll ..\restool

@@ -1,0 +1,10 @@
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\ddssyb.L32
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\ddssyb32.def
+
+rc -r -v -dWIN32 -foddssyb.res ..\..\%ACTVERS%.SRC\DDSSYB\ddssyb.rc
+
+link /DLL /DEBUG @ddssyb.l32
+copy ddssyb.lib ..
+copy ddssyb.dll ..
+copy ddssyb.exp ..
+copy ddssyb.lib ..\restool\*.*

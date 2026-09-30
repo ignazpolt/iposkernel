@@ -1,0 +1,16 @@
+dmwapi schiebe 
+cword cword1 font showbem 
+flist fint 
+wordwin mlist 
+multl singl 
+printer prconfig 
+voronoi reconst getword 
+polint coshinte ole fldcombo
+iadvsink iclisite oleobj
+cntmenu cspell
+dmwapi.res
+user32.lib gdi32.lib ole32.lib uuid.lib oleaut32.lib comdlg32.lib advapi32.lib
+winspool.lib ..\ddsmem.lib
+/OUT:dmwapi.dll
+/MAP:dmwapi.map
+

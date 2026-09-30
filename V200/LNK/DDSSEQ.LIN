@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DDSSEQ\DDSSE.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSSEQ\DDSSE1.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSSEQ\DDSSEQ.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSSEQ\DDSSEQ.lnk
+COPY ..\..\%ACTVERS%.SRC\DDSSEQ\DDSSEQ1.lnk
+
+link /nod /noe /co /li /map @ddsseq.lnk
+rc -r -v -z -foddsseq.res ..\..\%ACTVERS%.SRC\DDSSEQ\ddsseq.rc
+rc -T -K ddsseq.res ddsseq.dll
+copy ddsseq.dll ..\*.*
+implib ddsseq.lib ddsseq.dll
+copy ddsseq.lib ..\*.*
+
+link /nod /noe /co /li /map @ddsseq1.lnk
+rc -T -K ddsseq.res ddsseq1.dll
+copy ddsseq1.dll ..\restool
+implib ddsseq1.lib ddsseq1.dll
+copy ddsseq1.lib ..\restool

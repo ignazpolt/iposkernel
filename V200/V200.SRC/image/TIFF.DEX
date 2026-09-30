@@ -1,0 +1,71 @@
+EXETYPE WINDOWS
+
+DESCRIPTION 'Tiff Handling und Twainapp'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   4048
+
+EXPORTS
+  WEP                                                                                   @1 	RESIDENTNAME
+  ?ProcessDCMessage@@ZCHPEUtagMSG@@@Z                                                   @2
+  ?SobelFlt@mImage@@RECXPED@Z                                                           @3
+  ?lutTrans@mImage@@RECXPEEPED@Z                                                        @4
+  ?MedianFlt@mImage@@RECXPED@Z                                                          @5
+  ?GetHisto@mImage@@RECXPEKPED@Z                                                        @6
+  ??2farObj@@TCPEXI@Z                                                                   @7
+  ??3farObj@@TCXPEX@Z                                                                   @8
+  ??1mImage@@REC@XZ                                                                     @9
+  ?InitializeScale@mImage@@RECXPEUSCALEIMAGEINFO@@N@Z                                   @10
+;  ?DCOpenDSM@@ZCHI@Z                                                                    @11
+;  ?DCCloseDSM@@ZCHXZ                                                                    @12
+;  ?DCTerminate@@ZCXXZ                                                                   @13
+;  ?DCInitialize@@ZCXPEUDC_IDENTITY@@I@Z                                                 @14
+  ?DCInitialize@@ZCXI@Z                                                                 @15
+;  ?DCAcquire@@ZCXIHHHHHH@Z                                                              @16
+  ?ScanConfigure@@ZCHXZ                                                                 @17
+  ?linFlt@mImage@@RECXPEUFilter@@PED@Z                                                  @18
+  ?Paint@mImage@@RECXIPEUtagRECT@@00H@Z                                                 @19
+  ?ReadPart@mImage@@RECIIIHHHH@Z                                                        @20
+  ?ResetBMPs@mImage@@RECXXZ                                                             @21
+  ?GetDIBRect@mImage@@RECXPEUtagRECT@@@Z                                                @22
+  ?CalcDIBKoords@@ZCXPEUtagRECT@@00@Z                                                   @23
+  ?OnPaletteChanged@mImage@@RECIIH@Z                                                    @24
+  ??0mImage@@REC@XZ                                                                     @25
+  ?LocalContrast@mImage@@RECXPED@Z                                                      @26
+  ?StartScan@@ZCHPEDPEM1111PEG22H@Z                                                     @27
+  ?GetScannedImage@@ZCIXZ                                                               @28
+  ?GetImage@@ZCIPED@Z                                                                   @29
+  ?ImageExist@@ZCHPED@Z                                                                 @30
+  ?PutImage@@ZCXHIPEXH@Z                                                                @31
+  ?SetDIB@mImage@@RECXIPED@Z                                                            @32
+  ?ImportImage@@ZCIPED@Z                                                                @33
+  ?GetImageFileName@@ZCXPEDPEX@Z                                                        @34
+  ?MapChange@mImage@@RECXIPEUtagRECT@@00@Z                                              @35
+  ?GetFullDIBName@@ZCPEDPED@Z                                                           @36
+;  ?RemoveDIBListElem@@ZCXPED@Z                                                          @37
+  ?SndPlayWav@@ZCXPEDG@Z                                                                @38
+  ?SndReset@@ZCXXZ                                                                      @39
+  ?SndSetMsgWnd@@ZCXI@Z                                                                 @40
+  ?SndOnSoundMsg@@ZCXIIJ@Z                                                              @41
+  ?DCExit@@ZCXXZ                                                                        @42
+  ?GetTWAINSources@@ZCHPED@Z                                                            @43
+  ?GetEmptyColorHisto@@ZCIXZ                                                            @44
+  ?CalcBestPalette@@ZCIIPEI@Z                                                           @45
+  ?SetPal@mImage@@RECXIIH@Z                                                             @46
+  ?AddColorHisto@mImage@@RECXI@Z                                                        @47
+  ?CreateGrayPalette@@ZCII@Z                                                            @48
+  ?WriteBMP@mImage@@RECXPED@Z                                                           @49
+  ?GetPelsPerMeter@mImage@@RECXPEJ0@Z                                                   @50
+  ?SetPelsPerMeter@mImage@@RECXJJ@Z                                                     @51
+  ?GetImgWidth@mImage@@RECJXZ                                                           @52
+  ?DrawPixel8@@ZCXHHJ@Z                                                                 @53
+  ?DrawPixel24@@ZCXHHJ@Z                                                                @54
+  ?DrawContDirect@mImage@@RECXPEMHK@Z                                                   @55
+  ?AddEdge@@ZCXPEPEXHPEUtag_fpt@@111@Z                                                  @56
+  ?MorphImage@mImage@@RECXPEPEXHI@Z                                                     @57
+  ?GetImgHeight@mImage@@RECJXZ                                                          @58
+  ?SetContrast@@ZCXIIMM@Z                                                               @59
+

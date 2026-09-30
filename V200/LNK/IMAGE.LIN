@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\IMAGE\tf.DEF
+COPY ..\..\%ACTVERS%.SRC\IMAGE\tf1.DEF
+COPY ..\..\%ACTVERS%.SRC\IMAGE\tiff.LNK
+COPY ..\..\%ACTVERS%.SRC\IMAGE\tiff1.LNK
+
+link /nod /noe /co /li /map @tiff.lnk
+rc -r -v -z -fotiffimg.res ..\..\%ACTVERS%.SRC\IMAGE\tiffimg.rc
+rc -T -K tiffimg.res tiffimg.dll
+copy tiffimg.dll ..\*.*
+implib tiffimg.lib tiffimg.dll
+copy tiffimg.lib ..\*.*
+
+link /nod /noe /co /li /map @tiff1.lnk
+rc -T -K tiffimg.res tiffimg1.dll
+copy tiffimg1.dll ..\restool
+implib tiffimg1.lib tiffimg1.dll
+copy tiffimg1.lib ..\restool

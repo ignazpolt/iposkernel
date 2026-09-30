@@ -1,0 +1,8 @@
+ddsodbc+
+opodbc+altodbc+appsrc
+ddsodbc.dll
+ddsodbc.map
+libw.lib+mdllcew.lib+..\ddsmem.lib+
+..\dmwapi.lib+..\dbhelp.lib+odbc.lib
+ddso.def
+

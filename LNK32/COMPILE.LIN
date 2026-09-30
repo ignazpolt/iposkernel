@@ -1,0 +1,9 @@
+COPY ..\..\%ACTVERS%.SRC\COMPILE\COMPILE.L32
+
+rc -r -v -dWIN32 -focompile.res ..\..\%ACTVERS%.SRC\COMPILE\compile.rc
+
+link /DLL /DEBUG @compile.l32
+copy compile.dll ..\*.* 
+copy compile.lib ..\*.*
+copy compile.exp ..\*.*
+copy compile.dll ..\restool\*.* 

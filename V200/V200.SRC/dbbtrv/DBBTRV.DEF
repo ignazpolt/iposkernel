@@ -1,0 +1,100 @@
+;-----------------------------------------------------
+;       $Header:   P:/marille/clinicum/dbbtrv/rev/dbbtrv.dev   1.11   06 Mar 1998 17:07:02   Hannes  $ 
+;       $Log:   P:/marille/clinicum/dbbtrv/rev/dbbtrv.dev  $
+;  
+;     Rev 1.11   06 Mar 1998 17:07:02   Hannes
+;  
+;     Rev 1.10   10 Nov 1997 10:50:16   Hannes
+;  MakeTimeStamp
+;  
+;     Rev 1.9   26 Nov 1996 08:00:50   HANNES
+;  
+;     Rev 1.8   31 Jan 1996 19:34:22   HANNES
+;  
+;     Rev 1.7   16 Feb 1995 12:47:20   HANNES
+;  
+;     Rev 1.6   29 Jan 1995 11:45:02   HANNES
+;  
+;     Rev 1.5   09 Jan 1995 12:08:52   HANNES
+;  Debugger eingebaut
+;  
+;     Rev 1.4   15 Dec 1994 11:11:08   HANNES
+;  
+;     Rev 1.3   31 Oct 1994 10:38:50   hannes
+;  
+;     Rev 1.2   19 Oct 1994 22:31:34   hannes
+;  
+;     Rev 1.1   13 Jul 1994 21:22:26   HANNES
+;  
+;     Rev 1.0   24 Jun 1994 16:43:28   HANNES
+;  Neuuebernahme clinicum
+;  
+;     Rev 1.0   18 Apr 1994 20:42:42   HANNES
+;  Initial revision.
+;-----------------------------------------------------
+EXETYPE WINDOWS
+
+DESCRIPTION 'Datenbankanbindung Marille - Btrieve'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   4096
+
+EXPORTS
+  WEP                                                                      @1 	RESIDENTNAME
+  DATARES_GETDICTCONT      = ?DataRes_GetDictCont@@ZCIPEK0@Z               @2
+  DATARES_GETDOCCONT       = ?DataRes_GetDocCont@@ZCIPEK0@Z                @3
+  DATARES_GETDOCDEF        = ?DataRes_GetDocDef@@ZCIPEDPEK1@Z              @4
+  DATARES_GETFIRSTDOC      = ?DataRes_GetFirstDoc@@ZCIPEDPEK1@Z            @5
+  DATARES_GETFIRSTROWDEF   = ?DataRes_GetFirstRowDef@@ZCIPEDG0PEGPEK2@Z    @6
+  DATARES_GETFIRSTTABLEDEF = ?DataRes_GetFirstTableDef@@ZCHPEGPED@Z        @7
+  DATARES_GETNEXTDOC       = ?DataRes_GetNextDoc@@ZCIPEDPEK1@Z             @8
+  DATARES_GETNEXTROWDEF    = ?DataRes_GetNextRowDef@@ZCIPEDGG0PEGPEK2@Z    @9
+  DATARES_GETNEXTTABLEDEF  = ?DataRes_GetNextTableDef@@ZCHGPEGPED@Z        @10
+  DATARES_GETRESOURCE      = ?DataRes_GetResource@@ZCIKPEK0@Z              @11
+  DATARES_SETDICTCONT      = ?DataRes_SetDictCont@@ZCXPEXK@Z               @12
+  DATARES_SETDOCCONT       = ?DataRes_SetDocCont@@ZCXPEXK@Z                @13
+  DATARES_SETDOCDEF        = ?DataRes_SetDocDef@@ZCXPEDPEXK@Z              @14
+  DATARES_SETRESOURCE      = ?DataRes_SetResource@@ZCKGPEDPEXK@Z           @15
+  DATARES_SETROWDEF        = ?DataRes_SetRowDef@@ZCGPEDG0PEXKPEH@Z         @16
+  DATARES_SETTABLEDEF      = ?DataRes_SetTableDef@@ZCGPED0GGPEXKPEH@Z      @17
+  DATARES_GETFULLTABLEDEF  = ?DataRes_GetFullTableDef@@ZCIPEDG0PEK1@Z      @18
+  DATARES_SETFULLTABLEDEF  = ?DataRes_SetFullTableDef@@ZCXPEDG0PEXK@Z      @19
+  DBRESET                  = ?DBReset@@ZCXXZ                               @20
+  DATADICT_TABLEDEF        = ?DataDict_TableDef@@ZCPEXPEXPEDPEHPEK@Z       @21
+  DATADICT_FREETABLEDEF    = ?DataDict_FreeTableDef@@ZCXPEX@Z              @22
+  DATARES_GETTABLEDEF      = ?DataRes_GetTableDef@@ZCIPEDG0PEK1@Z          @23
+  DBCALL                   = ?DBCall@@ZCHGHPEUDBRequest@@PEPEXPEURecBuffer@@@Z  @24
+  DATADICT_FREEVARDEF      = ?DataDict_FreeVarDef@@ZCXPEX@Z                @25
+  DATADICT_VARDEF          = ?DataDict_VarDef@@ZCPEXPEXG0PEDPEHPEK@Z       @26
+  DATADICT_GETMTYPE        = ?DataDict_GetMType@@ZCGPEX@Z                  @27
+  DATADICT_GETACCESSLIST   = ?DataDict_GetAccessList@@ZCPEUAccessListEntry@@PEX@Z @28
+  DATADICT_GETVARDESCEXTRA = ?DataDict_GetVarDescExtra@@ZCXPEXPEDG@Z       @29
+  DATADICT_ISFOREIGNKEY    = ?DataDict_IsForeignKey@@ZCHPEXPEDH1H1HPEUSegNamePtrs@@@Z   @30
+  DATARES_CLEARROWDEFS     = ?DataRes_ClearRowDefs@@ZCXPEDG@Z              @31
+  DATADICT_ISPRIMARY       = ?DataDict_IsPrimary@@ZCHPEX@Z                 @32
+  DATARES_GETFIRSTRESOURCE = ?DataRes_GetFirstResource@@ZCIGPEKPED00@Z     @33
+  DATARES_GETNEXTRESOURCE  = ?DataRes_GetNextResource@@ZCIGPEKPED00@Z      @34
+  DATARES_GETRESCONT       = ?DataRes_GetResCont@@ZCIGPEK0@Z               @35
+  DATARES_SETRESCONT       = ?DataRes_SetResCont@@ZCXGPEXK@Z               @36
+  DATARES_SETFUNCDEF       = ?DataRes_SetFuncDef@@ZCXPEXK@Z                @37
+  DATARES_GETFUNCDEF       = ?DataRes_GetFuncDef@@ZCIPEK0@Z                @38
+  DATADICT_ISACCESSFORVIEW = ?DataDict_IsAccessForView@@ZCHPEXPED@Z        @39
+  DATADICT_GETSQLPART      = ?DataDict_GetSqlPart@@ZCPEDGPEDPEXGG0G@Z      @40
+  DOBEGINTRANSACTION       = ?DoBeginTransaction@@ZCXH@Z                   @41
+  DOENDTRANSACTION         = ?DoEndTransaction@@ZCXXZ                      @42
+  DOABORTTRANSACTION       = ?DoAbortTransaction@@ZCXXZ                    @43
+  DATADICT_GETVARPROPERTY  = ?DataDict_GetVarProperty@@ZCHPEX0G0@Z         @44
+  DATARES_GETSERVERSOURCE   = ?DataRes_GetServerSource@@ZCIPEDG0PEK1@Z     @45
+  DATADICT_LASTSERVERSOURCE = ?DataDict_LastServerSource@@ZCIXZ            @46
+  DATARES_SETSERVERSOURCE   = ?DataRes_SetServerSource@@ZCXPEDG0PEXK@Z     @47
+  DATADICT_NEWTABLEDEF      = ?DataDict_NewTableDef@@ZCPEXPEXPEDPEHPEK@Z   @48
+  DBHELP_GET                = ?DBHelp_Get@@ZCIGPEDPEK@Z                    @49
+  DBHELP_LIST               = ?DBHelp_List@@ZCIG@Z                         @50
+  DBHELP_PUT                = ?DBHelp_Put@@ZCXGPEDPEXK@Z                   @51
+  DATARES_DELTABLEDEF       = ?DataRes_DelTableDef@@ZCXPEDG@Z              @52
+  DBALTER                   = ?DBAlter@@ZCHPEUTableDef@@0HPEUDefVal@@P7CXK@Z@Z @53
+  MAKETIMESTAMP             = ?MakeTimeStamp@@ZCXPED@Z                     @54
+

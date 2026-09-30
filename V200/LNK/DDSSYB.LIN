@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\DDSS.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\DDSS1.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\DDSSYB.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\DDSSYB.lnk
+COPY ..\..\%ACTVERS%.SRC\DDSSYB\DDSSYB1.lnk
+
+link /nod /noe /co /li /map @ddssyb.lnk
+rc -r -v -z -foddssyb.res ..\..\%ACTVERS%.SRC\DDSSYB\ddssyb.rc
+rc -T -K ddssyb.res ddssyb.dll
+copy ddssyb.dll ..\*.*
+implib ddssyb.lib ddssyb.dll
+copy ddssyb.lib ..\*.*
+
+link /nod /noe /co /li /map @ddssyb1.lnk
+rc -T -K ddssyb.res ddssyb1.dll
+copy ddssyb1.dll ..\restool
+implib ddssyb1.lib ddssyb1.dll
+copy ddssyb1.lib ..\restool

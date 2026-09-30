@@ -1,0 +1,8 @@
+dbbtrv 
+rsbtrv cmbtrv opbtrv cvbtrv dcbtrv 
+joinbtrv btrvsql opbtrv1 altbtrv
+dbbtrv.res
+user32.lib wbtrv32.lib ..\ddsmem.lib ..\dmwapi.lib ..\dbhelp.lib ..\compile.lib
+/OUT:dbbtrv.dll
+/MAP:dbbtrv.map
+/DEF:dbbtrv32.def

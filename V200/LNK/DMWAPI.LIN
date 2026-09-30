@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\DMWAPI\DMWA.DEF
+COPY ..\..\%ACTVERS%.SRC\DMWAPI\DMWA1.DEF
+COPY ..\..\%ACTVERS%.SRC\DMWAPI\dmwapi.LNK
+COPY ..\..\%ACTVERS%.SRC\DMWAPI\dmwapi1.LNK
+
+link /nod /noe /co /li /map @dmwapi.lnk
+rc -r -v -z -fodmwapi.res ..\..\%ACTVERS%.SRC\DMWAPI\dmwapi.rc
+rc -T -K dmwapi.res dmwapi.dll
+copy dmwapi.dll ..\*.*
+implib dmwapi.lib dmwapi.dll
+copy dmwapi.lib ..\*.*
+
+link /nod /noe /co /li /map @dmwapi1.lnk
+rc -T -K dmwapi.res dmwapi1.dll
+copy dmwapi1.dll ..\restool
+implib dmwapi1.lib dmwapi1.dll
+copy dmwapi1.lib ..\restool

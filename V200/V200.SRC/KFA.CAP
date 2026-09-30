@@ -1,0 +1,17 @@
+Kunde:KFA-HERA
+VTO:yes
+StationsVerwaltung:none
+ScheinVerwaltung:yes
+DSYS:no
+ProduktName:ClinicWare
+AufnahmeUeberTerminbuch:yes
+Wartelisten:keine
+SysName:SYSC
+SysPass:WXXY
+NoPatTerminNichtAufrufen:yes
+BesuchVerwaltung:yes
+VerrechnungsArt:select
+Scripts:
+KUENVerwaltung:ENABLED
+PatientenAbfrage:Pro
+*

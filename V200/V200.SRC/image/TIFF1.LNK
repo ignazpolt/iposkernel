@@ -1,0 +1,8 @@
+tiffimg+mimage+rotimg+libentry+
+dibman+sound+morphing+imgcompr
+tiffimg1.dll
+tiff.map
+libw.lib+ldllcew.lib+mmsystem.lib+wbtrcall.lib+oldnames.lib+
+..\restool\ddsmem1.lib+..\restool\dmwapi1.lib+winmem32.lib+
+ltkrn_w.lib+ltfil_w.lib+lttwn_w.lib
+tf1.def

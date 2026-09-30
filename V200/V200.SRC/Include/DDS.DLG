@@ -1,0 +1,24 @@
+ABOUTBOX DIALOG 48, 24, 252, 171
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "SoftWork"
+FONT 10, "System"
+BEGIN
+	LTEXT "Produkt", 110, 10, 52, 66, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+	LTEXT "Copyright \251 1995-97  SoftWork", -1, 76, 52, 106, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+
+	LTEXT "Version", -1, 188, 52, 25, 8
+	LTEXT "", 105, 216, 52, 38, 8
+	LTEXT "Dieses Produkt wurde lizenziert für:", -1, 16, 75, 125, 8
+	CTEXT "", 100, 16, 87, 220, 8
+	CONTROL "OK", IDOK, "BUTTON", BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_GROUP, 202, 148, 40, 14
+	CONTROL "Abbruch", IDCANCEL, "BUTTON", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_GROUP, 1024, 768, 40, 14
+	LTEXT "KB  freie Arbeitsspeicher", -1, 45, 132, 85, 8
+	LTEXT "%  Systemressourcen frei", -1, 37, 144, 85, 8
+	LTEXT "", 107, 21, 132, 24, 8
+	LTEXT "", 106, 28, 144, 9, 8
+	GROUPBOX "", 201, 10, 66, 233, 36
+	GROUPBOX "Systeminformation", 203, 10, 114, 125, 51
+
+        LTEXT "16-Bit",111,150,116,37,8
+        LTEXT "Debug-Version",112,192,116,54,8
+END

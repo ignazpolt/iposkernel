@@ -1,0 +1,10 @@
+COPY ..\..\%ACTVERS%.SRC\TOOLBAR\toolbar.L32
+
+rc -r -v -dWIN32 -fomsdntb.res ..\..\%ACTVERS%.SRC\TOOLBAR\msdntb.rc
+
+link /DLL /DEBUG @toolbar.l32
+copy toolbar.dll ..\*.*
+copy toolbar.lib ..\*.*
+copy toolbar.exp ..\*.*
+copy toolbar.dll ..\restool\*.*
+

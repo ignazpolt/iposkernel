@@ -1,0 +1,5 @@
+ddsmem waitwin globmem hash ddsdeb_c jmodel jmwrap
+user32.lib gdi32.lib advapi32.lib imagehlp.lib
+ddsmem.res
+/OUT:ddsmem.dll
+/MAP:ddsmem.map

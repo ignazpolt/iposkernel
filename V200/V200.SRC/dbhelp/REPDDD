@@ -1,0 +1,62 @@
+/*-- Definieren der Datenbanken, die fuer den Replikator benoetigt werden --*/
+// I) Zuordnung Tabellenname zu Ident
+RVarDef T2IVars [] = {
+  { "Nummer" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "TName" , 64 , VAR_STR , VPROP_NOTNULL }
+  };
+// II) Counter
+RVarDef T2CVars [] = {
+  { "TId" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "Counter" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL }
+  };
+// III) TabellenVersionen
+RVarDef T2VVars [] = {
+  { "TId" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "Version" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL }
+  };
+// IV) Satzversionen
+RVarDef SVVars [] = {
+  { "Nummer" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "TId" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "SId" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "Version" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "AussenStelle" , sizeof(short) , VAR_STRARR , VPROP_NOTNULL }
+  };
+// V) Aussenstelle zu Version
+RVarDef A2VVars [] = {
+  { "RecordVersion" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "AussenStelle" , sizeof(short) , VAR_STRARR , VPROP_NOTNULL }
+  };
+// VI) Token
+RVarDef TVars [] = {
+  { "Nummer" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "TId" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "SId" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "Value" , sizeof(short) , VAR_STRARR , VPROP_NOTNULL }
+  };
+// VII) Aktive Token
+RVarDef ATVars [] = {
+  { "Token" , sizeof(LONG) , VAR_LONG , VPROP_NOTNULL } ,
+  { "NWAddress" , 32 , VAR_STR , VPROP_NOTNULL }
+  };
+
+Beispiel für die Darstellung eines Baumes
+Benutzer (Berechtigung) ,
+Material (LagerArtikel
+                (LagerArtikelZuLieferant (PreisZuLagerArtikel(PreisStaffel),HauptLieferant),
+                 MindestMenge
+                ),
+          MaterialZuMaterialGruppe
+         ) ,
+Verpackung (LagerArtikel
+                (LagerArtikelZuLieferant (PreisZuLagerArtikel(PreisStaffel),HauptLieferant),
+                 MindestMenge
+                ),
+            VerpackungZuVerpackung "Von = %1" (Nummer) ,
+            VerpackungsAttribut 
+           ) ,
+Zukauf (LagerArtikel
+            (LagerArtikelZuLieferant (PreisZuLagerArtikel(PreisStaffel),HauptLieferant),
+             MindestMenge
+            )
+       ) ,

@@ -1,0 +1,305 @@
+#include <windows.h>
+#include <winver.h>
+#include "dlladmin.h"
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+#define VAR_LONG                0
+#define VAR_DEC                 1
+#define VAR_STR                 2
+#define VAR_POINT               3
+#define VAR_CONT                4
+#define VAR_STRARR              5
+#define VAR_FLAG                6
+#define VAR_SCALE               7
+#define VAR_PICTURE             8
+#define VAR_DATE                9
+#define VAR_PROC                10
+#define VAR_IMAGE               11
+#define VAR_DWORD               12
+#define VAR_OBJ                 13
+#define VAR_BITMAP              14
+#define VAR_TIME                15
+
+STRINGTABLE
+   Begin
+        1000 + _DATARES_SETTABLEDEF                 , "DATARES_SETTABLEDEF"
+        1000 + _DATARES_SETROWDEF                   , "DATARES_SETROWDEF"
+        1000 + _DATARES_GETTABLEDEF                 , "DATARES_GETTABLEDEF"
+        1000 + _DATARES_GETFIRSTROWDEF              , "DATARES_GETFIRSTROWDEF"
+        1000 + _DATARES_GETNEXTROWDEF               , "DATARES_GETNEXTROWDEF"
+        1000 + _DATARES_SETFULLTABLEDEF             , "DATARES_SETFULLTABLEDEF"
+        1000 + _DATARES_GETFULLTABLEDEF             , "DATARES_GETFULLTABLEDEF"
+        1000 + _DATARES_GETFIRSTTABLEDEF            , "DATARES_GETFIRSTTABLEDEF"
+        1000 + _DATARES_GETNEXTTABLEDEF             , "DATARES_GETNEXTTABLEDEF"
+        1000 + _DATARES_SETDICTCONT                 , "DATARES_SETDICTCONT"
+        1000 + _DATARES_GETDICTCONT                 , "DATARES_GETDICTCONT"
+        1000 + _DATARES_SETDOCDEF                   , "DATARES_SETDOCDEF"
+        1000 + _DATARES_GETDOCDEF                   , "DATARES_GETDOCDEF"
+        1000 + _DATARES_GETFIRSTDOC                 , "DATARES_GETFIRSTDOC"
+        1000 + _DATARES_GETNEXTDOC                  , "DATARES_GETNEXTDOC"
+        1000 + _DATARES_SETDOCCONT                  , "DATARES_SETDOCCONT"
+        1000 + _DATARES_GETDOCCONT                  , "DATARES_GETDOCCONT"
+        1000 + _DATARES_SETRESOURCE                 , "DATARES_SETRESOURCE"
+        1000 + _DATARES_GETRESOURCE                 , "DATARES_GETRESOURCE"
+        1000 + _DBRESET                             , "DBRESET"
+        1000 + _DATADICT_TABLEDEF                   , "DATADICT_TABLEDEF"
+        1000 + _DATADICT_FREETABLEDEF               , "DATADICT_FREETABLEDEF"
+        1000 + _DBCALL                              , "DBCALL"
+        1000 + _DATADICT_VARDEF                     , "DATADICT_VARDEF"
+        1000 + _DATADICT_FREEVARDEF                 , "DATADICT_FREEVARDEF"
+        1000 + _DATADICT_GETMTYPE                   , "DATADICT_GETMTYPE"
+        1000 + _DATADICT_GETACCESSLIST              , "DATADICT_GETACCESSLIST"
+        1000 + _DATADICT_GETVARDESCEXTRA            , "DATADICT_GETVARDESCEXTRA"
+        1000 + _DATADICT_ISFOREIGNKEY               , "DATADICT_ISFOREIGNKEY"
+        1000 + _DATARES_CLEARROWDEFS                , "DATARES_CLEARROWDEFS"
+        1000 + _DATADICT_ISPRIMARY                  , "DATADICT_ISPRIMARY"
+        1000 + _DATARES_GETFIRSTRESOURCE            , "DATARES_GETFIRSTRESOURCE"
+        1000 + _DATARES_GETNEXTRESOURCE             , "DATARES_GETNEXTRESOURCE"
+        1000 + _DATARES_GETRESCONT                  , "DATARES_GETRESCONT"
+        1000 + _DATARES_SETRESCONT                  , "DATARES_SETRESCONT"
+        1000 + _DATARES_SETFUNCDEF                  , "DATARES_SETFUNCDEF"
+        1000 + _DATARES_GETFUNCDEF                  , "DATARES_GETFUNCDEF"
+        1000 + _DATADICT_ISACCESSFORVIEW            , "DATADICT_ISACCESSFORVIEW"
+        1000 + _DATADICT_GETSQLPART                 , "DATADICT_GETSQLPART"
+        1000 + _DOBEGINTRANSACTION                  , "DOBEGINTRANSACTION"
+        1000 + _DOENDTRANSACTION                    , "DOENDTRANSACTION"
+        1000 + _DOABORTTRANSACTION                  , "DOABORTTRANSACTION"
+        1000 + _DATADICT_GETVARPROPERTY             , "DATADICT_GETVARPROPERTY"
+        1000 + _DATARES_GETSERVERSOURCE             , "DATARES_GETSERVERSOURCE"
+        1000 + _DATADICT_LASTSERVERSOURCE           , "DATADICT_LASTSERVERSOURCE"
+        1000 + _DATARES_SETSERVERSOURCE             , "DATARES_SETSERVERSOURCE"
+        1000 + _DATADICT_NEWTABLEDEF                , "DATADICT_NEWTABLEDEF"
+        1000 + _DATARES_DELTABLEDEF                 , "DATARES_DELTABLEDEF"
+        1000 + _DBHELP_GET                          , "DBHELP_GET"
+        1000 + _DBHELP_PUT                          , "DBHELP_PUT"
+        1000 + _DBALTER                             , "DBALTER"
+        1000 + _DBIGNOREERROR                       , "DBIGNOREERROR"
+        1000 + _MAKETIMESTAMP                       , "MAKETIMESTAMP"
+
+        1000 + _NET_NWSOCKETFAMILY                  , "NWSOCKETFAMILY"
+        1000 + _NET_NWADDRESSSIZE                   , "NWADDRESSSIZE"
+        1000 + _NET_NWSOCKETPROTOCOL                , "NWSOCKETPROTOCOL"
+        1000 + _NET_GETUNIQUEADDRESS                , "GETUNIQUEADDRESS"
+        1000 + _NET_NWADDRESSSTRTOBIN               , "NWADDRESSSTRTOBIN"
+        1000 + _NET_NWADDRESSBINTOSTR               , "NWADDRESSBINTOSTR"
+
+        1000 + _NET_SETSTATIONSEMAPHOR              , "NETSETSTATIONSEMAPHOR"
+        1000 + _NET_CLEARSTATIONSEMAPHOR            , "NETCLEARSTATIONSEMAPHOR"
+        1000 + _NET_CHECKSTATIONSEMAPHOR            , "NETCHECKSTATIONSEMAPHOR"
+        1000 + _NET_SETSEMA                         , "NETSETSEMA"
+        1000 + _NET_CLEARSEMA                       , "NETCLEARSEMA"
+        1000 + _NET_TESTSEMA                        , "NETTESTSEMA"
+        1000 + _NET_GETCONNECTIONNMBR               , "NETGETCONNECTIONNMBR"
+        1000 + _NET_SEMAPHOREAVAILABLE              , "NETSEMAPHOREAVAILABLE"
+        1000 + _DBPOINT                             , "DBPOINT"
+        1000 + _SETUSERNAME                         , "SETUSERNAME"
+        1000 + _DBGETLASTERROR                      , "DBGETLASTERROR"
+        1000 + _DBCURRENTDATETIME                   , "DBCURRENTDATETIME"
+        1000 + _DBGETLASTERRORTEXT                  , "DBGETLASTERRORTEXT"
+        1000 + _SETDBLOGSTATE                       , "SETDBLOGSTATE"
+                            
+        2000 + _DATARES_SETTABLEDEF                 , "n"
+        2000 + _DATARES_SETROWDEF                   , "n"
+        2000 + _DATARES_GETFIRSTROWDEF              , "n"
+        2000 + _DATARES_GETNEXTROWDEF               , "n"
+        2000 + _DATARES_SETFULLTABLEDEF             , "n"
+        2000 + _DATARES_GETFULLTABLEDEF             , "n"
+        2000 + _DATARES_GETFIRSTTABLEDEF            , "n"
+        2000 + _DATARES_GETNEXTTABLEDEF             , "n"
+        2000 + _DATARES_SETDICTCONT                 , "n"
+        2000 + _DATARES_GETDICTCONT                 , "n"
+        2000 + _DATARES_SETDOCDEF                   , "n"
+        2000 + _DATARES_GETDOCDEF                   , "n"
+        2000 + _DATARES_GETFIRSTDOC                 , "n"
+        2000 + _DATARES_GETNEXTDOC                  , "n"
+        2000 + _DATARES_SETDOCCONT                  , "n"
+        2000 + _DATARES_GETDOCCONT                  , "n"
+        2000 + _DATARES_SETRESOURCE                 , "n"
+        2000 + _DATARES_GETRESOURCE                 , "n"
+        2000 + _DBRESET                             , "n"
+        2000 + _DATADICT_TABLEDEF                   , "n"
+        2000 + _DATADICT_FREETABLEDEF               , "n"
+        2000 + _DBCALL                              , "y"
+        2000 + _DATADICT_VARDEF                     , "n"
+        2000 + _DATADICT_FREEVARDEF                 , "n"
+        2000 + _DATADICT_GETMTYPE                   , "n"
+        2000 + _DATADICT_GETACCESSLIST              , "n"
+        2000 + _DATADICT_GETVARDESCEXTRA            , "n"
+        2000 + _DATADICT_ISFOREIGNKEY               , "n"
+        2000 + _DATARES_CLEARROWDEFS                , "n"
+        2000 + _DATADICT_ISPRIMARY                  , "n"
+        2000 + _DATARES_GETFIRSTRESOURCE            , "n"
+        2000 + _DATARES_GETNEXTRESOURCE             , "n"
+        2000 + _DATARES_GETRESCONT                  , "n"
+        2000 + _DATARES_SETRESCONT                  , "n"
+        2000 + _DATARES_SETFUNCDEF                  , "n"
+        2000 + _DATARES_GETFUNCDEF                  , "n"
+        2000 + _DATADICT_ISACCESSFORVIEW            , "n"
+        2000 + _DATADICT_GETSQLPART                 , "n"
+        2000 + _DOBEGINTRANSACTION                  , "n"
+        2000 + _DOENDTRANSACTION                    , "n"
+        2000 + _DOABORTTRANSACTION                  , "n"
+        2000 + _DATARES_GETSERVERSOURCE             , "n"
+        2000 + _DATADICT_LASTSERVERSOURCE           , "n"
+        2000 + _DATARES_SETSERVERSOURCE             , "n"
+        2000 + _DATADICT_NEWTABLEDEF                , "n"
+        2000 + _DATARES_DELTABLEDEF                 , "n"
+        2000 + _DBHELP_GET                          , "n"
+        2000 + _DBHELP_PUT                          , "n"
+        2000 + _DBALTER                             , "n"
+        2000 + _DBIGNOREERROR                       , "n"
+        2000 + _DBPOINT                             , "n"
+        2000 + _MAKETIMESTAMP                       , "n"
+        2000 + _SETUSERNAME                         , "n"
+        2000 + _DBGETLASTERROR                      , "n"
+        2000 + _DBCURRENTDATETIME                   , "n"
+        2000 + _DBGETLASTERRORTEXT                  , "n"
+      
+        2000 + _NET_GETUNIQUEADDRESS                , "n"
+        2000 + _NET_SETSTATIONSEMAPHOR              , "n"
+        2000 + _NET_CLEARSTATIONSEMAPHOR            , "n"
+        2000 + _NET_CHECKSTATIONSEMAPHOR            , "n"
+        2000 + _NET_SETSEMA                         , "n"
+        2000 + _NET_CLEARSEMA                       , "n"
+        2000 + _NET_TESTSEMA                        , "n"
+        2000 + _NET_GETCONNECTIONNMBR               , "n"
+        2000 + _NET_SEMAPHOREAVAILABLE              , "n"
+
+
+        10000 + VAR_LONG                            , "long"
+        10000 + VAR_DEC                             , "dec"
+        10000 + VAR_STR                             , "string"
+        10000 + VAR_POINT                           , "point"
+        10000 + VAR_CONT                            , "cont"
+        10000 + VAR_STRARR                          , "short"
+        10000 + VAR_FLAG                            , "flag"
+        10000 + VAR_SCALE                           , "scale"
+        10000 + VAR_DATE                            , "date"
+        10000 + VAR_TIME                            , "time"
+        10000 + VAR_DWORD                           , "unsigned"
+        10000 + VAR_OBJ                             , "void"
+
+        11000 + VAR_LONG                            , "long"
+        11000 + VAR_DEC                             , "dec"
+        11000 + VAR_STR                             , "string"
+        11000 + VAR_POINT                           , "point"
+        11000 + VAR_CONT                            , "cont"
+        11000 + VAR_STRARR                          , "strfield"
+        11000 + VAR_FLAG                            , "flag"
+        11000 + VAR_SCALE                           , "scale"
+        11000 + VAR_DATE                            , "date"
+        11000 + VAR_TIME                            , "time"
+        11000 + VAR_DWORD                           , "long"
+        11000 + VAR_OBJ                             , "obj"
+
+        21000,     "Januar"
+        21001,     "Februar"
+        21002,     "M�rz"
+        21003,     "April"
+        21004,     "Mai"
+        21005,     "Juni"
+        21006,     "Juli"
+        21007,     "August"
+        21008,     "September"
+        21009,     "Oktober"
+        21010,     "November"
+        21011,     "Dezember"
+        21012,     "JAN"
+        21013,     "FEB"
+        21014,     "M�R"
+        21015,     "APR"
+        21016,     "MAI"
+        21017,     "JUN"
+        21018,     "JUL"
+        21019,     "AUG"
+        21020,     "SEP"
+        21021,     "OKT"
+        21022,     "NOV"
+        21023,     "DEZ"
+    
+        28900,     "Montag"
+        28901,     "Dienstag"
+        28902,     "Mittwoch"
+        28903,     "Donnerstag"
+        28904,     "Freitag"
+        28905,     "Samstag"
+        28906,     "Sonntag"
+
+   End
+DIALOG_1 DIALOG 18, 18, 162, 62
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Daten Konvertieren"
+BEGIN
+  LTEXT "Tabelle:", -1, 4, 10, 31, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+  CONTROL "", 101, "EDIT", ES_LEFT | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 39, 8, 116, 12
+  LTEXT "Satz Nr:", -1, 4, 28, 31, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+  CONTROL "", 102, "EDIT", ES_LEFT | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 39, 26, 34, 12
+  PUSHBUTTON "Abbrechen", IDCANCEL, 111, 43, 44, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+  LTEXT "Fehler Nr:", -1, 81, 28, 36, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+  CONTROL "", 103, "EDIT", ES_LEFT | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 121, 26, 34, 12
+END
+
+DIALOG_2 DIALOG 18, 18, 162, 62
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Tabellendefinition testen"
+BEGIN
+  LTEXT "Tabelle:", -1, 6, 12, 31, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+  LTEXT "", 101, 39, 12, 112, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+  LTEXT "", 102, 75, 26, 31, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
+  PUSHBUTTON "Abbrechen", IDCANCEL, 111, 43, 44, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+END
+
+DIALOG_3 DIALOG DISCARDABLE  18, 18, 162, 84
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Tabelle sperren"
+FONT 8, "System"
+BEGIN
+    LTEXT           "Der gew�nschte Datensatz steht im Moment nicht zur Bearbeitung zur Verf�gung, da ev. nicht die neuesten Daten vorliegen. Sie k�nnen warten, bis der Replikator die neueste Version liefert oder die ev. nicht neuen Daten in der Zwischenzeit ansehen.",
+                    -1,4,7,150,51
+    PUSHBUTTON      "Abbrechen",IDCANCEL,54,62,44,15
+END
+
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "DBHELP.DLL\0"
+            VALUE "InternalName", "DBHELP\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+END
+
+

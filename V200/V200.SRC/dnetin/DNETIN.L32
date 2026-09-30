@@ -1,0 +1,6 @@
+dnetin inetapi
+user32.lib gdi32.lib wsock32.lib advapi32.lib ..\ddsmem.lib
+dnetin.res
+/OUT:dnetin.dll
+/MAP:dnetin.map
+/DEF:dnetin32.def

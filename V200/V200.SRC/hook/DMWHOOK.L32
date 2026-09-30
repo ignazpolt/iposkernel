@@ -1,0 +1,6 @@
+hooksdll
+dmwhook.res
+user32.lib
+/OUT:dmwhook.dll
+/MAP:dmwhook.map
+

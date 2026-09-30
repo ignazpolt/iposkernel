@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\DBCLEAN\DBCLEAN.LNK
+COPY ..\..\%ACTVERS%.SRC\DBCLEAN\DBCLEAN1.LNK
+COPY ..\..\%ACTVERS%.SRC\DBCLEAN\DBCLEAN.DEF
+COPY ..\..\%ACTVERS%.SRC\DBCLEAN\DBCLEAN1.DEF
+
+link /nod /noe /co /li /map @dbclean.lnk
+rc -r -v -z -fodbclean.res ..\..\%ACTVERS%.SRC\DBCLEAN\dbclean.rc
+rc -T -K dbclean.res dbclean.dll
+implib dbclean.lib dbclean.dll
+copy dbclean.dll ..\*.*
+copy dbclean.lib ..\*.*
+
+link /nod /noe /co /li /map @dbclean1.lnk
+rc -T -K dbclean.res dbclean1.dll
+implib dbclean1.lib dbclean1.dll
+copy dbclean1.dll ..\restool
+copy dbclean1.lib ..\restool

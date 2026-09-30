@@ -1,0 +1,279 @@
+;-----------------------------------------------------
+;       $Header:   P:/marille/clinicum/ctool/rev/ctool.dev   1.39   02 Feb 1996 10:54:18   GERHOLD  $
+;       $Log:   P:/marille/clinicum/ctool/rev/ctool.dev  $
+;  
+;     Rev 1.39   02 Feb 1996 10:54:18   GERHOLD
+;  1.Umstellung auf 32 Bit
+;  
+;     Rev 1.38   02 Jan 1996 22:13:22   HANNES
+;  
+;     Rev 1.37   20 Nov 1995 11:43:14   HANNES
+;  GetLastPressedChar
+;  
+;     Rev 1.36   15 Nov 1995 17:35:06   GERHOLD
+;  SetMapExtent ... Position und Groesse der Mappe aendern
+;  
+;     Rev 1.35   16 Oct 1995 13:29:06   GERHOLD
+;  SubClassFunc
+;  
+;     Rev 1.34   16 Sep 1995 02:03:58   HANNES
+;  
+;     Rev 1.33   11 Sep 1995 20:24:08   MARTIN
+;  OnSetFocusProc
+;  
+;     Rev 1.32   07 Sep 1995 09:02:24   HANNES
+;  
+;     Rev 1.31   24 Aug 1995 09:36:40   HANNES
+;  DBWIN_ASSERT
+;  
+;     Rev 1.30   14 Aug 1995 12:18:16   HANNES
+;  
+;     Rev 1.29   14 Aug 1995 08:24:42   HANNES
+;  
+;     Rev 1.28   03 Jul 1995 16:16:24   HANNES
+;  
+;     Rev 1.27   02 Jul 1995 18:18:48   HANNES
+;  
+;     Rev 1.26   27 Jun 1995 13:54:54   HANNES
+;  
+;     Rev 1.25   09 Jun 1995 00:27:34   HANNES
+;  
+;     Rev 1.24   20 May 1995 16:18:16   HANNES
+;  
+;     Rev 1.23   02 May 1995 13:48:32   HANNES
+;  
+;     Rev 1.22   12 Apr 1995 12:27:24   HANNES
+;  
+;     Rev 1.21   04 Apr 1995 12:11:10   HANNES
+;  
+;     Rev 1.20   31 Mar 1995 13:10:24   HANNES
+;  
+;     Rev 1.19   20 Mar 1995 12:11:12   HANNES
+;  
+;     Rev 1.18   15 Dec 1994 18:22:40   HANNES
+;  Windowklassen ext. initialisieren
+;  
+;     Rev 1.17   14 Dec 1994 19:22:08   HANNES
+;  
+;     Rev 1.16   28 Nov 1994 20:02:42   GERHOLD
+;  
+;     Rev 1.15   20 Nov 1994 18:28:46   HANNES
+;  
+;     Rev 1.14   18 Nov 1994 19:57:00   HANNES
+;  
+;     Rev 1.13   07 Nov 1994 11:28:02   HANNES
+;  
+;     Rev 1.12   25 Oct 1994 15:00:44   GERHOLD
+;  CreateDlgList
+;  
+;     Rev 1.11   20 Sep 1994 11:26:52   GERHOLD
+;  
+;     Rev 1.10   30 Aug 1994 10:40:18   HANNES
+;  
+;     Rev 1.9   25 Aug 1994 16:57:32   GERHOLD
+;  
+;     Rev 1.8   25 Aug 1994 13:52:30   HANNES
+;  
+;     Rev 1.7   17 Aug 1994 09:30:12   HANNES
+;  
+;     Rev 1.6   05 Aug 1994 17:55:16   HANNES
+;  
+;     Rev 1.5   05 Aug 1994 17:51:06   HANNES
+;  
+;     Rev 1.3   17 Jul 1994 14:43:14   HANNES
+;  Zwischenversion
+;  
+;     Rev 1.2   13 Jul 1994 21:21:28   HANNES
+;  
+;     Rev 1.1   12 Jul 1994 14:46:56   GERHOLD
+;  
+;     Rev 1.0   24 Jun 1994 16:41:14   HANNES
+;  Neuuebernahme clinicum
+;  
+;     Rev 1.26   14 Apr 1994 16:57:16   HANNES
+;  
+;     Rev 1.25   13 Jan 1994 16:02:18   HANNES
+;  
+;     Rev 1.24   07 Jan 1994 19:16:24   HANNES
+;  
+;     Rev 1.23   18 Nov 1993 16:26:18   HANNES
+;  
+;     Rev 1.22   28 Oct 1993 13:10:28   HANNES
+;  
+;     Rev 1.21   11 Oct 1993 11:46:20   HANNES
+;  
+;     Rev 1.20   06 Oct 1993 09:54:20   HANNES
+;  
+;     Rev 1.19   04 Oct 1993 08:30:16   GERHOLD
+;  
+;     Rev 1.18   29 Sep 1993 10:48:24   GERHOLD
+;  
+;     Rev 1.17   24 Sep 1993 11:18:18   GERHOLD
+;  DrawTransparentbitmap, SetFocusOnTool
+;  
+;     Rev 1.16   22 Sep 1993 10:06:58   GERHOLD
+;  Version nach St. Poelten
+;  
+;     Rev 1.14   18 Aug 1993 10:52:48   GERHOLD
+;  
+;     Rev 1.13   11 Aug 1993 12:14:12   GERHOLD
+;  InitializeAllHotKeys, RemoveAllHotKeys
+;  
+;     Rev 1.12   22 Jul 1993 14:55:34   HANNES
+;  
+;     Rev 1.11   21 Jul 1993 14:57:26   GERHOLD
+;  
+;     Rev 1.10   21 Jul 1993 14:53:34   GERHOLD
+;  InitHotKey
+;  
+;     Rev 1.9   20 Jul 1993 12:03:46   HANNES
+;  Icon - Paint
+;  
+;     Rev 1.8   14 Jul 1993 09:19:14   HANNES
+;  
+;     Rev 1.7   14 Jul 1993 09:17:38   HANNES
+;  
+;     Rev 1.6   12 Jul 1993 13:31:24   HANNES
+;  
+;     Rev 1.5   09 Jul 1993 10:54:56   HANNES
+;  
+;     Rev 1.4   09 Jul 1993 01:40:26   HANNES
+;  
+;     Rev 1.2   09 Jul 1993 00:45:14   HANNES
+;  
+;     Rev 1.1   08 Jul 1993 12:26:08   HANNES
+;  
+;     Rev 1.0   07 Jul 1993 17:57:34   GERHOLD
+;  Initial revision.
+;  
+;     Rev 1.0   02 Dec 1992 16:19:00   HANNES
+;  Initial revision.
+;-----------------------------------------------------
+EXETYPE WINDOWS
+
+DESCRIPTION 'Toolbar'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   4096
+
+EXPORTS
+  WEP                                                                   @1  RESIDENTNAME
+  ??0DDSList@@REC@HHHPEX0I@Z                                                                                                    @2
+  ??1DDSList@@VEC@XZ                                                                                                            @3
+  ?ActivateControl@@ZCXI@Z                                                                                                      @4
+  ?ActivateLayerInScreen@@ZCXPEVScreenList@@H@Z                                                                                 @5
+  ?ActivateMainToolBar@@ZCXH@Z                                                                                                  @6
+  ?ActivateWholeScreen@@ZCXPEVScreenList@@@Z                                                                                    @7
+  ?AddPmEle@IconTool@@RECXPEDIPEX@Z                                                                                             @8
+  ?AddPmEle@IconTool@@RECXPEDPEUtagBITMAPINFO@@PEX@Z                                                                            @9
+  ?BubbleWinFunc@@ZCJIIIJ@Z                                                                                                     @10
+  ?BuildMap@@ZCPEVClientMap@@IP7CXPEXK0G0H@Z@Z                                                                                  @11
+  ?ChangeToolbarSize@@ZCXPEVScreenList@@HH@Z                                                                                    @12
+  ?CheckAbort@DDSList@@RECHXZ                                                                                                   @13
+  ?CheckSelections@DDSList@@RECXXZ                                                                                              @14
+  ?CheckSelections_scroll@DDSList@@RECXH@Z                                                                                      @15
+  ?ChildToolBarFunc@@ZCJIIIJ@Z                                                                                                  @16
+  ?ClearAbort@DDSList@@RECXXZ                                                                                                   @17
+  ?Create@DDSList@@RECXIKHHHH@Z                                                                                                 @18
+  ?CreateBubbleWindow@@ZCIHHPEDI@Z                                                                                              @19
+  ?CreateDlgList@DDSList@@RECHIPEUtagRECT@@0HHH@Z                                                                               @20
+  ?CreateToolBar@@ZCIKIHKPEUWINDOWATTRSTRUCT@@PEXHHHHH@Z                                                                        @21
+  ?DeactivateControl@@ZCXI@Z                                                                                                    @22
+  ?DestroyList@DDSList@@RECXXZ                                                                                                  @23
+  ?DestroyMap@@ZCXPEVClientMap@@@Z                                                                                              @24
+  ?DestroyToolBar@@ZCXPEVScreenList@@@Z                                                                                         @25
+  ?DisableMap@@ZCXPEVClientMap@@@Z                                                                                              @26
+  ?DListDlgProc@@ZCHIIIJ@Z                                                                                                      @27
+  ?DoActivate@ClientMap@@RECXH@Z                                                                                                @28
+  ?DoHotkeyAction@@ZCXKPEX@Z                                                                                                    @29
+  ?DrawEdge@@ZCXIPEUtagRECT@@II@Z                                                                                               @30
+  ?DrawTransparentBitmap@@ZCXIIHHHHHHK@Z                                                                                        @31
+  ?DrawTransparentBitmap@@ZCXIPEUtagBITMAPINFO@@PEDHHK@Z                                                                        @32
+  ?EnableMap@@ZCXPEVClientMap@@@Z                                                                                               @33
+  ?EraseBkGnd@ClientMap@@RECXII@Z                                                                                               @34
+  ?GetBaseUnit@@ZCXPEN@Z                                                                                                        @35
+  ?GetBitmap@@ZCIKAEH0@Z                                                                                                        @36
+  ?GetFieldFormat@@ZCXKPEXK@Z                                                                                                   @37
+  ?GetFirstExtraData@ClientMap@@RECPEXPEPEX@Z                                                                                   @38
+  ?GetNextExtraData@ClientMap@@RECPEXPEPEX@Z                                                                                    @39
+  ?GetResolutionCF@@ZCXPEN@Z                                                                                                    @40
+  ?HitTest@ClientMap@@RECXPEUtagPOINT@@@Z                                                                                       @41
+  ?HotKeyDlgProc@@ZCHIIIJ@Z                                                                                                     @42
+  ?ibDefWindowProc@@ZCJIIIJ@Z                                                                                                   @43
+  ?ibGetCaptionSize@@ZCII@Z                                                                                                     @44
+  ?IconWndProc@@ZCJIIIJ@Z                                                                                                       @45
+  ?InitHotKey@@ZCXPEXPEUHotKeyStruct@@G@Z                                                                                       @46
+  ?Initialize@@ZCHP7CPEXPEXK@ZP7CX0K0H0@ZP7CX0K0@Z33P7CIK@ZP7CP7CX0GPETDoExtern_Param@@@ZGP7CX0G5@Z@ZP7CH0K@Z@Z                 @47
+  ?InitializeAllHotKeys@@ZCXXZ                                                                                                  @48
+  ?Initialize_Extended@@ZCHP7CXPEXK0G0@ZP7CPEX0G0@ZP7CPEX0G@ZP7CH0K@ZP7CX0@ZP7CPEX0KK0@Z6P7CXKK@Z@Z                             @49
+  ?InsertElem@DDSList@@RECXPEX0@Z                                                                                               @50
+  ?IsHotKey@@ZCHPEUtagMSG@@@Z                                                                                                   @51
+  ?IsMainExistant@@ZCHXZ                                                                                                        @52
+  ?IsMainPopup@@ZCHXZ                                                                                                           @53
+  ?IsToAbort@DDSList@@RECHXZ                                                                                                    @54
+  ?ListWnd@DDSList@@RECIXZ                                                                                                      @55
+  ?ListWndProc@@ZCJIIIJ@Z                                                                                                       @56
+  ?MoveElems@@ZCXPEUMoveElem_param@@PEX@Z                                                                                       @57
+  ?NextMapElem@@ZCXPEDGKHPEXHK1PEUHotKeyData@@@Z                                                                                @58
+  ?PaintMap@ClientMap@@RECXI@Z                                                                                                  @59
+  ?PopUpToolBarFunc@@ZCJIIIJ@Z                                                                                                  @60
+  ?PrintList@DDSList@@RECXPEVPrinter@@PEX@Z                                                                                     @61
+  ?RadioCheck@@ZCXPEX0G@Z                                                                                                       @62
+  ?RefreshList@DDSList@@RECXHPEX@Z                                                                                              @63
+  ?RemoveAllHotKeys@@ZCXXZ                                                                                                      @64
+  ?RemoveElem@DDSList@@RECXPEX@Z                                                                                                @65
+  ?RemoveScreenControlFromLayer@@ZCXPEVScreenList@@H@Z                                                                          @66
+  ?SetAbort@DDSList@@RECXPEXKKK@Z                                                                                               @67
+  ?SetActive@ClientMap@@RECXPEX@Z                                                                                               @68
+  ?SetButtons@DDSList@@RECXXZ                                                                                                   @69
+  ?SetCaretToEnd@ToolEdit@@RECXXZ                                                                                               @70
+  ?SetCharCallback@DDSList@@RECXKK@Z                                                                                            @71
+  ?SetControl@@ZCXIPEUtool_header@@GPEXH@Z                                                                                      @72
+  ?SetEdFormat@@ZCXKPEXH@Z                                                                                                      @73
+  ?SetEditCallBack@@ZCXP7CHPEXIGPETedcmem@@@Z@Z                                                                                 @74
+  ?SetExtToolDimension@@ZCXPEUExtToolDimension_param@@PEX@Z                                                                     @75
+  ?SetFocusOnTool@@ZCXKPEXH@Z                                                                                                   @76
+  ?SetFrameWnd@@ZCXI@Z                                                                                                          @77
+  ?SetHeaderCallBack@DDSList@@RECXP7CXPEXIPEH@ZP7CXI0HHH0@Z@Z                                                                   @78
+  ?SetOnEditChar@@ZCXKPEXGGK@Z                                                                                                  @79
+  ?SetOverwrite@ToolEdit@@RECXXZ                                                                                                @80
+  ?SetPrCallbacks@DDSList@@RECXP7CXPEXIHHHPEHH0@Z222@Z                                                                          @81
+  ?SetToolbarTitle@@ZCXPEVScreenList@@PED@Z                                                                                     @82
+  ?Show@DDSList@@RECXXZ                                                                                                         @83
+  ?StartSetmap@@ZCXHHHPEX@Z                                                                                                     @84
+  ?stcallback@@ZCXHPEX0@Z                                                                                                       @85
+  ?ToolBarCleanUp@@ZCXXZ                                                                                                        @86
+  ?ToolBarWidth@@ZCHXZ                                                                                                          @87
+  ?Update@ClientMap@@RECXPEDGKHPEX@Z                                                                                            @88
+  ?UpdateElement@DDSList@@RECXPEX@Z                                                                                             @89
+  ?NotifyActiveEle@IconTool@@RECXXZ                                                                                             @90
+  ?IsMapHotKey@@ZCHPEUtagMSG@@PEVClientMap@@@Z                                                                                  @91
+  ?CTOOL_SetClassNames@@ZCXPED0000@Z                                                                                            @92
+  ?ReleaseElem@DDSList@@RECXPEX@Z                                                                                               @93
+  ?TryToSetCurrentElem@DDSList@@RECHPEX@Z                                                                                       @94
+  ?CTOOL_NotifyPrinting@@ZCXH@Z                                                                                                 @95
+  ?SetStartInd@@ZCXH@Z                                                                                                          @96
+  ?SetMaxSize@ToolEdit@@RECXH@Z                                                                                                 @97
+  ?DefBitmapObject@@ZCXPEXG0H@Z                                                                                                 @98
+  ?CTOOL_InstallSelectMode@@ZCXK@Z                                                                                              @99
+  ?CTOOL_SetBitSelectMode@@ZCXPEVBitSelect@@H@Z                                                                                 @100
+  ?CTOOL_GetActiveTopWindow@@ZCIXZ                                                                                              @101
+  ?CTOOL_GetActivePalette@@ZCIXZ                                                                                                @102
+  ?CTOOL_SetActivePalette@@ZCXI@Z                                                                                               @103
+  ?SetToolPalette@@ZCXPEX0G@Z                                                                                                   @104
+  ?SetBitEditMode@@ZCXPEX0G@Z                                                                                                   @105
+  ?AddBitmap@@ZCXPEUtagRECT@@HKKHHHPEE@Z                                                                                        @106
+  ?SetOnSetFocus@@ZCXKPEXK@Z                                                                                                    @107
+  ?OnSetFocus@tool@@VECXXZ                                                                                                      @108
+  ?OnSetFocus@ToolEdit@@VECXXZ                                                                                                  @109
+  ?AddMergeText@@ZCXHHHHPEDHHHH@Z                                                                                               @110
+  ?SubClassFunc@@ZCJIIIJ@Z                                                                                                      @111
+  ?SetMapExtent@@ZCXHHHH@Z                                                                                                      @112
+  ?GetLastPressedChar@@ZCGXZ                                                                                                    @113
+  ?AnzElemsInSelection@DDSList@@RECHXZ                                                                                          @114
+  ?GetFieldModify@@ZCXKPEXK@Z                                                                                                   @115
+  ?SetFieldModify@ToolEdit@@RECXHH@Z                                                                                            @116
+

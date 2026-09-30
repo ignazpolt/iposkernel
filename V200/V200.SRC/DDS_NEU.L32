@@ -1,0 +1,24 @@
+dds extdll mainsnd
+normcalc func0 func2 interpr func1 func3 
+diagram dllchild mainobj maindigi mainsc2d 
+vtoobj about contcalc cycspl mainimg 
+dswtch document varcall ddsole headtxt hlpfunc 
+memchk mdiclien opti smooth trackwnd 
+StdAfx strfnc version mdichild wbase vto 
+form ddstool format use misc 
+list list1 extchild oneshot multipro nicnfld fileproc 
+lockhand ddsdde stddde ddsdeb post_it movetool 
+kisquery multidim formtool dbupd expr regio dict serial socket
+ddsspell
+user32.lib gdi32.lib ole32.lib version.lib ddsmem.lib comdlg32.lib 
+tiffimg.lib dmwhook.lib compile.lib dmwapi.lib ctool.lib 
+dbhelp.lib frmobj.lib dbclean.lib statbar.lib 
+ltfil_n.lib ltkrn_n.lib lttwn_n.lib ltdis_n.lib winmm.lib wsock32.lib
+kernel32.lib winspool.lib advapi32.lib shell32.lib uuid.lib odbc32.lib odbccp32.lib oleaut32.lib 
+dds.res
+/OUT:dds.exe
+/MAP:dds.map
+/PDB:dds.pdb
+/SUBSYSTEM:WINDOWS
+/INCREMENTAL:NO
+

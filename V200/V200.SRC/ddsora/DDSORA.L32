@@ -1,0 +1,6 @@
+ddsora opora altora syb2ora
+user32.lib ociw32.lib ..\ddsmem.lib ..\dmwapi.lib ..\dbhelp.lib
+ddsora.res
+/OUT:ddsora.dll
+/MAP:ddsora.map
+/DEF:ddsora32.def

@@ -1,0 +1,9 @@
+toolbar bitlist bubbles 
+hotkey barelem ddslist 
+icontool myline barelem1 
+mappe buttons barelem2 dlg3d 
+trbit pedit mergetxt
+toolbar.res
+user32.lib gdi32.lib comctl32.lib ..\ddsmem.lib ..\dmwapi.lib ..\dbhelp.lib
+/OUT:ctool.dll
+/MAP:ctool.map

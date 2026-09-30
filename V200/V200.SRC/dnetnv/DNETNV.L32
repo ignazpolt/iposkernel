@@ -1,0 +1,6 @@
+dnetnv nnetapi
+user32.lib gdi32.lib wsock32.lib ..\ddsmem.lib
+dnetnv.res
+/OUT:dnetnv.dll
+/MAP:dnetnv.map
+/DEF:dnetnv32.def

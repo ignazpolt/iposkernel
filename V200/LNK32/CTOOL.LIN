@@ -1,0 +1,15 @@
+COPY ..\..\%ACTVERS%.SRC\CTOOL\ctool.L32
+
+rc -r -v -dWIN32 -fotoolbar.res ..\..\%ACTVERS%.SRC\CTOOL\toolbar.rc
+
+link /DLL /DEBUG @ctool.l32
+if errorlevel 1 goto error
+goto continue
+:error
+pause
+:continue
+
+copy ctool.dll ..\*.*
+copy ctool.lib ..\*.*
+copy ctool.exp ..\*.*
+copy ctool.dll ..\restool\*.*

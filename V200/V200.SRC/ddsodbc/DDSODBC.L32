@@ -1,0 +1,6 @@
+ddsodbc opodbc altodbc appsrc
+user32.lib odbc32.lib ..\ddsmem.lib ..\dmwapi.lib ..\dbhelp.lib
+ddsodbc.res
+/OUT:ddsodbc.dll
+/MAP:ddsodbc.map
+/DEF:ddsodb32.def

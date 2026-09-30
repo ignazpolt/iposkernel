@@ -1,0 +1,23 @@
+; NAME DNETxx
+
+EXETYPE WINDOWS
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD FIXED SINGLE
+
+HEAPSIZE   4048
+
+EXPORTS
+;    ===List your explicitly exported functions here===
+  WEP                                                              @1 	RESIDENTNAME
+  
+  GETUNIQUEADDRESS         = ?GetUniqueAddress@@ZCXPEDH@Z          @2
+  NETSETSTATIONSEMAPHOR    = ?NetSetStationSemaphor@@ZCKPED@Z      @3
+	NETCLEARSTATIONSEMAPHOR  = ?NetClearStationSemaphor@@ZCXK@Z      @4
+	NETCHECKSTATIONSEMAPHOR  = ?NetCheckStationSemaphor@@ZCHPED@Z    @5
+	NETSETSEMA               = ?NetSetSema@@ZCKPEDPEG@Z              @6
+	NETCLEARSEMA             = ?NetClearSema@@ZCXK@Z                 @7
+	NETTESTSEMA              = ?NetTestSema@@ZCHPED@Z                @8
+	NETGETCONNECTIONNMBR     = ?NetGetConnectionNmbr@@ZCHXZ          @9
+	NETSEMAPHOREAVAILABLE    = ?NetSemaphoreAvailable@@ZCHXZ				 @10

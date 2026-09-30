@@ -1,0 +1,20 @@
+restool resini wndinmdi 
+dbtblst get_put mkdep 
+genres showres metahlp genscr 
+wonscrip dialed resfonts 
+drdrop toolhwnd txedit genfull 
+edtempl frmed hlines rlist misc_res 
+frmshow fontcol myline communic rsdeb 
+fldlst tblst keylst srved fklst 
+genrtbl riwnd pradmin ldriwnd intlst jlst 
+genitbl gengtbl globlst dlgtempl genrep
+user32.lib gdi32.lib comdlg32.lib comctl32.lib
+..\ddsmem.lib ..\dmwapi.lib ..\compile.lib ..\dbhelp.lib 
+..\ctool.lib ..\frmobj.lib ..\toolbar.lib 
+..\statbar.lib ..\dbclean.lib
+restool.res
+/OUT:restool.exe
+/MAP:restool.map
+/PDB:NONE
+/SUBSYSTEM:WINDOWS
+/INCREMENTAL:NO

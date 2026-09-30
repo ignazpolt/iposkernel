@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\STATBAR\STATB.DEF
+COPY ..\..\%ACTVERS%.SRC\STATBAR\STATB1.DEF
+COPY ..\..\%ACTVERS%.SRC\STATBAR\statbar.LNK
+COPY ..\..\%ACTVERS%.SRC\STATBAR\statbar1.LNK
+
+link /nod /noe /co /li /map @statbar.lnk
+rc -r -v -z -fostatbar.res ..\..\%ACTVERS%.SRC\STATBAR\statbar.rc
+rc -T -K statbar.res statbar.dll
+implib statbar.lib statbar.dll
+copy statbar.dll ..\*.*
+copy statbar.lib ..\*.*
+
+link /nod /noe /co /li /map @statbar1.lnk
+rc -T -K statbar.res statbar.dll
+implib statbar1.lib statbar1.dll
+copy statbar1.dll ..\restool
+copy statbar1.lib ..\restool

@@ -1,0 +1,6 @@
+tiffimg mimage rotimg 
+dibman sound morphing imgcompr
+tiffimg.res
+user32.lib gdi32.lib winmm.lib ..\ddsmem.lib ..\dmwapi.lib ltkrn_n.lib ltfil_n.lib lttwn_n.lib
+/OUT:tiffimg.dll
+/MAP:tiffimg.map

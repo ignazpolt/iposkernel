@@ -1,0 +1,20 @@
+LIBRARY dmwhook
+
+EXETYPE WINDOWS
+
+DESCRIPTION 'Mouse Hook'
+
+CODE	  PRELOAD MOVEABLE DISCARDABLE
+DATA	  PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE  1024
+
+
+EXPORTS
+    WEP 		                                @1 RESIDENTNAME
+    ?MouseFunc@@ZCHHGK@Z                                @2
+    ?CheckWindow@@ZCXIH@Z                               @3
+    ?InstallFilter@@ZCXHH@Z                             @4
+    ?AvoidActivation@@ZCXIH@Z                           @5
+    ?InstallDestroyServer@@ZCXIHI@Z                     @6
+    ?WatchCreate@@ZCXHPED0I@Z                           @7

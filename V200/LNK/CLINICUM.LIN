@@ -1,0 +1,12 @@
+copy ..\%ACTVERS%.SRC\dds.lnk
+copy ..\%ACTVERS%.SRC\dds.def
+link /co /noe /nod /map /seg:300 /li @dds.lnk
+rc -r -v -z -fodds.res ..\%ACTVERS%.SRC\dds.rc
+rc -T -K dds.res ddsx.exe
+:trydel
+del dds.exe
+if not exist dds.exe goto isdeleted
+pause
+goto trydel
+:isdeleted
+ren ddsx.exe dds.exe

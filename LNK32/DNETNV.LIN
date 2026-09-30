@@ -1,0 +1,10 @@
+COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv.L32
+COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv32.def
+
+rc -r -v -dWIN32 -fodnetnv.res ..\..\%ACTVERS%.SRC\DNETNV\dnetnv.rc
+
+link /DLL /DEBUG @dnetnv.l32
+copy dnetnv.dll ..\*.*
+copy dnetnv.lib ..\*.*
+copy dnetnv.exp ..\*.*
+copy dnetnv.dll ..\restool\*.*

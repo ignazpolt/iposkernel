@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv.DEF
+COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv1.DEF
+COPY ..\..\%ACTVERS%.SRC\DNETNV\netapinv.DEF
+COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv.LNK
+COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv1.LNK
+
+link /nod /noe /co /li /map @dnetnv.lnk
+rc -r -v -z -fodnetnv.res ..\..\%ACTVERS%.SRC\DNETNV\dnetnv.rc
+rc -T -K dnetnv.res dnetnv.dll
+copy dnetnv.dll ..\*.*
+implib dnetnv.lib dnetnv.dll
+copy dnetnv.lib ..\*.*
+
+link /nod /noe /co /li /map @dnetnv1.lnk
+rc -T -K dnetnv.res dnetnv1.dll
+copy dnetnv1.dll ..\restool
+implib dnetnv1.lib dnetnv1.dll
+copy dnetnv1.lib ..\restool

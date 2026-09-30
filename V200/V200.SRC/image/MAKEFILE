@@ -1,0 +1,83 @@
+##### Module Macro #####
+NAME	= TIFF
+SRCS	= $(NAME).c winio.c winmem.c tiffcomp.c 
+SRCPPS  = mimage.cpp tiffimg.cpp
+
+##### C7 Macro #####
+C7     = 1
+
+##### Library Macro #####
+LIBS	= libw mlibcew 
+MOD	= -ALw -DDLL
+
+##### Include Macro #####
+INCLS	= 
+
+##### Resource Macro #####
+RCFILES = 
+
+##### DEBUG Defined #####
+DEBUG	=  1
+
+##### Build Option Macros #####
+!if $(DEBUG)
+DDEF	= -DDEBUG
+CLOPT	= -Zi -Od
+MOPT	= -Zi
+LOPT	= /CO /LI /MAP
+!else
+DDEF	=
+CLOPT	= -Os
+LOPT	=
+!endif
+
+##### General Macros #####
+DEF	=
+
+##### Tool Macros #####
+ASM	= masm -Mx $(MOPT) $(DDEF) $(DEF)
+CC	= cl -nologo -c $(MOD) -G2sw -Zp -W3 $(CLOPT) $(DDEF) $(DEF)
+LINK	= link /NOD /NOE $(LOPT)
+RC	= rc -K $(DDEF) $(DEF)
+HC	= hc
+
+##### Inference Rules #####
+.c.obj:
+    $(CC) $*.c
+.cpp.obj:
+    $(CC) $*.cpp
+
+.asm.obj:
+    $(ASM) $*.asm;
+
+.rc.res:
+    $(RC) -r $*.rc
+
+##### Main (default) Target #####
+goal: $(NAME).dll $(NAME).lib
+
+##### Dependents For Goal and Command Line #####
+$(NAME).dll: $(SRCS:.c=.obj) $(SRCPPS:.cpp=.obj) $(OBJS) $(NAME).def 
+    $(LINK) @$(NAME).lnk
+    $(RC) -T tiffimg.dll
+    copy tiffimg.dll ..
+
+$(NAME).LIB: $(NAME).DLL
+    implib tiffimg.LIB tiffimg.DLL
+    copy tiffimg.LIB ..
+
+##### Dependents #####
+WINIO.OBJ       :    TIFF.H WINIO.C    
+WINMEM.OBJ      :    TIFF.H WINMEM.C   
+TIFF.OBJ        :    TIFF.H TIFF.C     
+TIFFCOMP.OBJ    :    TIFF.H TIFFCOMP.C 
+TIFFIMG.OBJ     :    ..\IMAGE.HPP TIFF.H TIFFIMG.CPP 
+MIMAGE.OBJ      :    ..\IMAGE.HPP TIFF.H MIMAGE.CPP
+##### Clean Directory #####
+clean:
+    -del *.obj
+    -del *.res
+    -del *.exe
+    -del *.map
+    -del *.sym
+

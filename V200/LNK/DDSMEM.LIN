@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DDSMEM\DDSMEM.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSMEM\DDSMEM1.DEF
+
+COPY ..\..\%ACTVERS%.SRC\DDSMEM\DDSMEM.LNK
+COPY ..\..\%ACTVERS%.SRC\DDSMEM\DDSMEM1.LNK
+
+link /nod /noe /co /li /map @ddsmem.lnk
+rc -r -v -z -foddsmem.res ..\..\%ACTVERS%.SRC\DDSMEM\ddsmem.rc
+rc -T -K ddsmem.res ddsmem.dll
+copy ddsmem.dll ..\*.* 
+implib ddsmem.lib ddsmem.dll
+copy ddsmem.lib ..\*.*
+
+link /nod /noe /co /li /map @ddsmem1.lnk
+rc -T -K ddsmem.res ddsmem1.dll
+copy ddsmem1.dll ..\restool
+implib ddsmem1.lib ddsmem1.dll
+copy ddsmem1.lib ..\restool

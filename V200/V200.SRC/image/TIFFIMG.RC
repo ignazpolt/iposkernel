@@ -1,0 +1,78 @@
+/*
+ *   $Header:   P:/marille/clinicum/image/rev/tiffimg.rcv   1.2   14 Sep 1998 16:56:12   Martin  $
+ *   $Log:   P:/marille/clinicum/image/rev/tiffimg.rcv  $
+ * 
+ *    Rev 1.2   14 Sep 1998 16:56:12   Martin
+ * SoftWork raus
+ * 
+ *    Rev 1.1   30 Jun 1997 18:11:58   Martin
+ * Versionsinfo
+ * 
+ *    Rev 1.0   24 Jun 1994 16:51:10   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.1   19 Apr 1994 19:52:14   MARTIN
+ * DMWS -> Diagnosticum
+ * 
+ *    Rev 1.0   04 Feb 1994 16:47:56   MARTIN
+ * Initial revision.
+ * 
+ */
+
+#include "windows.h"
+#include <winver.h>
+#include "ddsvers.h"
+#include "ddsrc.h"
+
+VS_VERSION_INFO VERSIONINFO
+
+#ifdef WIN32
+  FILEVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 4,0,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS32
+#else
+  FILEVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  PRODUCTVERSION 3,10,PROGRAM_VERSION,SUB_VERSION
+  FILEOS VOS__WINDOWS16
+#endif
+
+#ifdef DEBUG
+  FILEFLAGSMASK  VS_FF_DEBUG
+#else
+  FILEFLAGSMASK  VS_FF_DEBUG
+#endif
+
+FILEFLAGS 0x3F
+FILETYPE VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704E4"
+        BEGIN
+            VALUE "CompanyName", COMPANY_NAME
+            VALUE "FileDescription", FILE_DESCRIPTION
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "OriginalFilename", "TIFFIMG.DLL\0"
+            VALUE "InternalName", "TIFFIMG\0"
+            VALUE "LegalCopyright", LEGAL_COPYRIGHT
+            VALUE "ProductName", PRODUCT_NAME
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252 
+    END
+  END
+
+  STRINGTABLE
+  Begin
+
+    11000,    "TWAIN.DLL"
+    10020,    "ORBIS Application Kernel"
+    10021,    "GWI"
+    10022,    "GWI CPL Programs"
+    10023,    "ORBIS"
+
+  End
+

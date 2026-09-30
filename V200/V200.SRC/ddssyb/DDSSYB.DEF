@@ -1,0 +1,41 @@
+EXETYPE WINDOWS
+
+DESCRIPTION 'Datenbankanbindung Marille - Sybase'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD FIXED SINGLE
+
+HEAPSIZE   4096
+
+EXPORTS
+  WEP                                                                           @1 	RESIDENTNAME
+  DBCALL                   = ?DBCall@@ZCHGHPEUDBRequest@@PEPEXPEURecBuffer@@@Z  @2
+  DBRESET                  = ?DBReset@@ZCXXZ                                    @3
+  DATADICT_NEWTABLEDEF     = ?DataDict_NewTableDef@@ZCPEXPEXPEDPEHPEK@Z         @4
+  DOBEGINTRANSACTION       = ?DoBeginTransaction@@ZCXXZ                             @41
+  DOENDTRANSACTION         = ?DoEndTransaction@@ZCXXZ                               @42
+  DOABORTTRANSACTION       = ?DoAbortTransaction@@ZCXXZ                             @43
+  DATARES_DELTABLEDEF =  ?DataRes_DelTableDef@@ZCXPEDG@Z                            @44
+  DATARES_GETDICTCONT =  ?DataRes_GetDictCont@@ZCIPEK0@Z                            @45
+  DATARES_GETDOCCONT =  ?DataRes_GetDocCont@@ZCIPEK0@Z                              @46
+  DATARES_GETDOCDEF =  ?DataRes_GetDocDef@@ZCIPEDPEK1@Z                             @47
+  DATARES_GETFIRSTDOC =  ?DataRes_GetFirstDoc@@ZCIPEDPEK1@Z                         @48
+  DATARES_GETFIRSTRESOURCE =  ?DataRes_GetFirstResource@@ZCIGPEKPED00@Z             @49
+  DATARES_GETFIRSTTABLEDEF =  ?DataRes_GetFirstTableDef@@ZCHPEGPED@Z                @50
+  DATARES_GETFULLTABLEDEF =  ?DataRes_GetFullTableDef@@ZCIPEDG0PEK1@Z               @51
+  DATARES_GETFUNCDEF =  ?DataRes_GetFuncDef@@ZCIPEK0@Z                              @52
+  DATARES_GETNEXTDOC =  ?DataRes_GetNextDoc@@ZCIPEDPEK1@Z                           @53
+  DATARES_GETNEXTRESOURCE =  ?DataRes_GetNextResource@@ZCIGPEKPED00@Z               @54
+  DATARES_GETNEXTTABLEDEF =  ?DataRes_GetNextTableDef@@ZCHGPEGPED@Z                 @55
+  DATARES_GETRESCONT =  ?DataRes_GetResCont@@ZCIGPEK0@Z                             @56
+  DATARES_GETRESOURCE =  ?DataRes_GetResource@@ZCIKPEK0@Z                           @57
+  DATARES_GETTABLEDEF =  ?DataRes_GetTableDef@@ZCIPEDG0PEK1@Z                       @58
+  DATARES_SETDICTCONT =  ?DataRes_SetDictCont@@ZCXPEXK@Z                            @59
+  DATARES_SETDOCCONT =  ?DataRes_SetDocCont@@ZCXPEXK@Z                              @60
+  DATARES_SETDOCDEF =  ?DataRes_SetDocDef@@ZCXPEDPEXK@Z                             @61
+  DATARES_SETFULLTABLEDEF =  ?DataRes_SetFullTableDef@@ZCXPEDG0PEXK@Z               @62
+  DATARES_SETFUNCDEF =  ?DataRes_SetFuncDef@@ZCXPEXK@Z                              @63
+  DATARES_SETRESCONT =  ?DataRes_SetResCont@@ZCXGPEXK@Z                             @64
+  DATARES_SETRESOURCE =  ?DataRes_SetResource@@ZCKGPEDPEXK@Z                        @65
+  DATARES_SETTABLEDEF =  ?DataRes_SetTableDef@@ZCGPED0GGPEXKPEH@Z                   @66

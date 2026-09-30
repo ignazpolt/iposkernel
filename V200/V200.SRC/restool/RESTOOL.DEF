@@ -1,0 +1,13 @@
+;-------------------------------------
+; HELLOWIN.DEF module definition file
+;-------------------------------------
+
+NAME           RESTOOL
+
+DESCRIPTION    'Working with Marille Resources'
+EXETYPE        WINDOWS
+STUB           'WINSTUB.EXE'
+CODE           PRELOAD MOVEABLE DISCARDABLE
+DATA           PRELOAD MOVEABLE MULTIPLE
+HEAPSIZE       1024
+STACKSIZE      16384

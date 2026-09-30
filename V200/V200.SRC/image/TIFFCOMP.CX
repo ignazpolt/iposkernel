@@ -1,0 +1,2359 @@
+/*
+// $Header:   P:/marille/clinicum/image/rev/tiffcomp.c_v   1.0   24 Jun 1994 16:50:54   HANNES  $
+// $Log:   P:/marille/clinicum/image/rev/tiffcomp.c_v  $
+ * 
+ *    Rev 1.0   24 Jun 1994 16:50:54   HANNES
+ * Neuuebernahme clinicum
+ * 
+ *    Rev 1.1   03 Dec 1992 13:05:52   HANNES
+ * PVCS Kommentare
+ * 
+ *    Rev 1.0   02 Dec 1992 16:25:28   HANNES
+ * Initial revision.
+******************************************************************************
+**	Filename:   	TiffComp.c
+**	Purpose:     	Compression routines for the TIFF library
+**	Authors:    	Mike Niquette, Patty Lopez, and Jim Graham
+**	Environment:	Portable code, Originally designed 
+**	             	for MAC, DOS, and MSWindows, and now HP-UX and OS/2 PM
+**	Library:     	dosIO.c, dos21.asm on DOS, unixIO.c on HP-UX, 
+**	             	macIO.c on MAC, and os2IO.c on OS/2 PM
+**	History:
+**	Version:    	2.0
+**
+**	(c) Copyright Hewlett-Packard Company, 1988, 1989, 1990.
+**	All rights are reserved. Copying or other reproduction of
+**	this program except for archival purposes is prohibited
+**	without the prior written consent of Hewlett-Packard Company.
+**
+**	Notes to U.S. Government Users:
+**	
+**			  RESTRICTED RIGHTS LEGEND
+**
+**	Use, duplication, or disclosure by the Government is subject to 
+**	restrictions as set forth in paragraph (b) (3) (B) of the Rights 
+**	in Technical Data and Computer Software clause in DAR 7-104.9(a).
+**
+**	Use, duplication, or disclosure by the Government is subject to 
+**	restrictions as set forth in paragraph (c) (1) (ii) of the Rights 
+**	in Technical Data and Computer Software clause at DFARS 252.227-7013.
+**
+**	HEWLETT-PACKARD COMPANY
+**	Greeley, Colorado
+******************************************************************************/
+#include <windows.h>
+
+/**----------------------------------------------------------------------------
+						Include Files and Type Defines
+----------------------------------------------------------------------------**/
+#include "Tiff.h"
+#include "HostIO.h"
+#include "HostMem.h"
+
+/**----------------------------------------------------------------------------
+					 		 Local Definitions
+----------------------------------------------------------------------------**/
+
+#define CLEAR_CODE			256
+#define END_OF_INFORMATION	257
+
+#define MAX_NODES			0x1000		/* 4k */
+
+/**----------------------------------------------------------------------------
+					 	 Local Type Declarations
+----------------------------------------------------------------------------**/
+
+typedef struct LZW_ENINFO {	
+
+	UINT16		value;		/* byte value of node */
+	
+	INT16		left;		/* nodes less than this nodes value */
+	INT16		right;		/* nodes greater than this nodes value */
+	INT16		next;		/* next character node */
+
+} LZW_ENNODE, FD *PLZW_ENNODE;
+
+typedef struct LZW_DEINFO { /* decode node structure */
+
+	UINT16		value;		/* byte value of node */
+	INT16		previous;	/* index to previous node in string */
+	
+} LZW_DENODE, FD *PLZW_DENODE;
+
+/**----------------------------------------------------------------------------
+                          Public Function Prototypes
+----------------------------------------------------------------------------**/
+
+/* Public compression routines 
+INT16 PackTight  ( PTIFFFILE pTiff, PUINT8 pData, INT32 Lines, 
+							INT32 Count, PINT32 pLength ); 
+INT16 PackBITS   ( PTIFFFILE pTiff, PUINT8 pData, INT32 Lines, 
+							INT32 Count, PINT32 pLength ); 
+INT16 PackCCITT  ( PTIFFFILE pTiff, PUINT8 pData, INT32 Lines, 
+							INT32 Count, PINT32 pLength ); 
+INT16 PackLZW    ( PTIFFFILE pTiff, PUINT8 pData, INT32 Lines, 
+							INT32 Count, PINT32 pLength ); 
+							
+INT16 UnpackTight( PTIFFFILE pTiff, PUINT8 pData, PINT32 Offset, 
+				INT32 Lines, INT32 Count );
+INT16 UnpackBITS ( PTIFFFILE pTiff, PUINT8 pData, PINT32 Offset, 
+				INT32 Lines, INT32 Count );
+INT16 UnpackCCITT( PTIFFFILE pTiff, PUINT8 pData, PINT32 Offset, 
+				INT32 Lines, INT32 Count );
+INT16 UnpackLZW  ( PTIFFFILE pTiff, PUINT8 pData, PINT32 Offset, 
+				INT32 Lines, INT32 Count );
+*/
+
+/**----------------------------------------------------------------------------
+                        Private Function Prototypes
+----------------------------------------------------------------------------**/
+
+#ifdef __UNIX__
+
+static INT16 InitializeEncodeTable();
+static INT16 TerminateEncodeTable();
+static INT16 InitializeDecodeTable();
+static INT16 TerminateDecodeTable();
+static INT16 CurrentBitsWrite();
+static INT16 CurrentBitsRead();
+static INT16 WriteCode( /* INT16 handle,UINT16 code */ );
+static INT16 WriteLastBits( /* INT16 handle */ );
+static INT16 ReadCode( /* INT16 handle */ );
+static INT16 NewEnnode( /* UINT16 node,UINT16 value */ );
+static INT16 StringInTable( /* PUINT8 string,UINT16 count,PUINT16 pcurrent_node */ );
+static INT16 StringFromCode( /* UINT16 code,PUINT8 string,PUINT16 pcount */ );
+static INT16 AddStringToTable( /* UINT16 code,UINT8 khar */ );
+
+#else
+static INT16 InitializeEncodeTable( void );
+static INT16 TerminateEncodeTable( void );
+static INT16 InitializeDecodeTable( void );
+static INT16 TerminateDecodeTable( void );
+static INT16 CurrentBitsWrite( void );
+static INT16 CurrentBitsRead( void );
+static INT16 WriteCode( INT16 handle,UINT16 code );
+static INT16 WriteLastBits( INT16 handle );
+static INT16 ReadCode( INT16 handle );
+static INT16 NewEnnode( UINT16 node,UINT16 value );
+static INT16 StringInTable( PUINT8 string,UINT16 count,PUINT16 pcurrent_node );
+static INT16 StringFromCode( UINT16 code,PUINT8 string,PUINT16 pcount );
+static INT16 AddStringToTable( UINT16 code,UINT8 khar );
+#endif
+
+/**----------------------------------------------------------------------------
+                            Local Globals
+----------------------------------------------------------------------------**/
+
+#define BUFFER_SIZE		512
+
+static UINT8			buffer[BUFFER_SIZE];	/* global file buffer */
+static INT32			bcount=0;				/* number of bytes in buffer */
+static INT16			bindex=0;				/* index to buffer */
+
+static PLZW_ENNODE		ennodes=NULL;	/* table/tree for encode nodes */
+static PLZW_DENODE		denodes=NULL;	/* table/tree for decode nodes */
+static UINT16			next_node;		/* next node to be used */
+
+static UINT32			length=0;		/* number of bytes written or read */
+static UINT16			bit_count=0;	/* input/output bit number */
+static UINT32			bits;			/* current bit word */
+
+static UINT8 mask_table[8]={ /* table for masking bits */
+
+				0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01 };
+
+/* The following are the encode tables for CCITT.  The tables are broken down by
+   terminating codes, make-up codes, and additional make-up codes.  There are
+   separate tables for black and white terminating codes and make-up codes.
+   The first two columns are for documentation only.  The first column is
+   the run length represented by the entry.  The second column is the bit
+   code for the run length, left justified.  The third column is the hex
+   number for the bit code.  The fourth column is the number of bits in the
+   code. There is also a table with one entry for the end-of-line (eol) code. */
+   
+#ifdef __CCITT__
+
+static UINT16 encode_wterm[64][2]={ /* white terminating codes */
+
+/*    0:	0011 0101 0000 0000 */	0x3500,		8,
+/*    1:	0001 1100 0000 0000 */	0x1C00,		6,
+/*    2:	0111 0000 0000 0000 */	0x7000,		4,
+/*    3:	1000 0000 0000 0000 */	0x8000,		4,
+/*    4:	1011 0000 0000 0000 */	0xB000,		4,
+/*    5:	1100 0000 0000 0000 */	0xC000,		4,
+/*    6:	1110 0000 0000 0000 */	0xE000,		4,
+/*    7:	1111 0000 0000 0000 */	0xF000,		4,
+/*    8:	1001 1000 0000 0000 */	0x9800,		5,
+/*    9:	1010 0000 0000 0000 */	0xA000,		5,
+/*   10:	0011 1000 0000 0000 */	0x3800,		5,
+/*   11:	0100 0000 0000 0000 */	0x4000,		5,
+/*   12:	0010 0000 0000 0000 */	0x2000,		6,
+/*   13:	0000 1100 0000 0000 */	0x0C00,		6,
+/*   14:	1101 0000 0000 0000 */	0xD000,		6,
+/*   15:	1101 0100 0000 0000 */	0xD400,		6,
+/*   16:	1010 1000 0000 0000 */	0xA800,		6,
+/*   17:	1010 1100 0000 0000 */	0xAC00,		6,
+/*   18:	0100 1110 0000 0000 */	0x4E00,		7,
+/*   19:	0001 1000 0000 0000 */	0x1800,		7,
+/*   20:	0001 0000 0000 0000 */	0x1000,		7,
+/*   21:	0010 1110 0000 0000 */	0x2E00,		7,
+/*   22:	0000 0110 0000 0000 */	0x0600,		7,
+/*   23:	0000 1000 0000 0000 */	0x0800,		7,
+/*   24:	0101 0000 0000 0000 */	0x5000,		7,
+/*   25:	0101 0110 0000 0000 */	0x5600,		7,
+/*   26:	0010 0110 0000 0000 */	0x2600,		7,
+/*   27:	0100 1000 0000 0000 */	0x4800,		7,
+/*   28:	0011 0000 0000 0000 */	0x3000,		7,
+/*   29:	0000 0010 0000 0000 */	0x0200,		8,
+/*   30:	0000 0011 0000 0000 */	0x0300,		8,
+/*   31:	0001 1010 0000 0000 */	0x1A00,		8,
+/*   32:	0001 1011 0000 0000 */	0x1B00,		8,
+/*   33:	0001 0010 0000 0000 */	0x1200,		8,
+/*   34:	0001 0011 0000 0000 */	0x1300,		8,
+/*   35:	0001 0100 0000 0000 */	0x1400,		8,
+/*   36:	0001 0101 0000 0000 */	0x1500,		8,
+/*   37:	0001 0110 0000 0000 */	0x1600,		8,
+/*   38:	0001 0111 0000 0000 */	0x1700,		8,
+/*   39:	0010 1000 0000 0000 */	0x2800,		8,
+/*   40:	0010 1001 0000 0000 */	0x2900,		8,
+/*   41:	0010 1010 0000 0000 */	0x2A00,		8,
+/*   42:	0010 1011 0000 0000 */	0x2B00,		8,
+/*   43:	0010 1100 0000 0000 */	0x2C00,		8,
+/*   44:	0010 1101 0000 0000 */	0x2D00,		8,
+/*   45:	0000 0100 0000 0000 */	0x0400,		8,
+/*   46:	0000 0101 0000 0000 */	0x0500,		8,
+/*   47:	0000 1010 0000 0000 */	0x0A00,		8,
+/*   48:	0000 1011 0000 0000 */	0x0B00,		8,
+/*   49:	0101 0010 0000 0000 */	0x5200,		8,
+/*   50:	0101 0011 0000 0000 */	0x5300,		8,
+/*   51:	0101 0100 0000 0000 */	0x5400,		8,
+/*   52:	0101 0101 0000 0000 */	0x5500,		8,
+/*   53:	0010 0100 0000 0000 */	0x2400,		8,
+/*   54:	0010 0101 0000 0000 */	0x2500,		8,
+/*   55:	0101 1000 0000 0000 */	0x5800,		8,
+/*   56:	0101 1001 0000 0000 */	0x5900,		8,
+/*   57:	0101 1010 0000 0000 */	0x5A00,		8,
+/*   58:	0101 1011 0000 0000 */	0x5B00,		8,
+/*   59:	0100 1010 0000 0000 */	0x4A00,		8,
+/*   60:	0100 1011 0000 0000 */	0x4B00,		8,
+/*   61:	0011 0010 0000 0000 */	0x3200,		8,
+/*   62:	0011 0011 0000 0000 */	0x3300,		8,
+/*   63:	0011 0100 0000 0000 */	0x3400,		8	};
+
+static UINT16 encode_bterm[64][2]={ /* black terminating codes */
+
+/*    0:	0000 1101 1100 0000 */	0x0DC0,		10,
+/*    1:	0100 0000 0000 0000 */	0x4000,		3,
+/*    2:	1100 0000 0000 0000 */	0xC000,		2,
+/*    3:	1000 0000 0000 0000 */	0x8000,		2,
+/*    4:	0110 0000 0000 0000 */	0x6000,		3,
+/*    5:	0011 0000 0000 0000 */	0x3000,		4,
+/*    6:	0010 0000 0000 0000 */	0x2000,		4,
+/*    7:	0001 1000 0000 0000 */	0x1800,		5,
+/*    8:	0001 0100 0000 0000 */	0x1400,		6,
+/*    9:	0001 0000 0000 0000 */	0x1000,		6,
+/*   10:	0000 1000 0000 0000 */	0x0800,		7,
+/*   11:	0000 1010 0000 0000 */	0x0A00,		7,
+/*   12:	0000 1110 0000 0000 */	0x0E00,		7,
+/*   13:	0000 0100 0000 0000 */	0x0400,		8,
+/*   14:	0000 0111 0000 0000 */	0x0700,		8,
+/*   15:	0000 1100 0000 0000 */	0x0C00,		9,
+/*   16:	0000 0101 1100 0000 */	0x05C0,		10,
+/*   17:	0000 0110 0000 0000 */	0x0600,		10,
+/*   18:	0000 0010 0000 0000 */	0x0200,		10,
+/*   19:	0000 1100 1110 0000 */	0x0CE0,		11,
+/*   20:	0000 1101 0000 0000 */	0x0D00,		11,
+/*   21:	0000 1101 1000 0000 */	0x0D80,		11,
+/*   22:	0000 0110 1110 0000 */	0x06E0,		11,
+/*   23:	0000 0101 0000 0000 */	0x0500,		11,
+/*   24:	0000 0010 1110 0000 */	0x02E0,		11,
+/*   25:	0000 0011 0000 0000 */	0x0300,		11,
+/*   26:	0000 1100 1010 0000 */	0x0CA0,		12,
+/*   27:	0000 1100 1011 0000 */	0x0CB0,		12,
+/*   28:	0000 1100 1100 0000 */	0x0CC0,		12,
+/*   29:	0000 1100 1101 0000 */	0x0CD0,		12,
+/*   30:	0000 0110 1000 0000 */	0x0680,		12,
+/*   31:	0000 0110 1001 0000 */	0x0690,		12,
+/*   32:	0000 0110 1010 0000 */	0x06A0,		12,
+/*   33:	0000 0110 1011 0000 */	0x06B0,		12,
+/*   34:	0000 1101 0010 0000 */	0x0D20,		12,
+/*   35:	0000 1101 0011 0000 */	0x0D30,		12,
+/*   36:	0000 1101 0100 0000 */	0x0D40,		12,
+/*   37:	0000 1101 0101 0000 */	0x0D50,		12,
+/*   38:	0000 1101 0110 0000 */	0x0D60,		12,
+/*   39:	0000 1101 0111 0000 */	0x0D70,		12,
+/*   40:	0000 0110 1100 0000 */	0x06C0,		12,
+/*   41:	0000 0110 1101 0000 */	0x06D0,		12,
+/*   42:	0000 1101 1010 0000 */	0x0DA0,		12,
+/*   43:	0000 1101 1011 0000 */	0x0DB0,		12,
+/*   44:	0000 0101 0100 0000 */	0x0540,		12,
+/*   45:	0000 0101 0101 0000 */	0x0550,		12,
+/*   46:	0000 0101 0110 0000 */	0x0560,		12,
+/*   47:	0000 0101 0111 0000 */	0x0570,		12,
+/*   48:	0000 0110 0100 0000 */	0x0640,		12,
+/*   49:	0000 0110 0101 0000 */	0x0650,		12,
+/*   50:	0000 0101 0010 0000 */	0x0520,		12,
+/*   51:	0000 0101 0011 0000 */	0x0530,		12,
+/*   52:	0000 0010 0100 0000 */	0x0240,		12,
+/*   53:	0000 0011 0111 0000 */	0x0370,		12,
+/*   54:	0000 0011 1000 0000 */	0x0380,		12,
+/*   55:	0000 0010 0111 0000 */	0x0270,		12,
+/*   56:	0000 0010 1000 0000 */	0x0280,		12,
+/*   57:	0000 0101 1000 0000 */	0x0580,		12,
+/*   58:	0000 0101 1001 0000 */	0x0590,		12,
+/*   59:	0000 0010 1011 0000 */	0x02B0,		12,
+/*   60:	0000 0010 1100 0000 */	0x02C0,		12,
+/*   61:	0000 0101 1010 0000 */	0x05A0,		12,
+/*   62:	0000 0110 0110 0000 */	0x0660,		12,
+/*   63:	0000 0110 0111 0000 */	0x0670,		12	};
+
+static UINT16 encode_wmake[27][2]={ /* white make-up codes */
+
+/*   64:	1101 1000 0000 0000 */	0xD800,		5,
+/*  128:	1001 0000 0000 0000 */	0x9000,		5,
+/*  192:	0101 1100 0000 0000 */	0x5C00,		6,
+/*  256:	0110 1110 0000 0000 */	0x6E00,		7,
+/*  320:	0011 0110 0000 0000 */	0x3600,		8,
+/*  384:	0011 0111 0000 0000 */	0x3700,		8,
+/*  448:	0110 0100 0000 0000 */	0x6400,		8,
+/*  512:	0110 0101 0000 0000 */	0x6500,		8,
+/*  576:	0110 1000 0000 0000 */	0x6800,		8,
+/*  640:	0110 0111 0000 0000 */	0x6700,		8,
+/*  704:	0110 0110 0000 0000 */	0x6600,		9,
+/*  768:	0110 0110 1000 0000 */	0x6680,		9,
+/*  832:	0110 1001 0000 0000 */	0x6900,		9,
+/*  896:	0110 1001 1000 0000 */	0x6980,		9,
+/*  960:	0110 1010 0000 0000 */	0x6A00,		9,
+/* 1024:	0110 1010 1000 0000 */	0x6A80,		9,
+/* 1088:	0110 1011 0000 0000 */	0x6B00,		9,
+/* 1152:	0110 1011 1000 0000 */	0x6B80,		9,
+/* 1216:	0110 1100 0000 0000 */	0x6C00,		9,
+/* 1280:	0110 1100 1000 0000 */	0x6C80,		9,
+/* 1344:	0110 1101 0000 0000 */	0x6D00,		9,
+/* 1408:	0110 1101 1000 0000 */	0x6D80,		9,
+/* 1472:	0100 1100 0000 0000 */	0x4C00,		9,
+/* 1536:	0100 1100 1000 0000 */	0x4C80,		9,
+/* 1600:	0100 1101 0000 0000 */	0x4D00,		9,
+/* 1664:	0110 0000 0000 0000 */	0x6000,		6,
+/* 1728:	0100 1101 1000 0000 */	0x4D80,		9	};
+
+static UINT16 encode_bmake[27][2]={ /* black make-up codes */
+
+/*   64:	0000 0011 1100 0000 */	0x03C0,		10,
+/*  128:	0000 1100 1000 0000 */	0x0C80,		12,
+/*  192:	0000 1100 1001 0000 */	0x0C90,		12,
+/*  256:	0000 0101 1011 0000 */	0x05B0,		12,
+/*  320:	0000 0011 0011 0000 */	0x0330,		12,
+/*  384:	0000 0011 0100 0000 */	0x0340,		12,
+/*  448:	0000 0011 0101 0000 */	0x0350,		12,
+/*  512:	0000 0011 0110 0000 */	0x0360,		13,
+/*  576:	0000 0011 0110 1000 */	0x0368,		13,
+/*  640:	0000 0010 0101 0000 */	0x0250,		13,
+/*  704:	0000 0010 0101 1000 */	0x0258,		13,
+/*  768:	0000 0010 0110 0000 */	0x0260,		13,
+/*  832:	0000 0010 0110 1000 */	0x0268,		13,
+/*  896:	0000 0011 1001 0000 */	0x0390,		13,
+/*  960:	0000 0011 1001 1000 */	0x0398,		13,
+/* 1024:	0000 0011 1010 0000 */	0x03A0,		13,
+/* 1088:	0000 0011 1010 1000 */	0x03A8,		13,
+/* 1152:	0000 0011 1011 0000 */	0x03B0,		13,
+/* 1216:	0000 0011 1011 1000 */	0x03B8,		13,
+/* 1280:	0000 0010 1001 0000 */	0x0290,		13,
+/* 1344:	0000 0010 1001 1000 */	0x0298,		13,
+/* 1408:	0000 0010 1010 0000 */	0x02A0,		13,
+/* 1472:	0000 0010 1010 1000 */	0x02A8,		13,
+/* 1536:	0000 0010 1101 0000 */	0x02D0,		13,
+/* 1600:	0000 0010 1101 1000 */	0x02D8,		13,
+/* 1664:	0000 0011 0010 0000 */	0x0320,		13,
+/* 1728:	0000 0011 0010 1000 */	0x0328,		13	};
+
+static UINT16 encode_addition[13][2]={ /* additional make-up codes */	
+
+/* 1792:	0000 0001 0000 0000 */	0x0100,		11,
+/* 1856:	0000 0001 1000 0000 */	0x0180,		11,
+/* 1920:	0000 0001 1010 0000 */	0x01A0,		11,
+/* 1984:	0000 0001 0010 0000 */	0x0120,		12,
+/* 2048:	0000 0001 0011 0000 */	0x0130,		12,
+/* 2112:	0000 0001 0100 0000 */	0x0140,		12,
+/* 2176:	0000 0001 0101 0000 */	0x0150,		12,
+/* 2240:	0000 0001 0110 0000 */	0x0160,		12,
+/* 2304:	0000 0001 0111 0000 */	0x0170,		12,
+/* 2368:	0000 0001 1100 0000 */	0x01C0,		12,
+/* 2432:	0000 0001 1101 0000 */	0x01D0,		12,
+/* 2496:	0000 0001 1110 0000 */	0x01E0,		12,
+/* 2560:	0000 0001 1111 0000 */	0x01F0,		12	};
+
+static UINT16 encode_eol[1][2]={ /* End-of-line code */
+
+/* eol:		0000 0000 0001 0000 */  0x0010,		12	};
+
+/* The following are the decode tables for CCITT. The tables are broken
+   down based on the value of the first bits in the codes.  This allows
+   the number and size of the talbes to be cut down considerably.  There
+   are two tables for white codes, one with codes starting with 1 and
+   one with codes starting with 0.  There are four tables for black codes,
+   one for codes with less than four starting zeros, one with four 
+   starting zeros, one with five starting zeros and one with six starting
+   zeros.  The first column is used for documentation only and 
+   shows the index value used to access the table.  The second column
+   is the length of the run and the fourth column is the number of
+   bits in the run. */
+
+static INT16 decode_w1[32][2]={ /* white codes starting with 1 */
+
+/* 00 */		3,			4,
+/* 01 */		3,			4,
+/* 02 */		3,			4,
+/* 03 */		3,			4,
+/* 04 */		128,		5,
+/* 05 */		128,		5,
+/* 06 */		8,			5,
+/* 07 */		8,			5,
+/* 08 */		9,			5,
+/* 09 */		9,			5,
+/* 0A */		16,			6,
+/* 0B */		17,			6,
+/* 0C */		4,			4,
+/* 0D */		4,			4,
+/* 0E */		4,			4,
+/* 0F */		4,			4,
+/* 10 */		5,			4,
+/* 11 */		5,			4,
+/* 12 */		5,			4,
+/* 13 */		5,			4,
+/* 14 */		14,			6,
+/* 15 */		15,			6,
+/* 16 */		64,			5,
+/* 17 */		64,			5,
+/* 18 */		6,			4,
+/* 19 */		6,			4,
+/* 1A */		6,			4,
+/* 1B */		6,			4,
+/* 1C */		7,			4,
+/* 1D */		7,			4,
+/* 1E */		7,			4,
+/* 1F */		7,			4	};
+
+static INT16 decode_w0[256][2]={ /* white codes starting with 0 */
+
+/* 00 */		-1,			-1,
+/* 01 */		-1,			-1,
+/* 02 */		-1,			-1,
+/* 03 */		-1,			-1,
+/* 04 */		29,			8,
+/* 05 */		29,			8,
+/* 06 */		30,			8,
+/* 07 */		30,			8,
+/* 08 */		45,			8,
+/* 09 */		45,			8,
+/* 0A */		46,			8,
+/* 0B */		46,			8,
+/* 0C */		22,			7,
+/* 0D */		22,			7,
+/* 0E */		22,			7,
+/* 0F */		22,			7,
+/* 10 */		23,			7,
+/* 11 */		23,			7,
+/* 12 */		23,			7,
+/* 13 */		23,			7,
+/* 14 */		47,			8,
+/* 15 */		47,			8,
+/* 16 */		48,			8,
+/* 17 */		48,			8,
+/* 18 */		13,			6,
+/* 19 */		13,			6,
+/* 1A */		13,			6,
+/* 1B */		13,			6,
+/* 1C */		13,			6,
+/* 1D */		13,			6,
+/* 1E */		13,			6,
+/* 1F */		13,			6,
+/* 20 */		20,			7,
+/* 21 */		20,			7,
+/* 22 */		20,			7,
+/* 23 */		20,			7,
+/* 24 */		33,			8,
+/* 25 */		33,			8,
+/* 26 */		34,			8,
+/* 27 */		34,			8,
+/* 28 */		35,			8,
+/* 29 */		35,			8,
+/* 2A */		36,			8,
+/* 2B */		36,			8,
+/* 2C */		37,			8,
+/* 2D */		37,			8,
+/* 2E */		38,			8,
+/* 2F */		38,			8,
+/* 30 */		19,			7,
+/* 31 */		19,			7,
+/* 32 */		19,			7,
+/* 33 */		19,			7,
+/* 34 */		31,			8,
+/* 35 */		31,			8,
+/* 36 */		32,			8,
+/* 37 */		32,			8,
+/* 38 */		1,			6,
+/* 39 */		1,			6,
+/* 3A */		1,			6,
+/* 3B */		1,			6,
+/* 3C */		1,			6,
+/* 3D */		1,			6,
+/* 3E */		1,			6,
+/* 3F */		1,			6,
+/* 40 */		12,			6,
+/* 41 */		12,			6,
+/* 42 */		12,			6,
+/* 43 */		12,			6,
+/* 44 */		12,			6,
+/* 45 */		12,			6,
+/* 46 */		12,			6,
+/* 47 */		12,			6,
+/* 48 */		53,			8,
+/* 49 */		53,			8,
+/* 4A */		54,			8,
+/* 4B */		54,			8,
+/* 4C */		26,			7,
+/* 4D */		26,			7,
+/* 4E */		26,			7,
+/* 4F */		26,			7,
+/* 50 */		39,			8,
+/* 51 */		39,			8,
+/* 52 */		40,			8,
+/* 53 */		40,			8,
+/* 54 */		41,			8,
+/* 55 */		41,			8,
+/* 56 */		42,			8,
+/* 57 */		42,			8,
+/* 58 */		43,			8,
+/* 59 */		43,			8,
+/* 5A */		44,			8,
+/* 5B */		44,			8,
+/* 5C */		21,			7,
+/* 5D */		21,			7,
+/* 5E */		21,			7,
+/* 5F */		21,			7,
+/* 60 */		28,			7,
+/* 61 */		28,			7,
+/* 62 */		28,			7,
+/* 63 */		28,			7,
+/* 64 */		61,			8,
+/* 65 */		61,			8,
+/* 66 */		62,			8,
+/* 67 */		62,			8,
+/* 68 */		63,			8,
+/* 69 */		63,			8,
+/* 6A */		0,			8,
+/* 6B */		0,			8,
+/* 6C */		320,		8,
+/* 6D */		320,		8,
+/* 6E */		384,		8,
+/* 6F */		384,		8,
+/* 70 */		10,			5,
+/* 71 */		10,			5,
+/* 72 */		10,			5,
+/* 73 */		10,			5,
+/* 74 */		10,			5,
+/* 75 */		10,			5,
+/* 76 */		10,			5,
+/* 77 */		10,			5,
+/* 78 */		10,			5,
+/* 79 */		10,			5,
+/* 7A */		10,			5,
+/* 7B */		10,			5,
+/* 7C */		10,			5,
+/* 7D */		10,			5,
+/* 7E */		10,			5,
+/* 7F */		10,			5,
+/* 80 */		11,			5,
+/* 81 */		11,			5,
+/* 82 */		11,			5,
+/* 83 */		11,			5,
+/* 84 */		11,			5,
+/* 85 */		11,			5,
+/* 86 */		11,			5,
+/* 87 */		11,			5,
+/* 88 */		11,			5,
+/* 89 */		11,			5,
+/* 8A */		11,			5,
+/* 8B */		11,			5,
+/* 8C */		11,			5,
+/* 8D */		11,			5,
+/* 8E */		11,			5,
+/* 8F */		11,			5,
+/* 90 */		27,			7,
+/* 91 */		27,			7,
+/* 92 */		27,			7,
+/* 93 */		27,			7,
+/* 94 */		59,			8,
+/* 95 */		59,			8,
+/* 96 */		60,			8,
+/* 97 */		60,			8,
+/* 98 */		1472,		9,
+/* 99 */		1536,		9,
+/* 9A */		1600,		9,
+/* 9B */		1728,		9,
+/* 9C */		18,			7,
+/* 9D */		18,			7,
+/* 9E */		18,			7,
+/* 9F */		18,			7,
+/* A0 */		24,			7,
+/* A1 */		24,			7,
+/* A2 */		24,			7,
+/* A3 */		24,			7,
+/* A4 */		49,			8,
+/* A5 */		49,			8,
+/* A6 */		50,			8,
+/* A7 */		50,			8,
+/* A8 */		51,			8,
+/* A9 */		51,			8,
+/* AA */		52,			8,
+/* AB */		52,			8,
+/* AC */		25,			7,
+/* AD */		25,			7,
+/* AE */		25,			7,
+/* AF */		25,			7,
+/* B0 */		55,			8,
+/* B1 */		55,			8,
+/* B2 */		56,			8,
+/* B3 */		56,			8,
+/* B4 */		57,			8,
+/* B5 */		57,			8,
+/* B6 */		58,			8,
+/* B7 */		58,			8,
+/* B8 */		192,		6,
+/* B9 */		192,		6,
+/* BA */		192,		6,
+/* BB */		192,		6,
+/* BC */		192,		6,
+/* BD */		192,		6,
+/* BE */		192,		6,
+/* BF */		192,		6,
+/* C0 */		1664,		6,
+/* C1 */		1664,		6,
+/* C2 */		1664,		6,
+/* C3 */		1664,		6,
+/* C4 */		1664,		6,
+/* C5 */		1664,		6,
+/* C6 */		1664,		6,
+/* C7 */		1664,		6,
+/* C8 */		448,		8,
+/* C9 */		448,		8,
+/* CA */		512,		8,
+/* CB */		512,		8,
+/* CC */		704,		9,
+/* CD */		768,		9,
+/* CE */		640,		8,
+/* CF */		640,		8,
+/* D0 */		576,		8,
+/* D1 */		576,		8,
+/* D2 */		832,		9,
+/* D3 */		896,		9,
+/* D4 */		960,		9,
+/* D5 */		1024,		9,
+/* D6 */		1088,		9,
+/* D7 */		1152,		9,
+/* D8 */		1216,		9,
+/* D9 */		1280,		9,
+/* DA */		1344,		9,
+/* DB */		1408,		9,
+/* DC */		256,		7,
+/* DD */		256,		7,	
+/* DE */		256,		7,
+/* DF */		256,		7,
+/* E0 */		2,			4,
+/* E1 */		2,			4,
+/* E2 */		2,			4,
+/* E3 */		2,			4,
+/* E4 */		2,			4,
+/* E5 */		2,			4,
+/* E6 */		2,			4,
+/* E7 */		2,			4,
+/* E8 */		2,			4,
+/* E9 */		2,			4,
+/* EA */		2,			4,
+/* EB */		2,			4,
+/* EC */		2,			4,
+/* ED */		2,			4,
+/* EE */		2,			4,
+/* EF */		2,			4,
+/* F0 */		2,			4,
+/* F1 */		2,			4,
+/* F2 */		2,			4,
+/* F3 */		2,			4,
+/* F4 */		2,			4,
+/* F5 */		2,			4,
+/* F6 */		2,			4,
+/* F7 */		2,			4,
+/* F8 */		2,			4,
+/* F9 */		2,			4,
+/* FA */		2,			4,
+/* FB */		2,			4,
+/* FC */		2,			4,
+/* FD */		2,			4,
+/* FE */		2,			4,
+/* FF */		2,			4	};
+
+static INT16 decode_b0123[64][2]={ /* black codes starting with 0,1,2, or 3 zeros */
+
+/* 00 */		-1,			-1,
+/* 01 */		-1,			-1,
+/* 02 */		-1,			-1,
+/* 03 */		-1,			-1,
+/* 04 */		9,			6,
+/* 05 */		8,			6,
+/* 06 */		7,			5,
+/* 07 */		7,			5,
+/* 08 */		6,			4,
+/* 09 */		6,			4,
+/* 0A */		6,			4,
+/* 0B */		6,			4,
+/* 0C */		5,			4,
+/* 0D */		5,			4,			
+/* 0E */		5,			4,
+/* 0F */		5,			4,
+/* 10 */		1,			3,
+/* 11 */		1,			3,
+/* 12 */		1,			3,
+/* 13 */		1,			3,
+/* 14 */		1,			3,
+/* 15 */		1,			3,
+/* 16 */		1,			3,
+/* 17 */		1,			3,
+/* 18 */		4,			3,
+/* 19 */		4,			3,
+/* 1A */		4,			3,
+/* 1B */		4,			3,
+/* 1C */		4,			3,
+/* 1D */		4,			3,
+/* 1E */		4,			3,
+/* 1F */		4,			3,
+/* 20 */		3,			2,
+/* 21 */		3,			2,
+/* 22 */		3,			2,
+/* 23 */		3,			2,
+/* 24 */		3,			2,
+/* 25 */		3,			2,
+/* 26 */		3,			2,
+/* 27 */		3,			2,
+/* 28 */		3,			2,
+/* 29 */		3,			2,
+/* 2A */		3,			2,
+/* 2B */		3,			2,
+/* 2C */		3,			2,
+/* 2D */		3,			2,
+/* 2E */		3,			2,
+/* 2F */		3,			2,
+/* 30 */		2,			2,
+/* 31 */		2,			2,
+/* 32 */		2,			2,
+/* 33 */		2,			2,
+/* 34 */		2,			2,
+/* 35 */		2,			2,
+/* 36 */		2,			2,
+/* 37 */		2,			2,
+/* 38 */		2,			2,
+/* 39 */		2,			2,
+/* 3A */		2,			2,
+/* 3B */		2,			2,
+/* 3C */		2,			2,
+/* 3D */		2,			2,
+/* 3E */		2,			2,
+/* 3F */		2,			2		};
+
+static INT16 decode_b4[128][2]={ /* black codes starting with 4 zeros */
+
+/* 00 */		10,			7,
+/* 01 */		10,			7,
+/* 02 */		10,			7,
+/* 03 */		10,			7,
+/* 04 */		10,			7,
+/* 05 */		10,			7,
+/* 06 */		10,			7,
+/* 07 */		10,			7,
+/* 08 */		10,			7,
+/* 09 */		10,			7,
+/* 0A */		10,			7,
+/* 0B */		10,			7,
+/* 0C */		10,			7,
+/* 0D */		10,			7,
+/* 0E */		10,			7,
+/* 0F */		10,			7,
+/* 10 */		10,			7,
+/* 11 */		10,			7,
+/* 12 */		10,			7,
+/* 13 */		10,			7,
+/* 14 */		10,			7,
+/* 15 */		10,			7,
+/* 16 */		10,			7,
+/* 17 */		10,			7,
+/* 18 */		10,			7,
+/* 19 */		10,			7,
+/* 1A */		10,			7,
+/* 1B */		10,			7,
+/* 1C */		10,			7,
+/* 1D */		10,			7,
+/* 1E */		10,			7,
+/* 1F */		10,			7,
+/* 20 */		11,			7,
+/* 21 */		11,			7,
+/* 22 */		11,			7,
+/* 23 */		11,			7,
+/* 24 */		11,			7,
+/* 25 */		11,			7,
+/* 26 */		11,			7,
+/* 27 */		11,			7,
+/* 28 */		11,			7,
+/* 29 */		11,			7,
+/* 2A */		11,			7,
+/* 2B */		11,			7,
+/* 2C */		11,			7,
+/* 2D */		11,			7,
+/* 2E */		11,			7,
+/* 2F */		11,			7,
+/* 30 */		11,			7,
+/* 31 */		11,			7,
+/* 32 */		11,			7,
+/* 33 */		11,			7,
+/* 34 */		11,			7,
+/* 35 */		11,			7,
+/* 36 */		11,			7,
+/* 37 */		11,			7,
+/* 38 */		11,			7,
+/* 39 */		11,			7,
+/* 3A */		11,			7,
+/* 3B */		11,			7,
+/* 3C */		11,			7,
+/* 3D */		11,			7,
+/* 3E */		11,			7,
+/* 3F */		11,			7,
+/* 40 */		15,			9,
+/* 41 */		15,			9,
+/* 42 */		15,			9,
+/* 43 */		15,			9,
+/* 44 */		15,			9,
+/* 45 */		15,			9,
+/* 46 */		15,			9,
+/* 47 */		15,			9,
+/* 48 */		128,		12,
+/* 49 */		192,		12,
+/* 4A */		26,			12,
+/* 4B */		27,			12,
+/* 4C */		28,			12,
+/* 4D */		29,			12,
+/* 4E */		19,			11,
+/* 4F */		19,			11,
+/* 50 */		20,			11,
+/* 51 */		20,			11,
+/* 52 */		34,			12,
+/* 53 */		35,			12,
+/* 54 */		36,			12,
+/* 55 */		37,			12,
+/* 56 */		38,			12,
+/* 57 */		39,			12,
+/* 58 */		21,			11,
+/* 59 */		21,			11,
+/* 5A */		42,			12,
+/* 5B */		43,			12,
+/* 5C */		0,			10,
+/* 5D */		0,			10,
+/* 5E */		0,			10,
+/* 5F */		0,			10,
+/* 60 */		12,			7,
+/* 61 */		12,			7,
+/* 62 */		12,			7,
+/* 63 */		12,			7,
+/* 64 */		12,			7,
+/* 65 */		12,			7,
+/* 66 */		12,			7,
+/* 67 */		12,			7,
+/* 68 */		12,			7,
+/* 69 */		12,			7,
+/* 6A */		12,			7,
+/* 6B */		12,			7,
+/* 6C */		12,			7,
+/* 6D */		12,			7,
+/* 6E */		12,			7,
+/* 6F */		12,			7,
+/* 70 */		12,			7,
+/* 71 */		12,			7,
+/* 72 */		12,			7,
+/* 73 */		12,			7,
+/* 74 */		12,			7,
+/* 75 */		12,			7,
+/* 76 */		12,			7,
+/* 77 */		12,			7,
+/* 78 */		12,			7,
+/* 79 */		12,			7,
+/* 7A */		12,			7,
+/* 7B */		12,			7,
+/* 7C */		12,			7,
+/* 7D */		12,			7,
+/* 7E */		12,			7,
+/* 7F */		12,			7	};
+
+static INT16 decode_b5[64][2]={ /* black codes starting with 5 zeros */
+
+/* 00 */		13,			8,
+/* 01 */		13,			8,
+/* 02 */		13,			8,
+/* 03 */		13,			8,
+/* 04 */		13,			8,
+/* 05 */		13,			8,
+/* 06 */		13,			8,
+/* 07 */		13,			8,
+/* 08 */		13,			8,
+/* 09 */		13,			8,
+/* 0A */		13,			8,
+/* 0B */		13,			8,
+/* 0C */		13,			8,
+/* 0D */		13,			8,
+/* 0E */		13,			8,
+/* 0F */		13,			8,
+/* 10 */		23,			11,
+/* 11 */		23,			11,
+/* 12 */		50,			12,
+/* 13 */		51,			12,
+/* 14 */		44,			12,
+/* 15 */		45,			12,
+/* 16 */		46,			12,
+/* 17 */		47,			12,
+/* 18 */		57,			12,
+/* 19 */		58,			12,
+/* 1A */		61,			12,
+/* 1B */		256,		12,
+/* 1C */		16,			10,
+/* 1D */		16,			10,
+/* 1E */		16,			10,
+/* 1F */		16,			10,
+/* 20 */		17,			10,
+/* 21 */		17,			10,
+/* 22 */		17,			10,
+/* 23 */		17,			10,
+/* 24 */		48,			12,
+/* 25 */		49,			12,
+/* 26 */		62,			12,
+/* 27 */		63,			12,
+/* 28 */		30,			12,
+/* 29 */		31,			12,
+/* 2A */		32,			12,
+/* 2B */		33,			12,
+/* 2C */		40,			12,
+/* 2D */		41,			12,
+/* 2E */		22,			11,
+/* 2F */		22,			11,
+/* 30 */		14,			8,
+/* 31 */		14,			8,
+/* 32 */		14,			8,
+/* 33 */		14,			8,
+/* 34 */		14,			8,
+/* 35 */		14,			8,
+/* 36 */		14,			8,
+/* 37 */		14,			8,
+/* 38 */		14,			8,
+/* 39 */		14,			8,
+/* 3A */		14,			8,
+/* 3B */		14,			8,
+/* 3C */		14,			8,
+/* 3D */		14,			8,
+/* 3E */		14,			8,
+/* 3F */		14,			8	};
+
+static INT16 decode_b6[64][2]={ /* black codes starting with 6 zeros */
+
+/* 00 */		18,			10,
+/* 01 */		18,			10,
+/* 02 */		18,			10,
+/* 03 */		18,			10,
+/* 04 */		18,			10,
+/* 05 */		18,			10,
+/* 06 */		18,			10,
+/* 07 */		18,			10,
+/* 08 */		52,			12,
+/* 09 */		52,			12,
+/* 0A */		640,		13,
+/* 0B */		704,		13,
+/* 0C */		768,		13,
+/* 0D */		832,		13,
+/* 0E */		55,			12,
+/* 0F */		55,			12,
+/* 10 */		56,			12,
+/* 11 */		56,			12,
+/* 12 */		1280,		13,
+/* 13 */		1344,		13,
+/* 14 */		1408,		13,
+/* 15 */		1472,		13,
+/* 16 */		59,			12,
+/* 17 */		59,			12,
+/* 18 */		60,			12,
+/* 19 */		60,			12,
+/* 1A */		1536,		13,
+/* 1B */		1600,		13,
+/* 1C */		24,			11,
+/* 1D */		24,			11,
+/* 1E */		24,			11,
+/* 1F */		24,			11,
+/* 20 */		25,			11,
+/* 21 */		25,			11,
+/* 22 */		25,			11,
+/* 23 */		25,			11,
+/* 24 */		1664,		13,
+/* 25 */		1728,		13,
+/* 26 */		320,		12,
+/* 27 */		320,		12,
+/* 28 */		384,		12,
+/* 29 */		384,		12,
+/* 2A */		448,		12,
+/* 2B */		448,		12,
+/* 2C */		512,		13,
+/* 2D */		576,		13,
+/* 2E */		53,			12,
+/* 2F */		53,			12,
+/* 30 */		54,			12,
+/* 31 */		54,			12,
+/* 32 */		896,		13,
+/* 33 */		960,		13,
+/* 34 */		1024,		13,
+/* 35 */		1088,		13,
+/* 36 */		1152,		13,
+/* 37 */		1216,		13,
+/* 38 */		64,			10,
+/* 39 */		64,			10,
+/* 3A */		64,			10,
+/* 3B */		64,			10,
+/* 3C */		64,			10,
+/* 3D */		64,			10,
+/* 3E */		64,			10,
+/* 3F */		64,			10	};
+
+static INT16 decode_addition[16][2]={ /* additional decoding tables (start with 0000 0001 ) */
+
+/* 00 */		1792,		11,		
+/* 01 */		1792,		11,
+/* 02 */		1984,		12,
+/* 03 */		2048,		12,
+/* 04 */		2112,		12,
+/* 05 */		2176,		12,
+/* 06 */		2240,		12,
+/* 07 */		2304,		12,
+/* 08 */		1856,		11,
+/* 09 */		1856,		11,
+/* 0A */		1920,		11,
+/* 0B */		1920,		11,
+/* 0C */		2368,		12,
+/* 0D */		2432,		12,
+/* 0E */		2496,		12,
+/* 0F */		2560,		12	};
+
+#endif
+
+/**----------------------------------------------------------------------------
+                            Public Routines
+----------------------------------------------------------------------------**/
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PackBITS( pTiff, pData, Lines, Count, pLength )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+INT32    	Lines;
+INT32		Count;
+PINT32  	pLength;
+
+/*
+**	Parameters:
+**	    pTiff   	Pointer to the file data structure.
+**	    pData   	Pointer to buffer where unpacked data will reside. 
+**	    Lines 		Number of lines to write
+**	    Count		Number of bytes per line in memory
+**		pLength		Pointer to location for actual number of bytes written
+**	Globals:		
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**	    Packs data from memory out to a file using PackBits as specified by 
+**		TIFF 5.0 Specification.  Compresses data by counting the number of
+**		duplicate bytes in a row and writing out the number of bytes.
+**	Return:			
+**		status		WRITEEERROR if there was a problem writing the file.
+**					OKAY otherwise.
+**	History:		None.
+*/
+{
+	INT32		i,j,k;
+	PUINT8		data;
+	
+	INT32		start=0;
+	UINT8		count=0;
+	INT16		status=OKAY;
+	INT32		length;  /* this hides global */
+	
+	bcount=0;
+	
+/* move to end of file */
+
+	if (FileSeek(pTiff->Handle,(UINT8) SEEK_END, 0L) == -1)
+		{ status = WRITEERROR; goto xit; }
+
+/* write out image, one line at a time */
+
+	length=0L;
+	for (i=0L;i<Lines;i++) {
+	
+		j=0L;
+		data=pData+Count*i; /* data = start of line */
+		
+		while(j<pTiff->WidthBytes) {
+		
+			start=j;
+			
+			if (data[j]==data[j+1]) { /* do a repeat run */
+			
+				while((j<(pTiff->WidthBytes-1))&&(data[j]==data[j+1])&&
+					((j-start)<127)) j++;
+				j++;
+				
+				count=(UINT8)(j-start); /* count = number of bytes in run */
+				
+				count=(UINT8)(1-count); /* convert for file output */
+				
+				buffer[bcount++]=(UINT8)count;
+				if (bcount==BUFFER_SIZE) {
+					if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+						{status=WRITEERROR; goto xit; }
+					bcount=0;
+				}
+					
+				buffer[bcount++]=(UINT8)data[j-1];
+				if (bcount==BUFFER_SIZE) {
+					if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+						{status=WRITEERROR; goto xit; }
+					bcount=0;
+				}
+				length+=2L;
+			}
+			else { /* do a literal run */
+
+				while((j<(pTiff->WidthBytes))&&(data[j]!=data[j+1])
+					&&((j-start)<128)) j++;
+				
+				count=(UINT8)(j-start); /* count= number of bytes in run */
+				
+				count=count-(UINT8)1; /* convert for file output */
+				
+				buffer[bcount++]=(UINT8)count;
+				if (bcount==BUFFER_SIZE) {
+					if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+						{status=WRITEERROR; goto xit; }
+					bcount=0;
+				}
+					
+				for (k=0;k<(count+1);k++) {
+					buffer[bcount++]=(UINT8)data[start+k];
+					if (bcount==BUFFER_SIZE) {
+						if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+							{status=WRITEERROR; goto xit; }
+						bcount=0;
+					}
+				}
+				length+=count+2L;
+			}
+		}		
+	}
+	if (bcount>0) {
+		if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+			{status=WRITEERROR; goto xit; }
+		bcount=0;
+	}
+
+	*pLength=length;
+	
+xit: return( status );
+} /* PackBITS */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PackCCITT( pTiff, pData, Lines, Count, pLength )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+INT32    	Lines;
+INT32   	Count;
+PINT32  	pLength;
+/*
+**	Parameters:
+**	    pTiff   	Pointer to the file data structure.
+**	    pData   	Pointer to buffer where unpacked data will reside. 
+**	    Lines 		Number of lines to write
+**	    Count		Number of bytes per line in memory
+**		pLength		Pointer to location for actual number of bytes written
+**	Globals:
+**		mask_table		Table of bit indexes.
+**		encode_addition	Table of additional codes.
+**		encode_bmake	Table of make-up codes for black runs.
+**		encode_wmake	Table of make-up codes for white runs.
+**		encode_bterm	Table of terminating codes for black runs.
+**		encode_wterm	Table of terminating codes for white runs.
+**		bcount			Current byte count in global buffer.
+**		buffer			Global buffer for file IO.
+**	Operation:
+**		Compresses data from memory out to a file using CCITT run-length compression
+**		as specified in the TIFF 5.0 Specification.  Tables are used to find the 
+**		code and bit length of the code for each run length.
+**	Return:			
+**		status		WRITEERROR if a problem occured writing the file.
+**					OKAY otherwise.
+**	History:		None.
+**
+**	Notes:
+**		The compression and decompression for CCITT rely heavily on the tables
+**		defined at the start of the file.  For compression the "encode" tables 
+**		are used.  These tables give the code and length of the code for each
+**		run length of white or black.
+*/
+
+{
+	INT16		status=OKAY;
+
+#ifdef __CCITT__
+
+	INT32		i,x;
+	INT16		count=0;
+
+	INT32		length;  		/* this decl hides global decl */
+	PUINT8		data;
+	INT16		bit_count;  	/* this decl hides global decl */
+	INT16		num_bits;
+	UINT32		bits;  			/* this decl hides global decl */
+	UINT32		new_bits;
+	INT16		type;
+	BOOLEAN		term_flag;
+	INT16		index;
+	INT16		sbits;
+	INT32		pixel_count;
+	UINT8		byte1;
+	INT16		white_pixel;
+	
+	bcount=0;
+	
+/* move to end of file */
+
+	if (FileSeek(pTiff->Handle,(UINT8) SEEK_END, 0L) == -1)
+		{ status = WRITEERROR; goto xit; }
+
+/* setup white_pixel to match image interpretation */
+
+	if (pTiff->PhotoInterpret==0) white_pixel=0; /* white is zero */
+	else white_pixel=1; /* white is one */
+		
+/* write out image, one line at a time */
+
+	length=0L;
+	for (i=0L;i<Lines;i++) {
+	
+		x=0L;
+		type=white_pixel;
+		bit_count=0;
+		bits=0;
+		sbits=0;
+		data=pData+Count*i; /* data = start of line */
+		pixel_count=0L;
+		
+		while (pixel_count<pTiff->ImageWidth) {
+					
+/* find the number of black or white pixels in a row */
+
+			count=0;
+			if (type==0) {
+			
+				while (((data[x]&mask_table[sbits])==0x00)&&
+					(pixel_count<pTiff->ImageWidth)) {
+				
+					sbits++;
+					count++;
+					pixel_count++;
+					if (sbits==8) {
+						sbits=0;
+						x++;
+					}
+				}
+			}
+			else {
+				
+				while (((data[x]&mask_table[sbits])==mask_table[sbits])&&
+					(pixel_count<pTiff->ImageWidth)) {
+					
+					sbits++;
+					count++;
+					pixel_count++;
+					if (sbits==8) {
+						sbits=0;
+						x++;
+					}
+				}
+			}
+	
+/* find the new bit pattern and the number of bits in the tables */
+
+			term_flag=FALSE;
+			while (term_flag==FALSE) {
+				
+				if (count>2560) { /* write out longest available */
+				
+					new_bits=encode_addition[12][0];
+					num_bits=encode_addition[12][1];
+					count-=2560;
+				}
+				else if (count>1791) { /* use additional make-up codes */
+					index=(count-1792)/64;
+					new_bits=encode_addition[index][0];
+					num_bits=encode_addition[index][1];
+					count=count-1792-index*64;
+				} 
+				else if (count>63) { 
+					index=(count-64)/64;
+					if (type==white_pixel) { /* use white make-up codes */
+						new_bits=encode_wmake[index][0];
+						num_bits=encode_wmake[index][1];
+					}  
+					else { /* use black make-up codes */
+						new_bits=encode_bmake[index][0];
+						num_bits=encode_bmake[index][1];
+					}
+					count=count-64-index*64;
+				} 
+				else { /* count <=63 */
+				
+					if (type==white_pixel) { /* use white terminating codes */
+						new_bits=encode_wterm[count][0];
+						num_bits=encode_wterm[count][1];
+					} 
+					else { /* use black terminating codes */
+						new_bits=encode_bterm[count][0];
+						num_bits=encode_bterm[count][1];
+					}
+					term_flag=TRUE;
+					count=0;
+				}
+		
+/* add the new bits to the current bit stream */
+
+				new_bits=new_bits<<(16-bit_count);
+				bits=bits|new_bits;
+				bit_count=bit_count+num_bits;
+				if (bit_count>16) {
+					buffer[bcount++]=(UINT8)((bits>>24)&0xff);
+					if (bcount==BUFFER_SIZE) {
+						if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+							{status=WRITEERROR; goto xit; }
+						bcount=0;
+					}
+					buffer[bcount++]=(UINT8)((bits>>16)&0xff);
+					if (bcount==BUFFER_SIZE) {
+						if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+							{status=WRITEERROR; goto xit; }
+						bcount=0;
+					}
+					length+=2;
+					bits<<=16;
+					bit_count-=16;
+				}
+			} /* while term_flag==FALSE */
+
+			if (type==0) type=1;
+			else type=0;
+
+		} /* end of line */
+
+/* write out last bytes at the end of line */
+
+		if (bit_count>8) {
+			buffer[bcount++]=(UINT8)((bits>>24)&0xff);
+			if (bcount==BUFFER_SIZE) {
+				if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+					{status=WRITEERROR; goto xit; }
+				bcount=0;
+			}
+			buffer[bcount++]=(UINT8)((bits>>16)&0xff);
+			length += 2;
+		}
+		else if (bit_count>0) {
+			buffer[bcount++]=(UINT8)((bits>>24)&0xff);
+			length++;
+		}
+		if (bcount>0) {
+			if (FileWrite(pTiff->Handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+				{status=WRITEERROR; goto xit; }
+			bcount=0;
+		}
+	}
+
+xit:
+	*pLength=length;
+
+#endif
+
+	return( status );
+} /* PackCCITT */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PackLZW( pTiff, pData, Lines, Count, pLength )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+INT32    	Lines;
+INT32   	Count;
+PINT32  	pLength;
+
+/*
+**	Parameters:
+**	    pTiff   	Pointer to the file data structure.
+**	    pData   	Pointer to buffer where unpacked data will reside. 
+**	    Lines 		Number of lines to write
+**	    Count		Number of bytes per line in memory
+**		pLength		Pointer to location for actual number of bytes written
+**	Globals:
+**		ennodes		Pointer to encoding table.
+**		next_node	Pointer to the next available node in the encode table.
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Compresses data out to a file using LZW compression as specified by the
+**		TIFF 5.0 Specification.  
+**	Return:			
+**		status		WRITEERROR if a problem occurs writing the file.
+**					UNSUPPORTEDERROR if unsupported predictor code.
+**					OKAY otherwise.
+**	History:		None.
+*/
+
+{
+	return(UNSUPPORTEDERROR);
+} /* PackLZW */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL PackTight( pTiff, pData, Lines, Count, pLength )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+INT32    	Lines;
+INT32   	Count;
+PINT32  	pLength;
+
+/*
+**	Parameters:
+**	    pTiff   	Pointer to the file data structure.
+**	    pData   	Pointer to buffer where unpacked data will reside. 
+**	    Lines   	Number of lines to write
+**	    Count   	Number of bytes per line in memory
+**	    pLength 	Pointer to location for actual number of bytes written
+**	Globals:    	None.
+**	Operation:
+**	Return:
+**	Return:			
+**		status		WRITEERROR if a problem occurs writing the file.
+**					OKAY otherwise.
+**	History:
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	i;
+	
+	if (FileSeek(pTiff->Handle,SEEK_END, 0L) == -1 )
+		{ status = WRITEERROR; }
+	else {
+
+		if ( pTiff->WidthBytes==Count) { /* no padding in memory */
+			if (FileWrite(pTiff->Handle, pData, pTiff->WidthBytes*Lines) !=
+			    pTiff->WidthBytes*Lines) { status = WRITEERROR; }
+		}
+		else {
+			for (i=0L;(i<Lines)&&(status==OKAY);i++,pData+=Count)
+				if (FileWrite(pTiff->Handle,pData,pTiff->WidthBytes)!=pTiff->WidthBytes)
+					{ status = WRITEERROR; }
+		}
+	}
+
+	*pLength=pTiff->WidthBytes*Lines; /* to pad or not to pad, that is the question! */
+
+	return( status );
+
+} /* PackTight */
+
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL UnpackBITS(pTiff, pData, pOffset, Lines, Count )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+PINT32   	pOffset;
+INT32    	Lines;
+INT32   	Count;
+
+/*
+**	Parameters:
+**		pTiff		Pointer to the file data structure.
+**		pData		Pointer to where to place data in memory.
+**		pOffset		Pointer to current offset in file.
+**		Lines		Number of lines to unpack.
+**		Count		Number of bytes per line for data in memory.
+**	Globals:		
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Decompresses files compressed with PackBits compression as specified in
+**		TIFF 5.0 Specification.
+**	Return:
+**		status		READERROR if there was a problem reading from the file.
+**					OKAY otherwise.
+**	History:		None.
+*/
+
+{
+	INT32		i,j,k;
+	INT8		count=0;
+	INT8		temp;
+
+	INT32		line_index=0,index;
+	INT16		status=OKAY;
+	
+	if (FileSeek(pTiff->Handle, SEEK_SET, (INT32) *pOffset) != (INT32) *pOffset)
+		{ status = READERROR; goto xit; }
+	
+/* setup buffer initially */
+
+	bcount=0;
+	
+	for (i=0L;i<Lines;i++) {
+	
+		index=line_index;
+		while (index<(line_index+pTiff->WidthBytes)) {
+		
+			if (bcount==0) {
+				bcount=FileRead(pTiff->Handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+				if (bcount==0) { status=READERROR; goto xit; }
+				bindex=0;
+			}
+			count=buffer[bindex++];
+			bcount--;
+				
+			if ((count>=0)&&(count<=127)) { /* get literal bytes */
+			
+				for (k=0;k<(count+1);k++) {
+					if (bcount==0) {
+						bcount=FileRead(pTiff->Handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+						if (bcount==0) { status=READERROR; goto xit; }
+						bindex=0;
+					}
+					pData[index++]=buffer[bindex++];
+					bcount--;
+				}
+			}
+			else if ((count<=-1)&&(count>=-127)) { /* get repeat bytes */
+			
+				if (bcount==0) {
+					bcount=FileRead(pTiff->Handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+					if (bcount==0) { status=READERROR; goto xit; }
+					bindex=0;
+				}
+				temp=buffer[bindex++];
+				bcount--;
+				for (j=0;j<(1-count);j++) pData[index++]=temp;
+			}
+		}
+		line_index+=Count;
+	}
+xit:	return(status);
+
+} /* UnpackBITS */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL UnpackCCITT(pTiff, pData, pOffset, Lines, Count )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+PINT32   	pOffset;
+INT32    	Lines;
+INT32		Count;
+
+/*
+**	Parameters:
+**		pTiff		Pointer to the file data structure.
+**		pData		Pointer to where to place data in memory.
+**		pOffset		Pointer to current offset in file.
+**		Lines		Number of lines to unpack.
+**		Count		Number of bytes per line for data in memory.
+**	Globals:
+**		mask_table		Bit index table.
+**		decode_addition	Pointer to decode table for additional codes.
+**		decode_w0		Pointer to decode table for white run codes begining with 0.
+**		decode_w1		Pointer to decode table for white run codes begining with 1.
+**		decode_b0123	Pointer to decode table for black run codes begining with 0,1,2,or
+**						3 zeros.
+**		decode_b4		Pointer to decode table for black run codes begining with four zeros.
+**		decode_b5		Pointer to decode table for black run codes begining with five zeros.
+**		decode_b6		Pointer to decode table for black run codes begining with six zeros.
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Decodes a file that has been compressed with CCITT compression as specified in 
+**		TIFF 5.0 Specification.
+**	Return:
+**		status		READERROR if there was a problem reading from the file.
+**					OKAY otherwise.
+**	History:		None.
+**
+**	Notes:
+**		The compression and decompression for CCITT rely heavily on the tables
+**		defined at the start of the file.  For decompression the tables contain
+**		the run length and number of bits in the code.  Decompression poses a
+**		interesting problem in that the decompressor does not know the length 
+**		of the code it is currently trying to decipher.  To deal with this the
+**		tables are accessed with more bits than are in any code word (i.e. for 
+**		codes that have from 1 to 5 bits, 5 bits will always be used to access 
+**		the table).  In order to minimize the size of the tables some basic 
+**		heuristics are applied to break the possible codes into groups.  Each 
+**		group has a corresponding table.  The tables are defined under "Globals" 
+**		above.
+*/
+
+{
+	INT16		status=OKAY;		/* current status */
+
+#ifdef __CCITT__
+
+	INT32		i,j;
+	UINT8		byte1=0,byte2=0;	/* parsing bytes from input string */
+	INT16		type=0;				/* current type of data being output */
+	INT32		index;
+	INT32		dindex;				/* destination array index */
+	INT16		count=0;			/* number of white or black pixels to write */
+	INT16		bit_count=0;		/* number of bits in command word string */
+									/* bit_count decl hides global decl */
+	INT16		dbits=0;			/* current number of bits in the destination byte */
+	INT16		out_count=0;		/* number of pixels written */
+	INT16		in_count=0;			/* number of bits in the in_bits variable */
+	UINT32		in_bits=0;			/* holds the input data stream */
+	UINT16		in_bytes=0;			/* temporary buffer for input data */
+	INT32		pixel_count;		/* number of pixels written in line */
+	UINT8   	temp;
+	INT16		eol_flag;			/* flag to indicate an end-of-line condition */
+	INT16		white_pixel;			/* image interpretation of a white pixel */
+	
+/* move to start of data */
+
+	if (FileSeek(pTiff->Handle, SEEK_SET, (INT32) *pOffset) != (INT32) *pOffset)
+		{ status = READERROR; goto xit; }
+
+/* setup white_pixel to match image interpretation */
+
+	if (pTiff->PhotoInterpret==0) white_pixel=0; /* white is zero */
+	else white_pixel=1; /* white is one */
+		
+/* decode each line of data into pData */
+
+	in_bits=0;
+	in_count=0;
+	bcount=0;
+	
+	for (i=0;i<Lines;i++) {
+
+		dindex=i*Count;
+	
+		for (j=0;j<pTiff->WidthBytes;j++) pData[dindex+j]=0;
+		
+		dbits=0;
+		pixel_count=0L;
+		type=white_pixel;
+		
+		eol_flag=FALSE;
+		while (eol_flag==FALSE) {
+
+/* get the next two bytes */
+
+			if (in_count<16) {
+
+				if (bcount==0) {
+					bcount=FileRead(pTiff->Handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+					if (bcount==0) { /* ignore errors for bit stream */ }
+					bindex=0;
+				}
+
+				temp=buffer[bindex++];
+				bcount--;
+				
+				in_bytes=temp<<8;
+				
+				if (bcount==0) {
+					bcount=FileRead(pTiff->Handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+					if (bcount==0) { /* ignore errors for bit stream */ }
+					bindex=0;
+				}
+				
+				temp=buffer[bindex++];
+				bcount--;
+
+				in_bytes=in_bytes|temp;
+				
+				in_bits |= ((UINT32)in_bytes<<(16-in_count));
+				in_count+=16;
+			}
+			byte1=(UINT8)(in_bits>>24)&0xff;
+			byte2=(UINT8)(in_bits>>16)&0xff;
+				
+/* get the length of the code and the run length */
+
+			if (byte1==0x01) { /* additional make up codes */
+			
+				index=byte2>>4;
+				count=decode_addition[index][0];
+				bit_count=decode_addition[index][1];
+			}
+			else if (type==white_pixel) { /* white data */
+			
+				if ((byte1&0x80)==0x00) { /* white with top bit clear */
+				
+					index=((byte1<<1)|(byte2>>7))&0xff;
+					count=decode_w0[index][0];
+					bit_count=decode_w0[index][1];
+				}
+				else { /* white with top bit set */
+				
+					index=(byte1>>2)&0x1f; /* take the lower 5 bits */
+					count=decode_w1[index][0];
+					bit_count=decode_w1[index][1];
+				}
+			}
+			else { /* black data */
+			
+				if ((byte1&0xfc)==0x00) { /* black with 6 bits zero */
+				
+					index=((byte1<<5)|(byte2>>3))&0x3f;
+					count=decode_b6[index][0];
+					bit_count=decode_b6[index][1];
+					
+				} else if ((byte1&0xf8)==0x00) { /* black with 5 bits zero */
+				
+					index=((byte1<<4)|(byte2>>4))&0x3f;
+					count=decode_b5[index][0];
+					bit_count=decode_b5[index][1];
+					
+				} else if ((byte1&0xf0)==0x00) { /* black with 4 bits zero */
+				
+					index=((byte1<<4)|(byte2>>4))&0x7f;
+					count=decode_b4[index][0];
+					bit_count=decode_b4[index][1];
+				}
+				else { /* black with 0-3 bits zero */
+				
+					index=(byte1>>2)&0x3f;
+					count=decode_b0123[index][0];
+					bit_count=decode_b0123[index][1];
+				}
+			}
+
+/* write out the correct number of pixels */
+
+			out_count=0;
+			if (type==0) { /* zero data */
+				while (out_count<count) { /* put each bit out one at a time */
+					dbits++;
+					out_count++;
+					pixel_count++;
+					if (dbits==8) { /* hit end-of-byte, move on */
+						dindex++;
+						dbits=0;
+					}
+				}
+			}
+			else { /* ones data */
+				while (out_count<count) { /* put out each bit */
+					pData[dindex]|=mask_table[dbits++];
+					out_count++;
+					pixel_count++;
+					if (dbits==8) { /* hit end-of-byte, move on */
+						dindex++;
+						dbits=0;
+					}
+				}
+			}
+			
+/* if count<64 then terminate */
+
+			if (count<64) {
+				if (type==0) type=1;
+				else type=0;
+			}
+		
+/* update input bit string */
+
+			in_bits=in_bits<<bit_count;
+			in_count-=bit_count;
+			
+			if ((pixel_count>=pTiff->ImageWidth)&&(count<64)) eol_flag=TRUE;
+		}
+
+/* update input bit string for start of a new line (byte align it) */
+
+		in_bits=in_bits<<(in_count%8);
+		in_count=in_count-(in_count%8);
+	}
+
+#endif
+
+xit:	return(status);
+
+} /* UnpackCCITT */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL UnpackLZW(pTiff, pData, pOffset, Lines, Count )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+PINT32   	pOffset;
+INT32    	Lines;
+INT32		Count;
+
+/*
+**	Parameters:
+**		pTiff		Pointer to the file data structure.
+**		pData		Pointer to where to place data in memory.
+**		pOffset		Pointer to current offset in file.
+**		Lines		Number of lines to unpack.
+**		Count		Number of bytes per line for data in memory.
+**	Globals:
+**		denodes		Pointer to decode table.
+**		next_node	Pointer to next available node in decode table.
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Decompresses files that have been compressed with LZW compression as specified
+**		in TIFF 5.0 Specification.
+**	Return:
+**		status		READERROR if there was a problem reading from the file.
+**					UNSUPPORTEDERROR if unsupported predictor code.
+**					OKAY otherwise.
+**	History:		None.
+*/
+
+{
+	return(UNSUPPORTEDERROR);
+} /* UnpackLZW */
+
+/*---------------------------------------------------------------------------*/
+INT16 FAR PASCAL UnpackTight(pTiff, pData, pOffset, Lines, Count )
+PTIFFFILE	pTiff;
+PUINT8    	pData;
+PINT32   	pOffset;
+INT32    	Lines;
+INT32   	Count;
+
+/*
+**	Parameters:
+**		pTiff		Pointer to the file data structure.
+**		pData		Pointer to where to place data in memory.
+**		pOffset		Pointer to current offset in file.
+**		Lines		Number of lines to unpack.
+**		Count		Number of bytes per line for data in memory.
+**	Globals:		None.
+**	Operation:
+**		Reads data from file and places in memory.
+**	Return:
+**		status		READERROR if there was a problem reading from the file.
+**					OKAY otherwise.
+**	History:		None.
+*/
+
+{
+	INT16	status = OKAY;
+	INT32	i;
+
+	if (FileSeek(pTiff->Handle, SEEK_SET, (INT32) *pOffset) != (INT32) *pOffset)
+		{ status = READERROR; }
+	else {
+		if (pTiff->WidthBytes==Count) { /* no padding */
+			if (FileRead(pTiff->Handle, pData, Count*Lines) == -1)
+				{ status = READERROR; }
+		}
+		else {
+			for (i=0L;(i<Lines)&&(status==OKAY);i++,pData+=Count)
+				if (FileRead(pTiff->Handle,pData,pTiff->WidthBytes) == -1)
+					{ status = READERROR; }
+		}
+	}
+	return( status );
+
+} /* UnpackTight */
+
+/**----------------------------------------------------------------------------
+							Private Routines for LZW
+----------------------------------------------------------------------------**/
+
+/**--------------------------- Table Routines ------------------------------**/
+
+/*---------------------------------------------------------------------------*/
+static INT16 InitializeEncodeTable( )
+/*
+**	Parameters: 	None. 
+**	Globals:
+**	    ennodes		Pointer to encoding table.
+**		next_node	Next available node in the table.
+**	Operation:  	
+**		Allocate the encode table the first time called.
+**		Initializes the encode table with the first 256
+**		strings (i.e. 0-ff).
+**	Return: 		
+**		status		OKAY if successful.
+**					MEMORYERROR otherwise.
+**	History: 		Spotty.
+*/
+{
+	UINT32		size;
+	UINT16		i;
+	
+	if (ennodes==NULL) {
+	
+		size=(UINT32)sizeof(LZW_ENNODE)*(UINT32)MAX_NODES;
+		ennodes=(PLZW_ENNODE)AllocPointer(size);
+		if (ennodes==NULL) return(MEMORYERROR);
+	}
+	
+	for (i=0;i<256;i++) NewEnnode(i,i);
+	next_node=256;
+	
+	for (i=256;i<MAX_NODES;i++) NewEnnode(i,0);
+	
+	return(OKAY);
+	
+} /* InitializeEncodeTable */
+
+/*---------------------------------------------------------------------------*/
+static INT16 TerminateEncodeTable( )
+/*
+**	Parameters:		None.
+**	Globals:
+**		ennodes		Pointer to encoding table.
+**	Operation:		
+**		Deallocates the encode table.
+**	Return:			
+**		status		OKAY always, cannot fail.
+**	History:		None.
+*/
+{
+	if (ennodes!=NULL) DumpPointer((PUINT8)ennodes);
+	ennodes=NULL;
+	return(OKAY);
+} /* TerminateEncodeTable */
+
+/*---------------------------------------------------------------------------*/
+static INT16 InitializeDecodeTable( )
+/*
+**	Parameters:		None.
+**	Globals:
+**		denodes		Pointer to decode table.
+**		next_node	Next available node in the table.
+**	Operation:		
+**		Allocates the decode table.  Initializes the table with the first 
+**		256 entries.
+**	Return:			
+**		status		OKAY if allocate is successful.
+**					MEMORYERROR if allocation failed.
+**	History:		None.
+*/
+{
+	UINT32		size;
+	UINT16		i;
+	
+	if (denodes==NULL) {
+	
+		size=(UINT32)sizeof(LZW_DENODE)*(UINT32)MAX_NODES;
+		denodes=(PLZW_DENODE)AllocPointer(size);
+		if (denodes==NULL) return(MEMORYERROR);
+	}
+	
+	for (i=0;i<256;i++) {
+		denodes[i].value = i;
+		denodes[i].previous = -1;
+	}
+	next_node=256;
+	
+	for (i=256;i<MAX_NODES;i++) {
+		denodes[i].value = 0;
+		denodes[i].previous = -1;
+	}
+
+	return(OKAY);
+} /* InitializeDecodeTable */
+	
+/*---------------------------------------------------------------------------*/
+static INT16 TerminateDecodeTable( )
+/*
+**	Parameters:		None.
+**	Globals:
+**		denodes		Pointer to decoding table.
+**	Operation:		
+**		Deallocates the decoding table.
+**	Return:			
+**		status		OKAY always, cannot fail.
+**	History:		None.
+*/
+{
+	if (denodes!=NULL) DumpPointer((PUINT8)denodes);
+	denodes=NULL;
+	return(OKAY);
+} /* TerminateDecodeTable */
+
+/**-------------------- Read/Write Bit Stream Routines -----------------------**/
+
+/*---------------------------------------------------------------------------*/
+static INT16 CurrentBitsWrite( )
+/*
+**	Parameters:		None.
+**	Globals:
+**		next_node	Next available node in the LZW encode tree.
+**	Operation:		Returns the number of bits per code word for the next node
+**					in the tree.
+**	Return:			
+**		retval		Number of bits per code word for the next node in the tree.
+**	History:		None.
+*/
+{
+	INT16	retval;
+
+	if (next_node<=(512-2)) retval = 9;
+	else if (next_node<=(1024-2)) retval = 10;
+	else if (next_node<=(2048-2)) retval = 11;
+	else retval = 12;
+
+	return(retval);
+} /* CurrentBitsWrite */
+
+/*---------------------------------------------------------------------------*/
+static INT16 CurrentBitsRead( )
+/*
+**	Parameters:		None.
+**	Globals:
+**		next_node	Next avilable node in the LZW decode tree.
+**	Operation:		
+**		Returns the number of bits per code word for the next node
+**		in the tree.
+**	Return:			
+**		retval		Number of bits of the next code word.
+**	History:		None.
+*/
+{
+	INT16	retval;
+	INT16	node;
+	
+	node=next_node+2;
+	
+	if (node<=(512-2)) retval = 9;
+	else if (node<=(1024-2)) retval = 10;
+	else if (node<=(2048-2)) retval = 11;
+	else retval = 12;
+
+	return(retval);
+} /* CurrentBitsRead */
+
+/*---------------------------------------------------------------------------*/
+static INT16 WriteCode(handle,code)
+INT16		handle;
+UINT16		code;
+/*
+**	Parameters:		
+**		handle		Handle to an open file.
+**		code		Code word to write.
+**	Globals:
+**		bits		Current output bit stream.
+**		bit_count	Number of bits in output bit stream.
+**		length		Number of bytes written to file.
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Adds the specfied code word to the output stream for an LZW compressed
+**		image.  If the bit stream is longer than 16 bits, two bytes will be written
+**		to the file.
+**	Return:
+**		status		WRITEERROR if an error occured on writing to the file.
+**					OKAY otherwise.
+**	History:
+*/
+{
+	UINT32		new_bits;
+	UINT32		num_bits;
+
+	num_bits=(INT16)CurrentBitsWrite();
+	new_bits=(UINT32)code<<(16-num_bits);
+	bits |= new_bits<<(16-bit_count);
+	bit_count += (INT16)num_bits;
+	
+	if (bit_count>16) {
+
+		buffer[bcount++]=(UINT8)(bits>>24)&0xff;
+		buffer[bcount++]=(UINT8)(bits>>16)&0xff;
+		if (bcount==BUFFER_SIZE) {
+			if (FileWrite(handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+				return(WRITEERROR);
+			bcount=0;
+		}
+		length += 2;
+		bits <<= 16;
+		bit_count -= 16;
+	}
+	return(OKAY);
+} /* WriteCode */
+
+/*---------------------------------------------------------------------------*/
+static INT16 WriteLastBits(handle)
+INT16		handle;
+/*
+**	Parameters:
+**		handle		Handle to an open file.
+**	Globals:
+**		bits		Current output bit stream.
+**		bit_count	Number of bits in output bit stream.
+**		length		Number of bytes written to file.
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Writes any remaining bits from the output stream to the file.
+**	Return:
+**		status		WRITEERROR if an error occured on writing to the file.
+**					OKAY otherwise.
+**	History:		None.
+*/
+{
+	if (bit_count>0) {
+		buffer[bcount++]=(UINT8)(bits>>24)&0xff;
+		length++;
+	}
+	if (bit_count>8) {
+		buffer[bcount++]=(UINT8)(bits>>16)&0xff;
+		length++;
+	}
+
+	if (bcount>0) {
+		if (FileWrite(handle,(PUINT8)buffer,(INT32)bcount)!=bcount)
+			return(WRITEERROR);
+		bcount=0;
+	}
+	
+	return(OKAY);
+} /* WriteLastBits */
+
+/*---------------------------------------------------------------------------*/
+static INT16 ReadCode(handle)
+INT16	handle;
+/*
+**	Parameters:
+**		handle		Handle to an open file.
+**	Globals:
+**		bits		Current output bit stream.
+**		bit_count	Number of bits in output bit stream.
+**		bcount		Current byte count in global buffer.
+**		buffer		Global buffer for file IO.
+**	Operation:
+**		Returns a code word from the input stream.  If the input stream is
+**		less than 16 bit two more bytes will be read from the file.
+**	Return:
+**		code		Next avilable code word from the input stream.
+**	History:
+*/
+{
+	UINT16		num_bits;
+	UINT16		code;
+	
+	if (bit_count<16) {
+		
+		if (bcount==0) {
+			bcount=FileRead(handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+			if (bcount==0) {} /* ignore errors for bit stream */
+			bindex=0;
+		}
+
+		bits |= ((UINT32)buffer[bindex++]<<(24-bit_count));
+		bcount--;
+length++;
+		if (bcount==0) {
+			bcount=FileRead(handle,(PUINT8)buffer,(INT32)BUFFER_SIZE);
+			if (bcount==0) {} /* ignore errors for bit stream */
+			bindex=0;
+		}
+
+		bits |= ((UINT32)buffer[bindex++]<<(16-bit_count));
+		bcount--;
+length++;
+
+		bit_count += 16;
+	}
+	num_bits=CurrentBitsRead();
+	code=(UINT16)(bits>>(32-num_bits));
+	bits <<= num_bits;
+	bit_count -= num_bits;
+	return(code);
+} /* ReadCode */
+
+/**------------------------- Encode Routines ----------------------------**/
+
+/*---------------------------------------------------------------------------*/
+static INT16 NewEnnode(node,value)
+UINT16		node;
+UINT16		value;
+/*
+**	Parameters:
+**		node		Node in table to initialize.
+**		value		Value to initialize node to.
+**	Globals:
+**		ennodes		Pointer to encoding table.
+**	Operation:
+**		Initializes a node in the encoding table to the value specified.
+**	Return:			OKAY always
+**	History:		None.
+*/
+{
+	ennodes[node].value = value;
+	ennodes[node].left  = -1;
+	ennodes[node].right = -1;
+	ennodes[node].next  = -1;
+
+	return(OKAY);
+} /* NewEnnode */
+
+/*---------------------------------------------------------------------------*/
+static INT16 StringInTable(string,count,pcurrent_node)
+PUINT8		string;
+UINT16		count;
+PUINT16		pcurrent_node;
+/*
+**	Parameters:
+**		string			Current string being matched sought in tree.
+**		count			Index to string for current character.
+**		pcurrent_node	Pointer to the location to place the new node location.
+**	Globals:
+**		next_node		Next available node in LZW tree.
+**		ennodes			Pointer to encoding table.
+**	Operation:
+**		If this is the first character in the string the current node is set
+**		to the top level of the tree.  Otherwise we will transition to the next
+**		level in the tree and search for an occurance of the character there.
+**		if one is found we return with TRUE.  If not the new node will be
+**		added to the tree and FALSE will be returned.
+**	Return:
+**		result		TRUE if string was already in table.
+**					FALSE if string had to be added to table.
+**	History:		None.
+*/
+{
+	UINT8		khar; /* current character in string */
+	
+	khar=string[count-1];
+	
+	if (count==1) { /* single character string, always first 256 entries in table */
+	
+		*pcurrent_node=khar;
+		return(TRUE);
+	}
+	else {
+		
+		if (ennodes[*pcurrent_node].next == -1) { /* if no next char entry */
+		
+			ennodes[*pcurrent_node].next=next_node;
+			*pcurrent_node=next_node;
+			NewEnnode(*pcurrent_node,khar); /* next_node is always>255 */
+			next_node++;
+			return(FALSE);
+		}
+		else {
+			*pcurrent_node=ennodes[*pcurrent_node].next;
+			while (TRUE) {
+			
+				if (khar==(UINT8)ennodes[*pcurrent_node].value) {
+					return(TRUE);
+				} 
+				else if (khar<(UINT8)ennodes[*pcurrent_node].value) {
+					
+					if (ennodes[*pcurrent_node].left != -1) {
+						*pcurrent_node=ennodes[*pcurrent_node].left;
+					}
+					else { /* create new left node */
+						ennodes[*pcurrent_node].left=next_node;
+						*pcurrent_node=next_node;
+						NewEnnode(*pcurrent_node,khar);
+						next_node++;
+						return(FALSE);
+					}
+				}
+				else { /* khar must be greater than the current value */
+					if (ennodes[*pcurrent_node].right != -1) { 
+						*pcurrent_node=ennodes[*pcurrent_node].right;
+					}
+					else { /* create new right node */
+						ennodes[*pcurrent_node].right=next_node;
+						*pcurrent_node=next_node;
+						NewEnnode(*pcurrent_node,khar);
+						next_node++;
+						return(FALSE);
+					}
+				}
+			}
+		}
+	}
+} /* StringInTable */
+
+/**------------------------- Decode Routines ----------------------------**/
+
+/*---------------------------------------------------------------------------*/
+static INT16 StringFromCode(code,string,pcount)
+UINT16		code;
+PUINT8		string;
+PUINT16		pcount;
+/*
+**	Parameters:
+**		code		Code to look for string with.
+**		string		Pointer to location to place string at in memory.
+**		pcount		Pointer to value for the length of the string.
+**	Globals:
+**		denodes		Pointer to the decoding table.
+**	Operation:
+**		Using the code as the starting node in the decode tree this routine
+**		builds the string by traversing backwards up the tree.
+**	Return:			OKAY always, cannot fail.
+**	History:
+*/
+{
+	UINT16		index;
+	INT16		node;
+
+	if (code>255) node=code-2; /* remove for extra codes */
+	else node=code;
+		
+	index=0; /* start at end of string */
+	while (node != -1) { /* build string backwards */
+		
+		string[index++]=(UINT8)denodes[node].value;
+		node=denodes[node].previous;
+	}
+	*pcount=index;
+
+	return(OKAY);
+} /* StringFromCode */
+
+/*---------------------------------------------------------------------------*/
+static INT16 AddStringToTable(code,khar)
+UINT16		code;
+UINT8		khar;
+/*
+**	Parameters: 
+**		code		Code for previous entry in table.
+**		khar		Value for new node.
+**	Globals:
+**		denodes		Pointer to decoding table.
+**		next_node	Index to next available node in table.
+**	Operation:
+**		Adds a new node to the decode table and links it back to the last
+**		code for the current string.
+**	Return:			OKAY always, cannot fail.
+**	History:		None.
+*/
+{
+	denodes[next_node].value=khar;
+	if (code<256) denodes[next_node].previous=code;
+	else denodes[next_node].previous=code-2;
+	next_node++;
+
+	return(OKAY);
+} /* AddStringToTable */
+
+/* end TiffComp.c */
+

@@ -1,0 +1,9 @@
+COPY ..\..\%ACTVERS%.SRC\DMWAPI\dmwapi.L32
+
+rc -r -v -dWIN32 -fodmwapi.res ..\..\%ACTVERS%.SRC\DMWAPI\dmwapi.rc
+
+link /DLL /DEBUG @dmwapi.l32
+copy dmwapi.dll ..\*.*
+copy dmwapi.lib ..\*.*
+copy dmwapi.exp ..\*.*
+copy dmwapi.dll ..\restool\*.*

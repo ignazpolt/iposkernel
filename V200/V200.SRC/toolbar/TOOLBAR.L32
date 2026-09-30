@@ -1,0 +1,6 @@
+msdntb tbdock
+msdntb.res
+user32.lib gdi32.lib ..\ddsmem.lib
+/OUT:toolbar.dll
+/MAP:toolbar.map
+

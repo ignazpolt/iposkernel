@@ -1,0 +1,1246 @@
+#include <windows.h>
+#include <dlgs.h>
+#include "restool.hpp"
+#include "muscroll.hpp"
+#include "blandmdi.h"
+#include "restool.dlg"
+#include "tbcmpl.hpp"
+#include "itcmpl.hpp"
+#include "riwnd.hpp"
+
+RESTOOL         icon   C:\ipos_kernel\PICTURES\restool.ico
+RESCHILD        icon   C:\ipos_kernel\PICTURES\document.ico
+CMOVE           cursor C:\ipos_kernel\PICTURES\cmove.cur
+RIGHT           cursor C:\ipos_kernel\PICTURES\right.cur
+BITMAPNONHIT    cursor C:\ipos_kernel\PICTURES\bmnh.cur
+BITMAPHIT       cursor C:\ipos_kernel\PICTURES\bmh.cur
+NODROP          CURSOR C:\ipos_kernel\PICTURES\nodrop.cur
+DODROP          CURSOR C:\ipos_kernel\PICTURES\drdrop.cur
+MOVETEXT        CURSOR C:\ipos_kernel\PICTURES\MOVETEXT.cur
+COPYTEXT        CURSOR C:\ipos_kernel\PICTURES\COPYTEXT.cur
+
+
+PushButton        BITMAP  C:\ipos_kernel\PICTURES\bmppush.bmp
+CheckButton       BITMAP  C:\ipos_kernel\PICTURES\check.bmp
+TextPushButton    BITMAP  C:\ipos_kernel\PICTURES\textpsh.bmp
+TextCheckButton   BITMAP  C:\ipos_kernel\PICTURES\txtcheck.bmp
+TextRadioButton   BITMAP  C:\ipos_kernel\PICTURES\txtradio.bmp
+ComboButton       BITMAP  C:\ipos_kernel\PICTURES\combo.bmp
+ToolEdit          BITMAP  C:\ipos_kernel\PICTURES\edittext.bmp
+ToolDate          BITMAP  C:\ipos_kernel\PICTURES\editdate.bmp
+ToolTime          BITMAP  C:\ipos_kernel\PICTURES\edittime.bmp
+ToolFloat         BITMAP  C:\ipos_kernel\PICTURES\editflot.bmp
+ToolShortInt      BITMAP  C:\ipos_kernel\PICTURES\editint.bmp
+GroupBox          BITMAP  C:\ipos_kernel\PICTURES\groupbox.bmp
+StaticTool        BITMAP  C:\ipos_kernel\PICTURES\static.bmp
+lShowList         BITMAP  C:\ipos_kernel\PICTURES\listbox.bmp
+StaticBitmap      BITMAP  C:\ipos_kernel\PICTURES\transp.bmp
+Line3D            BITMAP  C:\ipos_kernel\PICTURES\line3d.bmp
+ColorLine         BITMAP  C:\ipos_kernel\PICTURES\lineclr.bmp
+PushCheckButton   BITMAP  C:\ipos_kernel\PICTURES\pushchk.bmp
+TransparentBitmap BITMAP  C:\ipos_kernel\PICTURES\transp.bmp
+ToolBEdit         BITMAP  C:\ipos_kernel\PICTURES\BEDIT.BMP
+XYFromRect        BITMAP  C:\ipos_kernel\PICTURES\XYRECT.BMP
+BmpTextPushButton BITMAP  C:\ipos_kernel\PICTURES\BMPTEXT.BMP
+UpDown            BITMAP  C:\ipos_kernel\PICTURES\UPDOWN.BMP
+ToolLongInt       BITMAP  C:\ipos_kernel\PICTURES\editint.bmp
+ToolMoney         BITMAP  C:\ipos_kernel\PICTURES\editflot.bmp
+
+DefFrmField       BITMAP  C:\ipos_kernel\PICTURES\FRMFIELD.BMP
+DefFrmDate        BITMAP  C:\ipos_kernel\PICTURES\FRMDATE.BMP
+DefFrmDec         BITMAP  C:\ipos_kernel\PICTURES\FRMDEC.BMP
+DefFrmStrList     BITMAP  C:\ipos_kernel\PICTURES\FRMSTRLS.BMP
+DefFrmLine        BITMAP  C:\ipos_kernel\PICTURES\FRMLINE.BMP
+DefCheckBox       BITMAP  C:\ipos_kernel\PICTURES\FRMCHECK.BMP
+DefPattern        BITMAP  C:\ipos_kernel\PICTURES\FRMPATT.BMP
+DefFrmTabField    BITMAP  C:\ipos_kernel\PICTURES\FRMTAB.BMP
+DefFrmTab         BITMAP  C:\ipos_kernel\PICTURES\FRMTAB.BMP
+DefFrmTime        BITMAP  C:\ipos_kernel\PICTURES\FRMTIME.BMP
+DefFrmShort       BITMAP  C:\ipos_kernel\PICTURES\FRMDEC.BMP
+DefFrmLong        BITMAP  C:\ipos_kernel\PICTURES\FRMDEC.BMP
+DefFrmMoney       BITMAP  C:\ipos_kernel\PICTURES\FRMDEC.BMP
+
+;--------------------------------------------------------------------------
+;Bitmaps f�r die Dialog-Templates
+;--------------------------------------------------------------------------
+;STDDLG            BITMAP  C:\ipos_kernel\PICTURES\STDDLG.BMP
+;INPUTDLG          BITMAP  C:\ipos_kernel\PICTURES\INPUTDLG.BMP
+;strlistdlg        BITMAP  C:\ipos_kernel\PICTURES\STRLIST.BMP
+
+
+IDR_TOOLICONS     BITMAP  C:\ipos_kernel\PICTURES\STDIMAGE.BMP
+IDR_DIALOG        BITMAP  C:\ipos_kernel\PICTURES\DIALOG.BMP
+IDR_PREVIEW       BITMAP  C:\ipos_kernel\PICTURES\PREVIEW.BMP
+
+
+;--------------------------------------------------------------------------
+; Menu-Struktur fuer ein offenes Script-Fenster
+;--------------------------------------------------------------------------
+MainMenu MENU 
+BEGIN
+	POPUP "&Datei"
+	BEGIN
+		MENUITEM "&Neu", IDM_FILENEW
+		MENUITEM "�&ffnen...\tStrg+O", MI_OPENFORSCRIPTED
+		MENUITEM "Sch&lie�en", IDM_FILECLOSE, GRAYED
+		MENUITEM "&Speichern\tAlt+W", MI_STOREED, GRAYED
+		MENUITEM "Speichern &unter...", IDM_FILESAVEAS, GRAYED
+		MENUITEM "&Alles Speichern", IDM_FILESAVEALL, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "&Beenden", IDM_FILEEXIT
+		MENUITEM SEPARATOR
+	END
+
+	POPUP "&Bearbeiten"
+	BEGIN
+		; MENUITEM "R�ckg�ngig\tAlt+Backspace", 0, GRAYED
+		; MENUITEM "Widerrufen\tShift+Alt+BackSpace", 0, GRAYED
+		; MENUITEM SEPARATOR
+		MENUITEM "&Ausschneiden\tStrg+X", IDM_CUT, GRAYED
+		MENUITEM "&Kopieren\tStrg+C", IDM_COPY, GRAYED
+		MENUITEM "&Einf�gen\tStrg+V", IDM_PASTE, GRAYED
+		MENUITEM "&L�schen\tDEL", IDM_CLEAR, GRAYED
+		MENUITEM "Duplizieren", 0, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "Alles Markieren", 0, GRAYED
+		MENUITEM "Suchen...\tAlt+F3", MI_SEARCH, GRAYED
+		MENUITEM "Weitersuchen\tF3", MI_SEARCHMORE, GRAYED
+		MENUITEM "R�ckw�rts suchen\tShift+F3", MI_SEARCHUP, GRAYED
+		MENUITEM "Ersetzen...\tF6", MI_REPLACE, GRAYED
+		MENUITEM "Weiter ersetzen...\tShift+F6", MI_REPLACEMORE, GRAYED
+		MENUITEM SEPARATOR
+    MENUITEM "Lesezeichen ein/aus\tStrg+F2", MI_TOGGLEBOOKMARK, GRAYED
+    MENUITEM "Lesezeichen weiter\tF2", MI_NEXTBOOKMARK, GRAYED
+    MENUITEM "Lesezeichen zur�ck\tShift+F2", MI_PREVBOOKMARK, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "Einf�gen &Template...\tStrg+T", MI_INSERTTEMPLATE, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "Dialogfenster\tStrg+E", MI_DIALED
+
+	END
+
+	POPUP "&Projekt"
+	BEGIN
+		MENUITEM "Generieren\tAlt+F10", MI_GENED
+		MENUITEM "Generieren (mit Abh.)\tAlt+Shift+F10", MI_GENED_DEPEND
+		MENUITEM "Generieren f�r Makefile(mit Abh.)\tStrg+Shift+F10", MI_GENMAKEFILE
+		MENUITEM SEPARATOR
+		MENUITEM "Resource erzeugen aus Beschreibungsdatei...", MI_GENRES
+		; MENUITEM "Datenbank Konvertierung...", MI_DBCONV
+		MENUITEM "&Funktionsprototypen...", MI_SETFNC
+		MENUITEM SEPARATOR
+		MENUITEM "Liste aller Scripts...", MI_SCRIPTLIST
+		MENUITEM "Generiere &Scripts...", MI_GENERATESCRIPT
+		MENUITEM SEPARATOR
+		MENUITEM "&Liste aller Tabellen...\tStrg+D", MI_TABLELIST
+		MENUITEM "Liste aller &Views...\tStrg+V", MI_GENINT
+                MENUITEM "Liste aller &Structs...\tStrg+S", MI_SHOWGLOB
+		MENUITEM "&RI - Diagramme...", MI_RIDIAGS
+		MENUITEM SEPARATOR
+		MENUITEM "Resourcen...", MI_SHOWRES
+		MENUITEM "Formate...", MI_SHOWFMT
+		MENUITEM "Farben...", MI_SHOWCOLOR
+#ifdef UEBERLEGT
+		MENUITEM SEPARATOR
+		MENUITEM "SQL - Verbindung...", MI_CONNECTTOSQL
+#endif
+	END
+
+        POPUP "D&ebug"
+        BEGIN
+		MENUITEM "Go\tF5",                  MI_RUN,        
+                MENUITEM "Step Into\tF8",           MI_STEP,       
+                MENUITEM "Step Over\tF10",          MI_STEPINTO,   
+		MENUITEM SEPARATOR
+                MENUITEM "Show Call Stack\tAlt+C",  MI_SHOWSTACK,  
+                MENUITEM "Breakpoint setzen\tF9",   MI_SETBREAK,   GRAYED
+                MENUITEM "Breakpoints\tStrg+Shift+B",     MI_BREAKLIST
+                MENUITEM "Quick Watch\tShift+F9",   MI_WATCHVAR,   GRAYED
+		MENUITEM SEPARATOR
+                MENUITEM "&Watch",                       MI_SHOWWATCHVAR
+                MENUITEM "Expand Variable\tStrg+F7",     MI_EXPANDWATCH, GRAYED
+                MENUITEM "Break at Change",              MI_WATCHBREAK, GRAYED
+                MENUITEM "Delete Watch\tAlt+F7",         MI_DELWATCH, GRAYED
+                MENUITEM "Focus to Variables\tShift+F7", MI_FOCUSTOLIST, GRAYED
+                MENUITEM "Terminate Clinicum" , MI_DESTROYDDS
+                MENUITEM "Break immediately" , MI_BREAKDDS
+        END
+
+	POPUP "&Optionen"
+	BEGIN
+		; MENUITEM "Verzeichnisse...", IDM_PATH
+		; MENUITEM "Editor...", IDM_EDIT
+		MENUITEM "Font...", IDM_EDITORFONT
+	END
+
+	POPUP "&Fenster"
+	BEGIN
+		MENUITEM "&Nebeneinander", IDM_WINDOWTILE
+		MENUITEM "&�berlappend", IDM_WINDOWCASCADE
+		MENUITEM "Arrange &Icons", IDM_WINDOWICONS
+		MENUITEM "&Alles schlie�en", IDM_WINDOWCLOSEALL
+	END
+
+END
+
+
+;--------------------------------------------------------------------------
+; Menu-Struktur fuer ein Dialog- oder Formular - Fenster
+;--------------------------------------------------------------------------
+DialogMenu MENU 
+BEGIN
+	POPUP "&Datei"
+	BEGIN
+		MENUITEM "&Neu", IDM_FILENEW
+		MENUITEM "�&ffnen...\tStrg+O", MI_OPENFORSCRIPTED
+		MENUITEM "Sch&lie�en", IDM_FILECLOSE, GRAYED
+		MENUITEM "&Speichern", MI_STOREED, GRAYED
+		MENUITEM "Speichern &unter...", IDM_FILESAVEAS, GRAYED
+		MENUITEM "&Alles Speichern", IDM_FILESAVEALL, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "&Beenden", IDM_FILEEXIT
+		MENUITEM SEPARATOR
+	END
+
+        POPUP "Dia&log"
+        BEGIN
+			MENUITEM "Speichern \tStrg+S,F10", MI_STOREDIALOG
+			MENUITEM "Abbrechen \tF7", MI_DESTROYDIALOG
+			MENUITEM SEPARATOR
+			MENUITEM "Element l�schen \tF4", MI_DELELE
+			MENUITEM "Element kopieren \tStrg+C", MI_DUPLICATE
+			MENUITEM "Element bearbeiten \tStrg+W,F1", MI_WORKONELE
+			MENUITEM "Element(e) verschieben \tALT+F5", MI_MOVEELEMES
+			MENUITEM SEPARATOR
+			MENUITEM "Schirm bearbeiten \tF2", MI_WORKONSCREEN
+			MENUITEM SEPARATOR
+			MENUITEM "Sortierreihenfolge ein/aus \tStrg+O", MI_SHOWSORT
+			MENUITEM "In den Vordergrund \tStrg+U", MI_INDENVORDERGRUND
+           		MENUITEM "In den Hintergrund \tStrg+B", MI_INDENHINTERGRUND
+        END
+
+        POPUP "Hilfs&linien"
+        BEGIN
+                MENUITEM "Horizontal \aF9", MI_NEWHLINE
+                MENUITEM "Vertikal \aStrg+F9", MI_NEWVLINE
+                MENUITEM "L�schen\aAlt+F9", MI_DELHLINE
+                MENUITEM "Bearbeiten\aStrg+Shift+F9", MI_WORKONHLINE
+                MENUITEM "Serie von Hilfslinien\aAlt+Shift+F9", MI_MULTIHLINE
+                MENUITEM "Raster Einstellungen", MI_SETRASTER
+
+
+        END
+
+        POPUP "&Debug"
+        BEGIN
+		MENUITEM "Go\tF5",                  MI_RUN,        GRAYED
+                MENUITEM "Step Into\tF8",           MI_STEP,       GRAYED
+                MENUITEM "Step Over\tF10",          MI_STEPINTO,   GRAYED
+		MENUITEM SEPARATOR
+                MENUITEM "Show Call Stack\tAlt+C",  MI_SHOWSTACK,  GRAYED
+                MENUITEM "Breakpoint setzen\tF9",   MI_SETBREAK,   GRAYED
+                MENUITEM "Breakpoints\tStrg+Shift+B",         MI_BREAKLIST
+                MENUITEM "Quick Watch",             MI_WATCHVAR,   GRAYED
+		MENUITEM SEPARATOR
+                MENUITEM "&Watch",                  MI_SHOWWATCHVAR
+        END
+
+	POPUP "&Optionen"
+	BEGIN
+		MENUITEM "Verzeichnisse...", IDM_PATH
+		MENUITEM "Editor...", IDM_EDIT
+		MENUITEM "Font...", IDM_EDITORFONT
+	END
+
+	POPUP "&Fenster"
+	BEGIN
+		MENUITEM "&Nebeneinander", IDM_WINDOWTILE
+		MENUITEM "&�berlappend", IDM_WINDOWCASCADE
+		MENUITEM "Arrange &Icons", IDM_WINDOWICONS
+		MENUITEM "&Alles schlie�en", IDM_WINDOWCLOSEALL
+;		MENUITEM SEPARATOR
+;		MENUITEM "Meldungen anzeigen", MI_OUTPUTOPT
+;		MENUITEM "Ausgabebildschirm l�schen", MI_CLEARSCREEN
+	END
+
+END
+
+;--------------------------------------------------------------------------
+; Menu-Struktur fuer ein MDI-Child mit mehreren Kind-Fenstern
+;--------------------------------------------------------------------------
+WndInMDIMenu MENU 
+BEGIN
+	POPUP "&Datei"
+	BEGIN
+		MENUITEM "&Neu", IDM_FILENEW
+		MENUITEM "�&ffnen...\tStrg+O", MI_OPENFORSCRIPTED
+		MENUITEM "Sch&lie�en", IDM_FILECLOSE, GRAYED
+		MENUITEM "&Speichern", MI_STOREED, GRAYED
+		MENUITEM "Speichern &unter...", IDM_FILESAVEAS, GRAYED
+		MENUITEM "&Alles Speichern", IDM_FILESAVEALL, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "&Beenden", IDM_FILEEXIT
+		MENUITEM SEPARATOR
+	END
+
+	POPUP "&Fenster"
+	BEGIN
+		MENUITEM "&Nebeneinander", IDM_WINDOWTILE
+		MENUITEM "&�berlappend", IDM_WINDOWCASCADE
+		MENUITEM "Arrange &Icons", IDM_WINDOWICONS
+		MENUITEM "&Alles schlie�en", IDM_WINDOWCLOSEALL
+	END
+
+END
+
+
+FLDLSTMENU MENU 
+BEGIN
+	POPUP "&Datei"
+	BEGIN
+		MENUITEM "&Neu", IDM_FILENEW
+		MENUITEM "�&ffnen...\tStrg+O", MI_OPENFORSCRIPTED
+		MENUITEM "Sch&lie�en", IDM_FILECLOSE, GRAYED
+		MENUITEM "&Speichern", MI_STOREED, GRAYED
+		MENUITEM "Speichern &unter...", IDM_FILESAVEAS, GRAYED
+		MENUITEM "&Alles Speichern", IDM_FILESAVEALL, GRAYED
+		MENUITEM SEPARATOR
+		MENUITEM "&Beenden", IDM_FILEEXIT
+		MENUITEM SEPARATOR
+                MENUITEM "Attribute\t^A"     , 111
+                MENUITEM "Speichern\t^S"     , 110
+        END
+        POPUP "Bearbeiten"
+	BEGIN
+                MENUITEM "L�schen\t^Y"               , 1000
+                MENUITEM "Zeile einf�gen\t^Enter"    , 1001
+        END
+	POPUP "Projekt"
+	BEGIN
+		MENUITEM "Generieren\tAlt+F10", MI_GENED
+		MENUITEM "Generieren (mit Abh.)\tAlt+Shift+F10", MI_GENED_DEPEND
+		MENUITEM "Generieren f�r Makefile(mit Abh.)\tStrg+Shift+F10", MI_GENMAKEFILE
+		MENUITEM SEPARATOR
+		MENUITEM "Datadictionary erzeugen aus Beschreibungsdatei...", MI_GENDDICT
+		MENUITEM "Resource erzeugen aus Beschreibungsdatei...", MI_GENRES
+		MENUITEM "Datenbank Konvertierung...", MI_DBCONV
+		MENUITEM "&Funktionsprototypen...", MI_SETFNC
+		MENUITEM SEPARATOR
+		MENUITEM "Liste aller Scripts...", MI_SCRIPTLIST
+		MENUITEM "Generiere &Scripts...", MI_GENERATESCRIPT
+		MENUITEM SEPARATOR
+		MENUITEM "&Liste aller Tabellen...\tStrg+L", MI_TABLELIST
+		MENUITEM "Liste aller &Views...\tStrg+V", MI_GENINT
+                MENUITEM "Liste aller &Structs...\tStrg+S", MI_SHOWGLOB
+		MENUITEM "&RI - Diagramme...", MI_RIDIAGS
+		MENUITEM SEPARATOR
+		MENUITEM "Resourcen...", MI_SHOWRES
+		MENUITEM "Formate...", MI_SHOWFMT
+		MENUITEM "Farben...", MI_SHOWCOLOR
+		MENUITEM SEPARATOR
+		MENUITEM "SQL - Verbindung...", MI_CONNECTTOSQL
+	END
+
+	POPUP "&Fenster"
+	BEGIN
+		MENUITEM "&Nebeneinander", IDM_WINDOWTILE
+		MENUITEM "&�berlappend", IDM_WINDOWCASCADE
+		MENUITEM "Arrange &Icons", IDM_WINDOWICONS
+		MENUITEM "&Alles schlie�en", IDM_WINDOWCLOSEALL
+	END
+
+END
+
+RIMENU MENU
+  BEGIN
+     POPUP "&Datei"
+     BEGIN
+             MENUITEM "&Speichern"        , 100
+             MENUITEM "&Drucken"          , 101
+     END
+     POPUP "Bearbeiten"
+     BEGIN
+             MENUITEM "L�schen"          , 102
+     END
+  END
+
+FldAcc ACCELERATORS
+   BEGIN
+      "^S"                              , 110
+      "^A"                              , 111
+      "^K"                              , 100
+      "^F"                              , 102
+      "^Y"                              , 1000
+      VK_RETURN                         , 1001 , CONTROL , VIRTKEY
+   END
+
+
+LINEMENU MENU
+BEGIN
+  POPUP "Hilfs&linien"
+  BEGIN
+        MENUITEM "Horizontal \aF9", MI_NEWHLINE
+        MENUITEM "Vertikal \aStrg+F9", MI_NEWVLINE
+        MENUITEM "L�schen\aAlt+F9", MI_DELHLINE
+        MENUITEM "Bearbeiten\aStrg+Shift+F9", MI_WORKONHLINE
+        MENUITEM "Serie von Hilfslinien\aAlt+Shift+F9", MI_MULTIHLINE
+  END
+END
+
+TBMENU MENU
+   BEGIN
+      MENUITEM "Line down"              , MI_LINEDOWN
+      MENUITEM "Line up"                , MI_LINEUP  
+      MENUITEM "Page down"              , MI_PAGEDOWN
+      MENUITEM "Page up"                , MI_PAGEUP  
+      MENUITEM "First"                  , MI_HOME
+      MENUITEM "Last"                   , MI_END
+   END
+
+
+CPMENU MENU
+  BEGIN
+      MENUITEM "�berschriften"          , MI_HDFONT
+      MENUITEM "Tabelle"                , MI_LIFONT
+  END
+
+FRMENU MENU
+  BEGIN
+      POPUP "&Skalierung"
+      BEGIN
+        MENUITEM "Vergr��ern \t^Numpad+"  , MI_BIGGERSCALE
+        MENUITEM "Verkleinern \t^Numpad-" , MI_SMALLERSCALE
+      END
+  END
+
+DlgAcc ACCELERATORS
+   BEGIN
+      "^F"                              , CMD_TB_BASE+100
+      "^S"                              , MI_STOREDIALOG
+      "^E"                              , MI_DIALED
+      "^W"                              , MI_WORKONELE
+;      "^C"                              , MI_DUPLICATE
+      "^Y"                              , IDM_DELLINE
+      VK_F2                             , MI_TOGGLEBOOKMARK     , CONTROL, VIRTKEY
+      VK_F2                             , MI_NEXTBOOKMARK     , VIRTKEY
+      VK_F2                             , MI_PREVBOOKMARK     , SHIFT, VIRTKEY
+
+      VK_F5                             , MI_MOVEELEMES         , ALT , VIRTKEY
+;      VK_F1                             , MI_WORKONELE          , VIRTKEY
+      VK_F1                             , IDM_HELPONITEM        , VIRTKEY
+      VK_F7                             , MI_DESTROYDIALOG      , VIRTKEY
+      VK_F2                             , MI_WORKONSCREEN       , VIRTKEY
+      VK_F4                             , MI_DELELE             , VIRTKEY
+      VK_F10                            , MI_STEP               , VIRTKEY
+      VK_F8                             , MI_STEPINTO           , VIRTKEY
+      "c"                               , MI_SHOWSTACK          , ALT
+      "u"                               , MI_SHOWUPDATE         , ALT
+      VK_F10                            , MI_GENED              , ALT , VIRTKEY
+      VK_F10                            , MI_GENED_DEPEND       , ALT , SHIFT , VIRTKEY
+      VK_F10                            , MI_GENMAKEFILE        , CONTROL , SHIFT , VIRTKEY
+      VK_F9                             , MI_SETBREAK           , VIRTKEY
+      VK_F9                             , MI_WATCHVAR           , SHIFT , VIRTKEY
+      VK_F8                             , MI_CREATEWATCH        , CONTROL , VIRTKEY
+      "w"                               , MI_STOREED            , ALT
+      "n"                               , MI_NEXTBUFFER         , ALT
+      0x30                              , MI_MAINFILE           , CONTROL , VIRTKEY
+      0x31                              , MI_INCLUDE            , CONTROL , VIRTKEY
+      0x32                              , MI_INCLUDE + 1        , CONTROL , VIRTKEY
+      0x33                              , MI_INCLUDE + 2        , CONTROL , VIRTKEY
+      0x34                              , MI_INCLUDE + 3        , CONTROL , VIRTKEY
+      0x35                              , MI_INCLUDE + 4        , CONTROL , VIRTKEY
+      0x36                              , MI_INCLUDE + 5        , CONTROL , VIRTKEY
+      0x37                              , MI_INCLUDE + 6        , CONTROL , VIRTKEY
+      0x38                              , MI_INCLUDE + 7        , CONTROL , VIRTKEY
+      0x39                              , MI_INCLUDE + 8        , CONTROL , VIRTKEY
+      VK_F3                             , MI_SEARCH             , ALT, VIRTKEY
+      VK_F3                             , MI_SEARCHMORE         , VIRTKEY
+      VK_F3                             , MI_SEARCHUP           , SHIFT , VIRTKEY
+      VK_F6                             , MI_REPLACE            , VIRTKEY
+      VK_F6                             , MI_REPLACEMORE        , SHIFT , VIRTKEY
+      VK_F9                             , MI_NEWHLINE           , SHIFT , CONTROL , ALT , VIRTKEY
+      VK_F9                             , MI_NEWVLINE           , CONTROL , VIRTKEY 
+      VK_F9                             , MI_DELHLINE           , ALT , VIRTKEY 
+      VK_F9                             , MI_WORKONHLINE        , CONTROL , SHIFT , VIRTKEY 
+      VK_F9                             , MI_MULTIHLINE         , ALT , SHIFT , VIRTKEY 
+      "^U"                              , MI_INDENVORDERGRUND
+      "^B"                              , MI_INDENHINTERGRUND
+      VK_INSERT                         , IDM_COPY              , CONTROL , VIRTKEY
+      "^C"                              , IDM_COPY
+      VK_INSERT                         , IDM_PASTE             , SHIFT , VIRTKEY
+      "^V"                              , IDM_PASTE
+      VK_DELETE                         , IDM_CUT               , SHIFT, VIRTKEY
+      "^X"                              , IDM_CUT
+      VK_ADD                            , MI_BIGGERSCALE        , CONTROL , VIRTKEY
+      VK_SUBTRACT                       , MI_SMALLERSCALE       , CONTROL , VIRTKEY
+      "^T"                              , MI_INSERTTEMPLATE
+      VK_F7                             , MI_EXPANDWATCH, CONTROL , VIRTKEY 
+      VK_F7                             , MI_DELWATCH, ALT , VIRTKEY 
+      VK_F7                             , MI_FOCUSTOLIST, SHIFT , VIRTKEY
+      "^K"                              , MI_FINDMATCHINGBRACES
+   END
+
+FrmAcc ACCELERATORS
+   BEGIN
+;      VK_ADD                            , MI_BIGGERSCALE        , CONTROL , VIRTKEY
+;      VK_SUBTRACT                       , MI_SMALLERSCALE       , CONTROL , VIRTKEY
+      "^S"                              , MI_STOREDIALOG
+      VK_F7                             , MI_DESTROYDIALOG      , VIRTKEY
+   END
+
+DeskAcc ACCELERATORS
+   BEGIN
+      "1"                               , MI_WFILECOMMAND       , ALT
+      "2"                               , MI_WFILECOMMAND + 1   , ALT
+      "3"                               , MI_WFILECOMMAND + 2   , ALT
+      "4"                               , MI_WFILECOMMAND + 3   , ALT
+      "5"                               , MI_WFILECOMMAND + 4   , ALT
+      "6"                               , MI_WFILECOMMAND + 5   , ALT
+      "7"                               , MI_WFILECOMMAND + 6   , ALT
+      "8"                               , MI_WFILECOMMAND + 7   , ALT
+      "9"                               , MI_WFILECOMMAND + 8   , ALT
+
+      "^O"                              , MI_OPENFORSCRIPTED
+      "^D"                              , MI_TABLELIST
+      "^J"                              , MI_GENINT
+      "^G"                              , MI_SHOWGLOB
+
+      VK_F5                             , MI_RUN                , VIRTKEY
+      "B"                               , MI_BREAKLIST          , CONTROL, SHIFT, VIRTKEY
+   END
+
+
+STRINGTABLE 
+BEGIN
+    IDS_UNTITLED  "Untitled"
+    IDS_APPNAME   "Clinicum Resource - Tool"
+
+	RSKW_BASE + KWENDRES, "end"
+	RSKW_BASE + KWEQUAL, "="
+	RSKW_BASE + KWBRACEOPEN, "("
+	RSKW_BASE + KWDOPPELPUNKT, ":"
+	RSKW_BASE + KWCOLON, ","
+	RSKW_BASE + KWBRACECLOSE, ")"
+	RSKW_BASE + KWSEMICOLON, ";"
+	RSKW_BASE + KWTABLE, "table"
+	RSKW_BASE + KWIN, "in"
+	RSKW_BASE + KWCURBRACEOPEN, "{"
+	RSKW_BASE + KWCURBRACECLOSE, "}"
+	RSKW_BASE + KWVARLONG, "_?_?_"
+	RSKW_BASE + KWVARDEC, "dec"
+	RSKW_BASE + KWVARSTR, "string"
+	RSKW_BASE + KWVARPOINT, "point"
+	RSKW_BASE + KWVARCONT, "cont"
+	RSKW_BASE + KWVARSTRARR, "strfield"
+	RSKW_BASE + KWVARFLAG, "flag"
+	RSKW_BASE + KWVARSCALE, "scale"
+	RSKW_BASE + KWVARDATE, "date"
+	RSKW_BASE + KWVARTIME, "time"
+	RSKW_BASE + KWVARDWORD, "long"
+	RSKW_BASE + KWVAROBJ, "obj"
+	RSKW_BASE + KWFROM, "from"
+	RSKW_BASE + KWINTERN, "intern"
+	RSKW_BASE + KWPRIMKEY, "primary"
+	RSKW_BASE + KWAS, "as"
+	RSKW_BASE + KWGLOBAL, "struct"
+	RSKW_BASE + KWNEXTTABLE, "NewTable"
+	RSKW_BASE + KWSORT, "sort"
+	RSKW_BASE + KWSTATIC, "static"
+	RSKW_BASE + KWINDEX, "indexed"
+	RSKW_BASE + KWLINDEX, "lindexed"
+	RSKW_BASE + KWINDEXNAME, "_IndexName"
+        RSKW_BASE + KWVARQLONG, "qlong"
+	RSKW_BASE + KWVARBLOB, "blob"
+	RSKW_BASE + KWVARDATETIME, "timestamp"
+	RSKW_BASE + KWEND, "short alias strfield"
+	RSKW_BASE + KWEND + 1, "float alias dec"
+	RSKW_BASE + KWEND + 2, "END"
+	RSCMPERROR_BASE, "Error in %s, Zeile %d, Spalte %d:\r<%s>"
+	RSCMPERROR_GENERROR, "DLL spezifischer Compiler meldet Fehler"
+	RSCMPERROR_NOTABLE, "Tabelle nicht definiert"
+	RSCMPERROR_ORDER, "Falsche Reihenfolge, Alle Eintr�ge einer Tabelle m��en hintereinander sein"
+	RSCMPERROR_NOVARINTABLE, "Variable nicht definiert"
+	RSCMPERROR_INCOMPATIBLE, "Inkompatible Datentypen"
+	ID_TABLEPATTERN, "  ***** f�r %s Tabelle <%s> *****"
+	ID_COLUMNPATTERN, "     f�r %s Spalte <%s> in Tabelle %s"
+	ID_RSCMPHEADLINE, "----< RSTOOL: Dictionary Generieren aus %s >-----"
+	ID_CFULLTABLE, "$$$$$ Alle Vorbereitungen f�r %s Tabelle <%s> getroffen $$$$$"
+	ID_INTERNTABLEPATTERN, "  ***** Erstellen der internen Tabelle %s *****"
+	ID_ADDJOINVAR, "    von %s Spalte %s alias <%s> in Tabelle %s"
+	ID_RCCMPHEADLINE, "----< RSTOOL: Resourcen Generieren aus %s >-----"
+	ID_RCCMPENDLINE, "----< Generieren der Resource fertig, Inhaltsverzeichnis erzeugt >-----"
+	ID_RSBMPPATTERN, "   Loading Bitmap %s from %s"
+	ID_RSWMFPATTERN, "   Loading WMF %s from %s"
+	ID_FCMPHEADLINE, "----< Erzeugen der Funktionsprototypen aus %s >-----"
+	ID_FCMPENDLINE, "----< Funktionsprototypen fertig erzeugt >-----"
+	ID_GLOBVAR, "   Globale Variable %s in Tabelle %s"
+	ID_CVCMPHEADLINE, "***** Konvertierung gestartet (Definition in %s) *****"
+	CVKW_BASE +IDC_KWEQUAL, "to"
+	CVKW_BASE +IDC_KWACCESS, "access"
+	CVKW_BASE +IDC_KWBY, "by"
+	CVKW_BASE +IDC_KWSEMICOLON, ";"
+	CVKW_BASE +IDC_KWBRACEOPEN, "("
+	CVKW_BASE +IDC_KWBRACECLOSE, ")"
+	CVKW_BASE +IDC_KWCOLON, ","
+	CVKW_BASE +IDC_KWSAMENAME, "samename"
+	CVKW_BASE +IDC_KWXXXX, "end"
+	CVKW_BASE +IDC_KWEND, "END"
+	CVCMPERROR_BASE, "Definitionsfehler in %s, Zeile %d, Spalte %d:\r<%s>"
+	CVCMPERROR_EVENSIZE, "Ungerade Anzahl HEX Zeichen"
+	CVCMPERROR_INVHEXCHAR, "Ung�ltiges HEX Zeichen"
+	CVCMPERROR_NOTABLE, "Tabellen nicht gefunden"
+	CVCMPERROR_INSERROR, "Error on Insert"
+	IDHEADLINE_GENRES, "Beschreibungsdatei Datadictionary"
+	IDHEADLINE_DBCONV, "Beschreibungsdatei Datenkonvertierung"
+	IDTRANSFER, "  - Transferiere %s -"
+	ID_CONVDONE, "***** Datenkonvertierung fertig *****"
+	IDHEADLINE_GENRC, "Beschreibungsdatei Resourcen"
+	IDHEADLINE_FNCPROT, "Beschreibung der Funktionsprototypen"
+	ID_NEWSCRIPT, "Neues Script"
+	IDHEADLINE_GENINT, "Besch. f�r Compilieranweisung"
+	IDHEADLINE_SHOWSCRIP, "Script, das bearbeitet werden soll"
+        IDHEADLINE_CONNECTTOSQL, "Ausgabedatei"
+        IDHEADLINE_CREATERI, "RI - Speicherdatei"
+	RCCMPERROR_BASE, "Error in %s, Zeile %d, Spalte %d:\r<%s>"
+	RCCMPERROR_FNOTFOUND, "File not found"
+	RCKW_BASE +RCKW_BITMAP, "bitmap"
+	RCKW_BASE +RCKW_EQUAL, "="
+	RCKW_BASE +RCKW_DIMENSION, "dimension"
+	RCKW_BASE +RCKW_COLON, ","
+	RCKW_BASE +RCKW_WMF, "wmf"
+	RCKW_BASE +RCKW_SEMICOLON, ";"
+	RCKW_BASE +RCKW_8x6, "_8x6"
+	RCKW_BASE +RCKW_XXXX, "end"
+	RCKW_BASE +RCKW_END, "END"
+	RCFI_BASE +0, "Linksb�ndig"
+	RCFI_BASE +1, "Zentriert"
+	RCFI_BASE +2, "Rechtsb�ndig"
+	RCFI_BASE +3, "Blocksatz"
+	RCFI_BASE +30, "Format %d: "
+	RCFI_BASE +31, "Schrift "
+	RCFI_BASE +32, " %d Pkt. + "
+	RCFI_BASE +33, "Linksb�ndig"
+	RCFI_BASE +34, "Zentriert"
+	RCFI_BASE +35, "Rechtsb�ndig"
+	RCFI_BASE +36, "Blocksatz"
+	RCFI_BASE +37, " + Linker Einzug %s mm"
+	RCFI_BASE +38, " + Rechter Einzug %s mm"
+	RCFI_BASE +39, " + Zeilenabstand %s mm"
+	RCFI_BASE +40, "fett + "
+	RCFI_BASE +41, "kursiv + "
+	RCFI_BASE +42, "unterstrichen + "
+	RCFI_BASE +43, "durchgestrichen + "
+
+	IDDSC_BASE + dsc_PushButton, "oadd,oadd,int Layer,x,y,shortcut,void Prozedur,void Disable,string Hilfe,bitmap,bx,by,bitmap Bildname opt,bx,by,bitmap,bx,by,bitmap,bx,by"
+	IDDSC_BASE + dsc_CheckButton, "oadd,oadd,int Layer,x,y,shortcut,void Flag,void Disable,string Hilfe,bitmap,bx,by,bitmap opt,bx,by,bitmap,bx,by,bitmap,bx,by"
+	IDDSC_BASE + dsc_TextPushButton, "oadd,oadd,int Layer,x,y,shortcut,void Prozedur,void Disable,string Hilfe,w,h,text Text,format"
+	IDDSC_BASE + dsc_BmpTextPushButton, "oadd,oadd,int Layer,x,y,shortcut,void Prozedur,void Disable,string Hilfe,w,h,text Text,format,bitmap,bx,by"
+	IDDSC_BASE + dsc_TextCheckButton, "oadd,oadd,int Layer,x,y,shortcut,void Flag,void Disable,string Hilfe,bitmap,bx,by,bitmap opt,bx,by,bitmap,bx,by,bitmap,bx,by,bitmap,bx,by,text Text,format,w"
+	IDDSC_BASE + dsc_TextRadioButton, "oadd,oadd,int Layer,x,y,shortcut,void Flag,void Disable,string Hilfe,bitmap,bx,by,bitmap opt,bx,by,bitmap,bx,by,bitmap,bx,by,bitmap,bx,by,text Text,format,w,void Prozedur"
+	IDDSC_BASE + dsc_ComboButton, "oadd,oadd,int Layer,x,y,shortcut,void Prozedur,int Flag,string Hilfe,bitmap,bx,by,oadd"
+	IDDSC_BASE + dsc_UpDown, "oadd,oadd,int Layer,x,y,shortcut,void Prozedur,void Prozedur,void Flag,string Hilfe,oadd"
+	IDDSC_BASE + dsc_ToolEdit, "oadd,oadd,int Layer,x,y,shortcut,void Variable var,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_ToolZoom, "oadd,oadd,int Layer,x,y,shortcut,void Faktor,void Disable,string Hilfe,w,h,dec,dec,int,int"
+	IDDSC_BASE + dsc_ToolPage, "oadd,oadd,int Layer,x,y,shortcut,void Seite,void Disable,string Hilfe,w,h,void"
+	IDDSC_BASE + dsc_ToolDate, "oadd,oadd,int Layer,x,y,shortcut,void Datum,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,string Darstellung opt"
+	IDDSC_BASE + dsc_ToolTime, "oadd,oadd,int Layer,x,y,shortcut,void Zeit,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_ToolFloat, "oadd,oadd,int Layer,x,y,shortcut,void Wert,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_ToolShortInt, "oadd,oadd,int Layer,x,y,shortcut,void Wert,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_GroupBox, "oadd,oadd,int Layer,x,y,shortcut,w,h,format,string Titel,int Stil,int BkMode,colorvar BkColor"
+	IDDSC_BASE + dsc_StaticTool, "oadd,oadd,int Layer,x,y,shortcut,w,format,text Text"
+	IDDSC_BASE + dsc_lShowList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,void AnzGet,void AnzCache,string Tabelle,string Script,int multisel.,string Hilfe,int AnzExtra,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_StaticBitmap, "oadd,oadd,int Layer,x,y,shortcut,bitmap,bx,by"
+	IDDSC_BASE + dsc_Line3D, "oadd,oadd,int Layer,px1,py1,shortcut,px2,py2"
+	IDDSC_BASE + dsc_ColorLine, "oadd,oadd,int Layer,px1,py1,shortcut,px2,py2,colorvar Style"
+	IDDSC_BASE + dsc_ColorRect, "oadd,oadd,int Layer,px1,py1,shortcut,px2,py2,colorvar Style,colorvar FillColor,int"
+	IDDSC_BASE + dsc_ActionBox, "oadd,oadd,int Layer,x,y,shortcut,int,int,int,void,void"
+	IDDSC_BASE + dsc_FlapMap, "oadd,oadd,int Layer,x,y,shortcut,void,void,void,string,w,int,dec,void,void"
+	IDDSC_BASE + dsc_ToolPwd, "oadd,oadd,int Layer,x,y,shortcut,void Passwort,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_PushCheckButton, "oadd,oadd,int Layer,x,y,shortcut,void Flag,void Disable,string Hilfe,void Prozedur,bitmap,bx,by,bitmap opt,bx,by,bitmap,bx,by,bitmap,bx,by"
+	IDDSC_BASE + dsc_TransparentBitmap, "oadd,oadd,int Layer,x,y,shortcut,colorvar,bitmap,bx,by"
+	IDDSC_BASE + dsc_AnimationBitmap, "oadd,oadd,int Layer,x,y,shortcut,int,int,int,bitmap,bx,by"
+	IDDSC_BASE + dsc_ToolBEdit, "oadd,oadd,int Layer,x,y,shortcut,void Variable var,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_BmpFloat, "oadd,oadd,int Layer,x,y,shortcut,void,void,string,w,h,dec,dec,void,void,oadd,bitmap,bx,by"
+	IDDSC_BASE + dsc_ShowPermList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,void AnzGet,void AnzCache,string Tabelle,string Script,int multisel.,string Hilfe,int AnzExtra,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_ShowStringList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,void AnzGet,void AnzCache,string Tabelle,string Script,int multisel.,string Hilfe,int AnzExtra,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_ShowColumnList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,void AnzGet,void AnzCache,string Tabelle,string Script,int multisel.,string Hilfe,int AnzExtra,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_ShowObjectList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,void AnzGet,void AnzCache,string Tabelle,string Script,int multisel.,string Hilfe,int AnzExtra,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_ShowPMObjectList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,void AnzGet,void AnzCache,string Tabelle,string Script,int multisel.,string Hilfe,int AnzExtra,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_ExternDocument, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Dokument,void,void,void,void,void,void,void"
+        IDDSC_BASE + dsc_XYFromRect, "oadd,oadd,int Layer,x,y,shortcut,string Hilfe,w,h,dec,dec,dec,dec,void XPos,void YPos,bitmap,bx,by"
+	IDDSC_BASE + dsc_CreateScreen, "oadd,oadd,int ScreenID,string Titel,void Position,w,h,int Modal"
+        IDDSC_BASE + dsc_StdHeader, "oadd,string,string,string,string,string,string,string,string,string,string,string,string,string,string"
+        IDDSC_BASE + dsc_FullHeader, "oadd,format,string,string,string,string,string,string,string,string,string,string,string,string,string,string"
+        IDDSC_BASE + dsc_StdButton, "oadd"
+        IDDSC_BASE + dsc_FullButton, "oadd"
+        IDDSC_BASE + dsc_SetButtons, "oadd"
+        IDDSC_BASE + dsc_BindInnerListToOutList, "oadd,oadd"
+        IDDSC_BASE + dsc_DBCall_StringList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,string,string,int,string,int,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+        IDDSC_BASE + dsc_DBCall_ColumnList, "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string Selektion,string,string,int,string,int,void opt,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+        IDDSC_BASE + dsc_DBCall_ObjList,    "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string,string,string,int,string,int,void,void,void opt,void,void,void,void,void,void,void,void,void,void,void,void"
+        IDDSC_BASE + dsc_DBCall_MPObjList,  "oadd,oadd,int Layer,x,y,shortcut,void Disable,w,h,string,string,string,int,string,int,void,void,void opt,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_ToolLongInt, "oadd,oadd,int Layer,x,y,shortcut,void Wert,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+	IDDSC_BASE + dsc_ToolMoney, "oadd,oadd,int Layer,x,y,shortcut,void Wert,void Disable,string Hilfe,w,format,int AnzLines,int DoSelect,int Int.Breite opt"
+
+	IDDSC_BASE + dsc_DefFrmField, "oadd,string,point,x,y,format,w,int AnzLines,int Doselect,string Hilfe"
+	IDDSC_BASE + dsc_DefFrmDate, "oadd,void Datum,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe"
+	IDDSC_BASE + dsc_DefFrmDec, "oadd,void Wert,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string C_Format"
+	IDDSC_BASE + dsc_DefFrmShort, "oadd,void Wert,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string C_Format"
+	IDDSC_BASE + dsc_DefFrmLong, "oadd,void Wert,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string C_Format"
+	IDDSC_BASE + dsc_DefFrmMoney, "oadd,void Wert,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string C_Format"
+	IDDSC_BASE + dsc_DefFrmSLDec, "oadd,void Wert,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string C_Format"
+	IDDSC_BASE + dsc_DefFrmStrList, "oadd,void Index,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string Aufzaehlung"
+	IDDSC_BASE + dsc_DefFrmLine, "oadd,p1,p2,colorvar Farbe"
+	IDDSC_BASE + dsc_DefFrmImage, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_Trc_DefCont, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_Trc_DefPattern, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_Trc_DefmPattern, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_Trc_DefLine, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmSozNr, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmDevDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefCheckBox, "oadd,void flagvar,point,x,y,w,colorvar Farbe,string Hilfe,int Zeichnungstyp"
+
+        IDDSC_BASE + dsc_DefFrmShortStrList, "oadd,void Index,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string Aufzaehlung"
+;	IDDSC_BASE + dsc_DefFrmShortStrList, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+
+	IDDSC_BASE + dsc_Trc_DefArc, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefPattern, "oadd,bild,p1,dec,dec,dec,colorvar Farbe"
+        IDDSC_BASE + dsc_DefFrmTab, "oadd,p1,int AnzSpalten,int AnzReihen,int w1,w,int h1,h,colorvar,colorvar,colorvar,colorvar,colorvar"
+        IDDSC_BASE + dsc_DefFrmTabField, "oadd,string,oadd,x,y,format,w,int AnzLines,int Doselect,string Hilfe,int Reihe,int Spalte"
+	IDDSC_BASE + dsc_DefTabDecField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmTabShortStrList, "oadd,void Index,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string Aufzaehlung"
+	IDDSC_BASE + dsc_DefTabFlagField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefCheckField, "oadd,void flagvar,point,x,y,w,h,colorvar,string Hilfe,int Zeichnungstyp"
+	IDDSC_BASE + dsc_DefTabCheckField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmStrDivList, "oadd,void Index,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string Aufzaehlung"
+	IDDSC_BASE + dsc_DefTabDate, "oadd,void Index,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe,string Aufzaehlung"
+	IDDSC_BASE + dsc_DefFrmTabStrList, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefTabColDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmSlantField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmSlantDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmSlantSLDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefMovePattern, "oadd,bild,p1,dec,dec,dec,int,colorvar,dec,dec,dec,dec,dec,dec,dec,dec,colorvar"
+	IDDSC_BASE + dsc_DefFrmDefDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmMultiField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefTrcImage, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmStaticBitmap, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefActivationRegion, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDDSC_BASE + dsc_DefFrmBField, "oadd,string,point,x,y,format,w,int AnzLines,int Doselect,string Hilfe"
+	IDDSC_BASE + dsc_Trc_DefRectangle, "oadd,p1,p2,colorvar Farbe,int BrushStyle,int Fuellfarbe,int hstyle"
+	IDDSC_BASE + dsc_DefFrmTime, "oadd,void Zeit,point,x,y,format,w,int AnzLines,int DoSelect,string Hilfe"
+
+	IDPAR_BASE + dsc_PushButton, "0,10,10,no_hk,Prozedur,FALSE,""Hilfe"",Dialogs,0,0"
+	IDPAR_BASE + dsc_CheckButton, "0,10,10,no_hk,Flag,FALSE,""Hilfe"",Dialogs,0,0"
+	IDPAR_BASE + dsc_TextPushButton, "0,10,10,no_hk,Prozedur,FALSE,""Hilfe"",100,15,""Push"",5"
+	IDPAR_BASE + dsc_BmpTextPushButton, "0,10,10,no_hk,Prozedur,FALSE,""Hilfe"",35,15,""OK"",5,toolbmps,0,39"
+	IDPAR_BASE + dsc_TextCheckButton, "0,10,10,no_hk,Flag,FALSE,""Hilfe"",chkbtn,0,0,chkbtn,1,0,chkbtn,2,0,chkbtn,3,0,chkbtn,4,0,""Text"",2,30"
+	IDPAR_BASE + dsc_TextRadioButton, "0,10,10,no_hk,Flag,FALSE,""Hilfe"",chkbtn,0,1,chkbtn,1,1,chkbtn,2,1,chkbtn,3,1,chkbtn,4,1,""Text"",2,30"
+	IDPAR_BASE + dsc_ComboButton, "0,10,10,no_hk,Prozedur,FALSE,""Hilfe"",combobmp,0,0,editobj"
+	IDPAR_BASE + dsc_UpDown, "0,10,10,no_hk,Prozedur,Prozedur,FALSE,""Hilfe"",editobj"
+	IDPAR_BASE + dsc_ToolEdit, "0,10,10,no_hk,StringVar,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_ToolZoom, "0,10,10,no_hk,Faktor,FALSE,""Hilfe"",30,15,0.25,4.0,10,0"
+	IDPAR_BASE + dsc_ToolPage, "0,10,10,no_hk,Seite,FALSE,""Hilfe"",30,15,[1]"
+	IDPAR_BASE + dsc_ToolDate, "0,10,10,no_hk,Datum,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_ToolTime, "0,10,10,no_hk,Zeit,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_ToolFloat, "0,10,10,no_hk,Wert,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_ToolShortInt, "0,10,10,no_hk,Wert,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_ToolLongInt, "0,10,10,no_hk,Wert,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_ToolMoney, "0,10,10,no_hk,Wert,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_GroupBox, "0,10,10,no_hk,30,15,2,"""",1,FALSE,0L"
+	IDPAR_BASE + dsc_StaticTool, "0,10,10,no_hk,30,2,""Text"""
+	IDPAR_BASE + dsc_lShowList, "0,10,10,no_hk,FALSE,30,15,""Selektion"",10,10,""TableName"","""",FALSE,""Hilfe"",0,0,0"
+	IDPAR_BASE + dsc_StaticBitmap, "0,10,10,no_hk,Dialogs,0,0"
+	IDPAR_BASE + dsc_Line3D, "0,10,10,no_hk,30,30"
+	IDPAR_BASE + dsc_ColorLine, "0,10,10,no_hk,30,30,0L"
+	IDPAR_BASE + dsc_ColorRect, "0,10,10,no_hk,30,30,0L,0L"
+	IDPAR_BASE + dsc_ActionBox, "0,10,10,no_hk,30,30,Prozedur,16777215L,StateVar"
+	IDPAR_BASE + dsc_FlapMap, "0,10,10,no_hk,StringVar,ExternTool,FALSE,""Hilfe"",30,10,2.0,StringVar,Prozedur"
+	IDPAR_BASE + dsc_ToolPwd, "0,10,10,no_hk,Passwort,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_PushCheckButton, "0,10,10,no_hk,Flag,FALSE,""Hilfe"",Prozedur,Dialogs,0,0"
+	IDPAR_BASE + dsc_TransparentBitmap, "0,10,10,no_hk,0,Dialogs,0,0"
+	IDPAR_BASE + dsc_AnimationBitmap, "0,10,10,no_hk,0,50,0,Dialogs,0,0"
+	IDPAR_BASE + dsc_ToolBEdit, "0,10,10,no_hk,StringVar,FALSE,""Hilfe"",30,2,1,TRUE"
+	IDPAR_BASE + dsc_BmpFloat, "0,10,10,no_hk,void,void,DecVar,30,15,1.0,10.0,void,void,oadd,Dialogs,0,0"
+	IDPAR_BASE + dsc_ShowPermList, "0,10,10,no_hk,FALSE,30,15,""Selektion"",10,10,""TableName"","""",FALSE,""Hilfe"",0,0,0"
+	IDPAR_BASE + dsc_ShowStringList, "0,10,10,no_hk,FALSE,30,15,""Selektion"",10,10,""TableName"","""",FALSE,""Hilfe"",0,0,0"
+	IDPAR_BASE + dsc_ShowColumnList, "0,10,10,no_hk,FALSE,30,15,""Selektion"",10,10,""TableName"","""",FALSE,""Hilfe"",0,0,0"
+	IDPAR_BASE + dsc_ShowObjectList, "0,10,10,no_hk,FALSE,30,15,""Selektion"",10,10,""TableName"","""",FALSE,""Hilfe"",0,0,0"
+	IDPAR_BASE + dsc_ShowPMObjectList, "0,10,10,no_hk,FALSE,30,15,""Selektion"",10,10,""TableName"","""",FALSE,""Hilfe"",0,0,0"
+	IDPAR_BASE + dsc_ExternDocument, "0,10,10,no_hk,FALSE,30,15,""Script"""
+	IDPAR_BASE + dsc_XYFromRect, "0,10,10,no_hk,""Hilfe"",30,15,0.0,0.0,100.0,100.0,valx,valy,toolbmps,0,7"
+	IDPAR_BASE + dsc_CreateScreen, "0,""Titel"",no_pos,150,100,TRUE"
+	IDPAR_BASE + dsc_StdHeader, """Header1"",""Header2"",""Header3"",""Header4"""
+	IDPAR_BASE + dsc_FullHeader, "15,""Header1"",""Header2"",""Header3"",""Header4"""
+        IDPAR_BASE + dsc_DBCall_StringList, "0,10,10,no_hk,FALSE,30,15,""Zugriff"","""",""Tabelle"",FALSE,""Hilfe"",0,0,0"
+        IDPAR_BASE + dsc_DBCall_ColumnList, "0,10,10,no_hk,FALSE,30,15,""Zugriff"","""",""Tabelle"",FALSE,""Hilfe"",0,0,0"
+        IDPAR_BASE + dsc_DBCall_ObjList,    "0,10,10,no_hk,FALSE,30,15,""Zugriff"","""",""Tabelle"",FALSE,""Hilfe"",0,0,0"
+        IDPAR_BASE + dsc_DBCall_MPObjList,  "0,10,10,no_hk,FALSE,30,15,""Zugriff"","""",""Tabelle"",FALSE,""Hilfe"",0,0,0"
+
+	IDPAR_BASE + dsc_DefFrmField, """Text"",[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"""
+	IDPAR_BASE + dsc_DefFrmDate, "Datum,[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"""
+	IDPAR_BASE + dsc_DefFrmDec, "Wert,[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"",""%.1f"""
+	IDPAR_BASE + dsc_DefFrmShort, "Wert,[(0.0,0.0)],200,200,2,1500,1,1,""Hilfe"""
+	IDPAR_BASE + dsc_DefFrmLong, "Wert,[(0.0,0.0)],200,200,2,1500,1,1,""Hilfe"","""
+	IDPAR_BASE + dsc_DefFrmMoney, "Wert,[(0.0,0.0)],200,200,2,1500,1,1,""Hilfe"","""
+	IDPAR_BASE + dsc_DefFrmSLDec, "Wert,[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"",""%.1f"""
+	IDPAR_BASE + dsc_DefFrmStrList, "Index,[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"",""Enum"""
+	IDPAR_BASE + dsc_DefFrmLine, "[(100.0,100.0)],[(400.0,400.0)],0L"
+	IDPAR_BASE + dsc_DefFrmImage, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_Trc_DefCont, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_Trc_DefPattern, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_Trc_DefmPattern, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_Trc_DefLine, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmSozNr, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmDevDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefCheckBox, "Flag,[(0.0,0.0)],200,200,200,0L,""Hilfe"""
+	IDPAR_BASE + dsc_DefFrmShortStrList, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_Trc_DefArc, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefPattern, "mensch,[(0.0,0.0)],1.0,1.0,0.0"
+        IDPAR_BASE + dsc_DefFrmTab, "[(100.0,100.0)],2,2,100,300,100,300,0L,0L,0L,0L,0L"
+        IDPAR_BASE + dsc_DefFrmTabField, """Text"",tab0,200,200,2,1500,1,0,""Hilfe"",0,0"
+	IDPAR_BASE + dsc_DefTabDecField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmTabShortStrList, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefTabFlagField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefCheckField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefTabCheckField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmStrDivList, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefTabDate, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmTabStrList, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefTabColDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmSlantField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmSlantDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmSlantSLDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefMovePattern, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmDefDec, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmMultiField, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefTrcImage, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmStaticBitmap, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefActivationRegion, "oadd,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void,void"
+	IDPAR_BASE + dsc_DefFrmBField, """Text"",[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"""
+	IDPAR_BASE + dsc_Trc_DefRectangle, "[(100.0,100.0)],[(400.0,400.0)],0L,0,0,0"
+	IDPAR_BASE + dsc_DefFrmTime, "Zeit,[(0.0,0.0)],200,200,2,1500,1,0,""Hilfe"""
+        
+	IDPIC_BASE + dsc_PushButton, "y"
+	IDPIC_BASE + dsc_CheckButton, "y"
+	IDPIC_BASE + dsc_TextPushButton, "y"
+	IDPIC_BASE + dsc_BmpTextPushButton, "y"
+	IDPIC_BASE + dsc_TextCheckButton, "y"
+	IDPIC_BASE + dsc_TextRadioButton, "y"
+	IDPIC_BASE + dsc_ComboButton, "y"
+	IDPIC_BASE + dsc_UpDown, "y"
+	IDPIC_BASE + dsc_ToolEdit, "y"
+	IDPIC_BASE + dsc_ToolZoom, "n"
+	IDPIC_BASE + dsc_ToolPage, "n"
+	IDPIC_BASE + dsc_ToolDate, "y"
+	IDPIC_BASE + dsc_ToolTime, "y"
+	IDPIC_BASE + dsc_ToolFloat, "y"
+	IDPIC_BASE + dsc_ToolShortInt, "y"
+	IDPIC_BASE + dsc_ToolLongInt, "y"
+	IDPIC_BASE + dsc_ToolMoney, "y"
+	IDPIC_BASE + dsc_GroupBox, "y"
+	IDPIC_BASE + dsc_StaticTool, "y"
+	IDPIC_BASE + dsc_lShowList, "y"
+	IDPIC_BASE + dsc_StaticBitmap, "y"
+	IDPIC_BASE + dsc_Line3D, "y"
+	IDPIC_BASE + dsc_ColorLine, "y"
+	IDPIC_BASE + dsc_ColorRect, "n"
+	IDPIC_BASE + dsc_ActionBox, "n"
+	IDPIC_BASE + dsc_FlapMap, "n"
+	IDPIC_BASE + dsc_ToolPwd, "n"
+	IDPIC_BASE + dsc_PushCheckButton, "y"
+	IDPIC_BASE + dsc_TransparentBitmap, "y"
+	IDPIC_BASE + dsc_AnimationBitmap, "n"
+	IDPIC_BASE + dsc_ToolBEdit, "y"
+	IDPIC_BASE + dsc_BmpFloat, "n"
+	IDPIC_BASE + dsc_ShowPermList, "n"
+	IDPIC_BASE + dsc_ShowStringList, "n"
+	IDPIC_BASE + dsc_ShowColumnList, "n"
+	IDPIC_BASE + dsc_ShowObjectList, "n"
+	IDPIC_BASE + dsc_ShowPMObjectList, "n"
+	IDPIC_BASE + dsc_ExternDocument, "n"
+        IDPIC_BASE + dsc_XYFromRect, "y"
+	IDPIC_BASE + dsc_CreateScreen, "n"
+	IDPIC_BASE + dsc_StdHeader, "n"
+	IDPIC_BASE + dsc_FullHeader, "n"
+
+        IDPIC_BASE + dsc_DBCall_StringList, "n"
+        IDPIC_BASE + dsc_DBCall_ColumnList, "n"
+        IDPIC_BASE + dsc_DBCall_ObjList, "n"
+        IDPIC_BASE + dsc_DBCall_MPObjList, "n"
+
+	IDPIC_BASE + dsc_DefFrmField, "y"
+	IDPIC_BASE + dsc_DefFrmDate, "y"
+	IDPIC_BASE + dsc_DefFrmDec, "y"
+	IDPIC_BASE + dsc_DefFrmShort, "y"
+	IDPIC_BASE + dsc_DefFrmLong, "y"
+	IDPIC_BASE + dsc_DefFrmMoney, "y"
+	IDPIC_BASE + dsc_DefFrmSLDec, "n"
+	IDPIC_BASE + dsc_DefFrmStrList, "y"
+	IDPIC_BASE + dsc_DefFrmLine, "y"
+	IDPIC_BASE + dsc_DefFrmImage, "n"
+	IDPIC_BASE + dsc_Trc_DefCont, "n"
+	IDPIC_BASE + dsc_Trc_DefPattern, "n"
+	IDPIC_BASE + dsc_Trc_DefmPattern, "n"
+	IDPIC_BASE + dsc_Trc_DefLine, "n"
+	IDPIC_BASE + dsc_DefFrmSozNr, "n"
+	IDPIC_BASE + dsc_DefFrmDevDec, "n"
+	IDPIC_BASE + dsc_DefCheckBox, "y"
+	IDPIC_BASE + dsc_DefFrmShortStrList, "n"
+	IDPIC_BASE + dsc_Trc_DefArc, "n"
+	IDPIC_BASE + dsc_DefPattern, "y"
+        IDPIC_BASE + dsc_DefFrmTab, "y"
+        IDPIC_BASE + dsc_DefFrmTabField, "y"
+	IDPIC_BASE + dsc_DefTabDecField, "n"
+	IDPIC_BASE + dsc_DefFrmTabShortStrList, "n"
+	IDPIC_BASE + dsc_DefTabFlagField, "n"
+	IDPIC_BASE + dsc_DefCheckField, "n"
+	IDPIC_BASE + dsc_DefTabCheckField, "n"
+	IDPIC_BASE + dsc_DefFrmStrDivList, "n"
+	IDPIC_BASE + dsc_DefTabDate, "n"
+	IDPIC_BASE + dsc_DefFrmTabStrList, "n"
+	IDPIC_BASE + dsc_DefTabColDec, "n"
+	IDPIC_BASE + dsc_DefFrmSlantField, "n"
+	IDPIC_BASE + dsc_DefFrmSlantDec, "n"
+	IDPIC_BASE + dsc_DefFrmSlantSLDec, "n"
+	IDPIC_BASE + dsc_DefMovePattern, "n"
+	IDPIC_BASE + dsc_DefFrmDefDec, "n"
+	IDPIC_BASE + dsc_DefFrmMultiField, "n"
+	IDPIC_BASE + dsc_DefTrcImage, "n"
+	IDPIC_BASE + dsc_DefFrmStaticBitmap, "n"
+	IDPIC_BASE + dsc_DefActivationRegion, "n"
+	IDPIC_BASE + dsc_DefFrmBField, "n"
+	IDPIC_BASE + dsc_Trc_DefRectangle, "n"
+	IDPIC_BASE + dsc_DefFrmTime, "y"
+
+	IDHLP_BASE + dsc_PushButton, "grafische PushButton, l�st eine Aktion aus"
+	IDHLP_BASE + dsc_CheckButton, "grafischer CheckButton, stellt einen Zustand dar"
+	IDHLP_BASE + dsc_TextPushButton, "textueller PushButton, l�st eine Aktion aus"
+	IDHLP_BASE + dsc_BmpTextPushButton, "PushButton mit Text und Grafik, l�st eine Aktion aus"
+	IDHLP_BASE + dsc_TextCheckButton, "textueller PushButton, stellt einen Zusatnd dar"
+	IDHLP_BASE + dsc_TextRadioButton, "textueller Radionbutton, stellt einen Zusatnd dar"
+	IDHLP_BASE + dsc_ComboButton, "Knopf, um Comboboxen zu stilisieren"
+	IDHLP_BASE + dsc_UpDown, "Zwei Kn�pfe die Prozeduren ausl�sen"
+	IDHLP_BASE + dsc_ToolEdit, "Standardeingabe Element"
+	IDHLP_BASE + dsc_ToolDate, "Datumseingabe"
+	IDHLP_BASE + dsc_ToolTime, "Zeiteingabe"
+	IDHLP_BASE + dsc_ToolFloat, "Dezimalwerteingabe"
+	IDHLP_BASE + dsc_ToolShortInt, "Ganzzahleneingabe"
+	IDHLP_BASE + dsc_ToolLongInt, "Eingabe von LONG Zahlen"
+	IDHLP_BASE + dsc_ToolMoney, "Eingabe von Geldbetraegen"
+	IDHLP_BASE + dsc_GroupBox, "Gruppierung von Elementen"
+	IDHLP_BASE + dsc_StaticTool, "Statischer Text"
+	IDHLP_BASE + dsc_lShowList, "Standard Liste"
+	IDHLP_BASE + dsc_StaticBitmap, "Statisches Bitmap"
+	IDHLP_BASE + dsc_Line3D, "Linie mit Schatten"
+	IDHLP_BASE + dsc_ColorLine, "Linie mit Farben"
+	IDHLP_BASE + dsc_PushCheckButton, "graphischer Knopf, stellt Zustand dar und l�st eine Aktion aus"
+	IDHLP_BASE + dsc_TransparentBitmap, "Bitmap mit Hintergrund"
+	IDHLP_BASE + dsc_AnimationBitmap, "Bitmap, das mit einem Timer animiert wird"
+	IDHLP_BASE + dsc_ToolBEdit, "Eingabefeld, erster Buchstabe wird gro� geschrieben"
+        IDHLP_BASE + dsc_XYFromRect, "Element, um X-Y-Positionen grafisch darzustellen"
+	IDHLP_BASE + dsc_DefFrmField, "DefFrmField"
+	IDHLP_BASE + dsc_DefFrmDate, "DefFrmDate"
+	IDHLP_BASE + dsc_DefFrmDec, "DefFrmDec"
+	IDHLP_BASE + dsc_DefFrmShort, "DefFrmShort"
+	IDHLP_BASE + dsc_DefFrmLong, "DefFrmLong"
+	IDHLP_BASE + dsc_DefFrmMoney, "DefFrmMoney"
+	IDHLP_BASE + dsc_DefFrmStrList, "DefFrmStrList"
+	IDHLP_BASE + dsc_DefFrmLine, "DefFrmLine"
+	IDHLP_BASE + dsc_DefCheckBox, "DefCheckBox"
+	IDHLP_BASE + dsc_DefPattern, "DefPattern"
+        IDHLP_BASE + dsc_DefFrmTab            , "DefFrmTab"
+        IDHLP_BASE + dsc_DefFrmTabField       , "DefFrmTabField"
+	IDHLP_BASE + dsc_DefFrmTime, "DefFrmTime .. Zeiteingabe (hh:mm:ss)"
+
+	PTNAME_BASE + PT_OBJADDRESS, "Parameter %d"
+	PTNAME_BASE + PT_INT, "Parameter %d"
+	PTNAME_BASE + PT_STRING, "Parameter %d"
+	PTNAME_BASE + PT_UNKNOWN, "Parameter %d"
+	PTNAME_BASE + PT_WIDTH, "Breite"
+	PTNAME_BASE + PT_HEIGHT, "H�he"
+	PTNAME_BASE + PT_X, "X"
+	PTNAME_BASE + PT_Y, "Y"
+	PTNAME_BASE + PT_BX, "Bildindex x"
+	PTNAME_BASE + PT_BY, "Bildindex y"
+	PTNAME_BASE + PT_BITMAP, "BildName"
+	PTNAME_BASE + PT_DEC, "Parameter %d"
+	PTNAME_BASE + PT_POINT, "Patameter %d"
+	PTNAME_BASE + PT_P1, "Punkt 1"
+	PTNAME_BASE + PT_P2, "Punkt 2"
+	PTNAME_BASE + PT_X1, "Punkt 1, x"
+	PTNAME_BASE + PT_Y1, "Punkt 1, y"
+	PTNAME_BASE + PT_X2, "Punkt 2, x"
+	PTNAME_BASE + PT_Y2, "Punkt 2, y"
+	PTNAME_BASE + PT_WMF, "Bild"
+	PTNAME_BASE + PT_FORMAT, "Textformat"
+	PTNAME_BASE + PT_HOTKEY, "Hotkey"
+	IDDLGBSP_BASE, "  local obj %s,%s;"
+	IDDLGBSP_BASE + 1, "  CreateScreen (%s,MainScreen,2,""�berschrift"",no_pos,100,100,TRUE);"
+	IDDLGBSP_BASE + 2, "  StaticTool (%s,%s,0,10,10,no_hk,80,2,""Text"");"
+
+        MENU_BASE + NOMENU,        ""
+
+        SC_SIZE,       "Size the Window with the Keyboard"
+        SC_MOVE,       "Move the Window with the keyboard"
+        SC_MINIMIZE,   "Minimize the Window"
+        SC_MAXIMIZE,   "Maximize the Window"
+        SC_CLOSE,      "Close the Window"
+        SC_RESTORE,    "Restore the Window"
+        SC_TASKLIST,   "Switch to another Window"
+
+        MENU_BASE + IDM_SYSMENU,   "Move, size, minimize, maximize or close window"
+
+        MENU_BASE + MI_DATEI           "Datei"
+        MENU_BASE + MI_GENDDICT        "Datadictionary erzeugen aus Beschreibungsdatei"
+        MENU_BASE + MI_GENRES          "Resource erzeugen aus Beschreibungsdatei"
+        MENU_BASE + MI_DBCONV          "Datenbank Konvertierung"
+        MENU_BASE + MI_SETFNC          "Funktionsprototypen"
+        MENU_BASE + MI_SCRIPTEDITOR    "Scripteditor"
+        MENU_BASE + MI_OPENFORSCRIPTED "�ffnen"
+        MENU_BASE + MI_CONNECTTOSQL    "Erzeugen der CREATE - SQL Statements"
+        
+        MENU_BASE + MI_SCRIPTS         "Scripts"
+        
+        MENU_BASE + MI_TABELLEN        "Tabellen"
+        MENU_BASE + MI_TABLELIST       "Liste aller Tabellen"
+        MENU_BASE + MI_GENINT          "Erstellen einer int. Tabelle"
+
+        MENU_BASE + MI_SHOWRES         "Resourcen"
+
+        MENU_BASE + MI_EINSTELLUNGEN   "Einstellungen"
+        MENU_BASE + MI_SHOWFMT         "Formate"
+        MENU_BASE + MI_SHOWCOLOR       "Farben"
+
+        MENU_BASE + MI_FENSTER         "Fenster"
+        MENU_BASE + MI_OUTPUTOPT       "Bla Bla"
+        MENU_BASE + MI_CLEARSCREEN     "Bildschirm l�schen"
+
+	GCKW_BASE + GCKW_FPROT, "Funktionsprototypen"
+	GCKW_BASE + GCKW_RES, "Resourcen"
+	GCKW_BASE + GCKW_TABLES, "Tabellen"
+	GCKW_BASE + GCKW_SCRIPTS, "Scripts"
+	GCKW_BASE + GCKW_DBTABLES, "DB_Tabellen"
+	GCKW_BASE + GCKW_ITABLES, "INT_Tabellen"
+	GCKW_BASE + GCKW_GTABLES, "GLOB_Tabellen" 
+	GCKW_BASE + GCKW_REP, "Replikator" 
+        GCKW_BASE + GCKW_MODULES, "Modules"
+	GCKW_BASE + GCKW_END, "end"
+	GCKW_BASE + GCKW_END + 1, "END"
+
+        40000 , "long_dec_string_point_cont_short_flag_scale_date_time_unsigned_void__"
+
+        TBCMPL_BASE + TC_VAR_LONG                            , "long"
+        TBCMPL_BASE + TC_VAR_DEC                             , "dec"
+        TBCMPL_BASE + TC_VAR_STR                             , "string"
+        TBCMPL_BASE + TC_VAR_POINT                           , "point"
+        TBCMPL_BASE + TC_VAR_CONT                            , "cont"
+        TBCMPL_BASE + TC_VAR_STRARR                          , "short"
+        TBCMPL_BASE + TC_VAR_FLAG                            , "flag"
+        TBCMPL_BASE + TC_VAR_SCALE                           , "scale"
+        TBCMPL_BASE + TC_VAR_DATE                            , "date"
+        TBCMPL_BASE + TC_VAR_TIME                            , "time"
+        TBCMPL_BASE + TC_VAR_DWORD                           , "unsigned"
+        TBCMPL_BASE + TC_VAR_OBJ                             , "void"
+        TBCMPL_BASE + TC_TABLE                               , "Table"
+        TBCMPL_BASE + TC_FIELDS                              , "fields"
+        TBCMPL_BASE + TC_KEY                                 , "keys"
+        TBCMPL_BASE + TC_FOREIGNKEY                          , "ForeignDefinition"
+        TBCMPL_BASE + TC_EXTENDED                            , "_Extended"
+        TBCMPL_BASE + TC_STANDARD                            , "_Standard"
+        TBCMPL_BASE + TC_SERVER                              , "ServerSource"
+        TBCMPL_BASE + TC_COLON                               , ","
+        TBCMPL_BASE + TC_SEMICOLON                           , ";"
+        TBCMPL_BASE + TC_ARRBRACEOPEN                        , "["
+        TBCMPL_BASE + TC_ARRBRACECLOSE                       , "]"
+        TBCMPL_BASE + TC_EQUAL                               , "="
+        TBCMPL_BASE + TC_CURBRACEOPEN                        , "{"
+        TBCMPL_BASE + TC_CURBRACECLOSE                       , "}"
+        TBCMPL_BASE + TC_BRACEOPEN                           , "("
+        TBCMPL_BASE + TC_BRACECLOSE                          , ")"
+        TBCMPL_BASE + TC_ID                                  , "_Id"
+        TBCMPL_BASE + TC_NULL                                , "null"
+        TBCMPL_BASE + TC_MODIFY                              , "modify"
+        TBCMPL_BASE + TC_UNIQUE                              , "unique"
+        TBCMPL_BASE + TC_AUTOINC                             , "autoinc"
+        TBCMPL_BASE + TC_NO                                  , "no"
+        TBCMPL_BASE + TC_YES                                 , "yes"
+        TBCMPL_BASE + TC_NOT                                 , "not"
+        TBCMPL_BASE + TC_CLUSTERED                           , "clustered"
+        TBCMPL_BASE + TC_VAR_QLONG                           , "qlong"
+        TBCMPL_BASE + TC_VERSION                             , "_Version"
+        TBCMPL_BASE + TC_CASEINSENSITIVE                     , "caseinsensitive"
+        TBCMPL_BASE + TC_VAR_BLOB                            , "blob"
+        TBCMPL_BASE + TC_VAR_DATETIME                        , "timestamp"
+        TBCMPL_BASE + TC_PROPERTY                            , "property"
+        TBCMPL_BASE + TC_END                                 , "END"
+
+        LDCMPL_BASE + LDKWBRACEOPEN                          , "("
+        LDCMPL_BASE + LDKWBRACECLOSE                         , ")"
+        LDCMPL_BASE + LDKWCOLON                              , ","
+        LDCMPL_BASE + LDKWEND                                , "end"
+        LDCMPL_BASE + LDKWEND + 1                            , "END"
+
+        ITCMPL_BASE + IC_CURBRACECLOSE                       , "}"
+        ITCMPL_BASE + IC_SEMICOLON                           , ";"
+        ITCMPL_BASE + IC_EQUAL                               , "="
+        ITCMPL_BASE + IC_CURBRACEOPEN                        , "{"
+        ITCMPL_BASE + IC_ALIAS                               , "alias"
+        ITCMPL_BASE + IC_ALL                                 , "all"
+        ITCMPL_BASE + IC_SELECT                              , "select"
+        ITCMPL_BASE + IC_BRACECLOSE                          , ")"
+        ITCMPL_BASE + IC_COLON                               , ","
+        ITCMPL_BASE + IC_BRACEOPEN                           , "("
+        ITCMPL_BASE + IC_RI                                  , "RI"
+        ITCMPL_BASE + IC_WITH                                , "with"
+        ITCMPL_BASE + IC_JOIN                                , "join"
+        ITCMPL_BASE + IC_TABLE                               , "table"
+        ITCMPL_BASE + IC_INTERN                              , "View"
+        ITCMPL_BASE + IC_INNER                               , "inner"
+        ITCMPL_BASE + IC_OUTER                               , "outer"
+        ITCMPL_BASE + IC_END                                 , "end"
+        ITCMPL_BASE + IC_END + 1                             , "END"
+
+        SCMPL_BASE  + SC_CURBRACECLOSE                       , "}"
+        SCMPL_BASE  + SC_CURBRACEOPEN                        , "{"
+        SCMPL_BASE  + SC_EQUAL                               , "="
+        SCMPL_BASE  + SC_TABLE                               , "table"
+        SCMPL_BASE  + SC_INTERN                              , "View"
+        SCMPL_BASE  + SC_SEMICOLON                           , ";"
+        SCMPL_BASE  + SC_END                                 , "end"
+        SCMPL_BASE  + SC_END + 1                             , "END"
+
+        REPCMPL_BASE + REP_BCC                               , ")"
+        REPCMPL_BASE + REP_COLON                             , ","
+        REPCMPL_BASE + REP_DELETE                            , "_DELETE"
+        REPCMPL_BASE + REP_BCO                               , "("
+        REPCMPL_BASE + REP_SEMICOLON                         , ";"
+        REPCMPL_BASE + REP_END                               , "END"
+END
+
+OLDDIALOGMENU MENU 
+BEGIN
+	POPUP "Dialog"
+	BEGIN
+		MENUITEM "Bearbeiten...\tF2",      MI_WORKONSCREEN
+		MENUITEM "Speichern \tStrg+S,F10", MI_STOREDIALOG
+		MENUITEM SEPARATOR
+		MENUITEM "Beenden\tF7",            MI_DESTROYDIALOG
+	END
+
+	POPUP "Element"
+	BEGIN
+		MENUITEM "L�schen\tF4",               MI_DELELE
+		MENUITEM "Kopieren \tStrg+C",         MI_DUPLICATE
+		MENUITEM "Bearbeiten...\tStrg+W, F1", MI_WORKONELE
+		MENUITEM "Verschieben \tALT+F5",      MI_MOVEELEMES
+ 		MENUITEM SEPARATOR
+	END
+
+	POPUP "Hilfslinien"
+	BEGIN
+		MENUITEM "Neu Horizontal \aF9", MI_NEWHLINE
+		MENUITEM "Neu Vertikal \aStrg+F9", MI_NEWVLINE
+		MENUITEM "L�schen ALT \aF9", MI_DELHLINE
+		MENUITEM "Bearbeiten \aStrg+Shift+F9", MI_WORKONHLINE
+		MENUITEM "Serie von Hilfslinien    \aALT+Shift+F9", MI_MULTIHLINE
+	END
+
+END
+
+EDITMENU MENU 
+BEGIN
+	POPUP "&Datei"
+	BEGIN
+		MENUITEM "Speichern \tALT+w", MI_STOREED
+		MENUITEM "Generieren \tALT+F10", MI_GENED
+		MENUITEM "Beenden", MI_CLOSESC
+		MENUITEM SEPARATOR
+		MENUITEM "N�chster Buffer \tALT+n", MI_NEXTBUFFER
+		MENUITEM "Hauptprogramm \tStrg+0", MI_MAINFILE
+	END
+
+	POPUP "&Bearbeiten"
+	BEGIN
+		MENUITEM "&Ausschneiden\tStrg+X", IDM_CUT
+		MENUITEM "&Kopieren\tStrg+C",     IDM_COPY
+		MENUITEM "&Einf�gen\tStrg+V",     IDM_PASTE
+                MENUITEM SEPARATOR
+                MENUITEM "&Zeile l�schen\tStrg+Y",        IDM_DELLINE
+
+	END
+
+	POPUP "&Suchen"
+	BEGIN
+		MENUITEM "Suchen \tF5", MI_SEARCH
+		MENUITEM "Weitersuchen \tShift+F5", MI_SEARCHMORE
+		MENUITEM "Ersetzen... \tF6", MI_REPLACE
+		MENUITEM "Weiter Ersetzen \tShift+F6", MI_REPLACEMORE
+	END
+
+END
+
+
+MENU_1 MENU 
+BEGIN
+	POPUP "&Datei"
+	BEGIN
+		MENUITEM "Datadictionary &erzeugen aus Beschreibungsdatei...", MI_GENDDICT
+		MENUITEM "Resource &erzeugen aus Beschreibungsdatei...", MI_GENRES
+		MENUITEM SEPARATOR
+		MENUITEM "Datenbank &Konvertierung...", MI_DBCONV
+		MENUITEM SEPARATOR
+		MENUITEM "Funktionsprototypen...", MI_SETFNC
+		MENUITEM SEPARATOR
+		MENUITEM "SQL - Verbindung...", MI_CONNECTTOSQL
+	END
+
+	POPUP "Scripteditor"
+	BEGIN
+		MENUITEM "�&ffnen...", MI_OPENFORSCRIPTED
+		MENUITEM SEPARATOR
+	END
+
+	POPUP "&Scripts"
+	BEGIN
+		MENUITEM "Liste aller Scripts...", MI_SCRIPTLIST
+		MENUITEM "Generiere Scripts...", MI_GENERATESCRIPT
+	END
+
+	POPUP "&Tabellen"
+	BEGIN
+		MENUITEM "&Liste aller Tabellen...", MI_TABLELIST
+		MENUITEM "&Erstellen einer int. Tabelle...", MI_GENINT
+	END
+
+	MENUITEM "&Resourcen", MI_SHOWRES
+	POPUP "&Einstellungen"
+	BEGIN
+		MENUITEM "&Formate...", MI_SHOWFMT
+		MENUITEM "F&arben...", MI_SHOWCOLOR
+	END
+
+	POPUP "&Fenster"
+	BEGIN
+		MENUITEM "&Tile", IDM_WINDOWTILE
+		MENUITEM "&Cascade", IDM_WINDOWCASCADE
+		MENUITEM "Arrange &Icons", IDM_WINDOWICONS
+		MENUITEM "Close &All", IDM_WINDOWCLOSEALL
+		MENUITEM SEPARATOR
+		MENUITEM "Meldungen anzeigen", MI_OUTPUTOPT
+		MENUITEM "Ausgabebildschirm l�schen", MI_CLEARSCREEN
+	END
+END
+
+DBTBMENU MENU
+  BEGIN
+        POPUP "Bearbeiten"
+	BEGIN
+                MENUITEM "Tabelle bearbeiten\tEnter"   , 100
+                MENUITEM "Tabelle L�schen"             , 101
+                MENUITEM "Neue Tabelle"                , 102
+        END
+  END
+
+END
+
+

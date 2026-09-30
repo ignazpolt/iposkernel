@@ -1,0 +1,20 @@
+LIBRARY DDSODBC
+EXETYPE WINDOWS
+
+DESCRIPTION 'Datenbankanbindung Marille - ODBC'
+
+EXPORTS
+  DBCALL                   = ?DBCall@@YGHGHPAUDBRequest@@PAPAXPAURecBuffer@@@Z  @2
+  DBRESET                  = ?DBReset@@YGXXZ                                    @3
+  DATADICT_NEWTABLEDEF     = ?DataDict_NewTableDef@@YGPAXPAXPADPAHPAK@Z         @46
+  DOBEGINTRANSACTION       = ?DoBeginTransaction@@YGXH@Z                        @41
+  DOENDTRANSACTION         = ?DoEndTransaction@@YGXXZ                           @42
+  DOABORTTRANSACTION       = ?DoAbortTransaction@@YGXXZ                         @43
+  DBALTER                  = ?DBAlter@@YGHPAUTableDef@@0HPAUDefVal@@P6GXK@Z@Z
+  DBPOINT                  = ?GetDBPointer@@YGPAXXZ
+  MAKETIMESTAMP            = ?MakeTimeStamp@@YGXPAD@Z
+  DBIGNOREERROR            = ?DBIgnoreError@@YGHHH@Z
+  DBGETLASTERROR           = ?GetDBLastError@@YGHXZ
+  DBGETLASTERRORTEXT       = ?GetDBLastErrorText@@YGPADXZ
+  SETDBLOGSTATE            = ?SetDBLogState@@YGXHPAD@Z
+

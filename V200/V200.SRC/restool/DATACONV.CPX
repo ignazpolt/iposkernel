@@ -1,0 +1,348 @@
+////////////////////////////////////////////////////////////////
+//  Convertierten von Datenbanken
+////////////////////////////////////////////////////////////////
+//  $Header:   P:/marille/clinicum/restool/rev/dataconv.cpv   1.8   04 Feb 1996 21:49:12   HANNES  $
+//  $Log:   P:/marille/clinicum/restool/rev/dataconv.cpv  $
+// 
+//    Rev 1.8   04 Feb 1996 21:49:12   HANNES
+// 
+//    Rev 1.7   04 Feb 1996 17:00:36   HANNES
+// Protyp LogMsg
+// 
+//    Rev 1.6   02 Feb 1996 10:50:12   GERHOLD
+// 1.Umstellung auf 32 Bit
+// 
+//    Rev 1.5   14 Jul 1995 16:55:38   HANNES
+// Horizontale Fileteilung
+// 
+//    Rev 1.4   02 Apr 1995 13:33:22   HANNES
+//  
+// 
+//    Rev 1.3   16 Feb 1995 12:33:08   HANNES
+// Erweiterung um verbesserte DB - Tools
+// 
+//    Rev 1.2   02 Jan 1995 09:29:30   GERHOLD
+// Umstellung auf MDI
+// 
+//    Rev 1.1   17 Jul 1994 14:47:20   HANNES
+// 
+//    Rev 1.0   24 Jun 1994 16:54:42   HANNES
+// Neuuebernahme clinicum
+//
+
+#include <windows.h>
+#include <stdio.h>
+#include "dds32.h"
+
+#include "globmem.h"
+#include "btrieve.hpp"
+#include "hash.hpp"
+#include "compile.hpp"
+#include "restool.hpp"
+#define MODULENUM 85
+#include "winass.hpp"
+
+#include "dlladmin.h"
+#include "dlladmin.hpp"
+#include "tbdef.hpp"
+#include "dbrecord.hpp"
+
+extern HANDLE MyInstance;
+class ConvCompiler : public compiler {
+ public :
+  virtual DLLExport void _export WINAPI LoadKwHash (void);
+  virtual DLLExport BOOL _export WINAPI TestError (void);
+
+  ConvCompiler () : compiler (NULL) { }
+  };
+
+static HWND hCvWnd;
+
+DLLExport void _export WINAPI ConvCompiler::LoadKwHash ()
+  {
+  hash *h = FixKwHash ();
+  for (int i = 0 ; ; i++) {
+    char instring[50];
+    LoadString (MyInstance,CVKW_BASE+i,instring,sizeof (instring));
+    if (lstrcmp (instring,"END") == 0) break ;
+    else h->SetData (instring,&i,sizeof (WORD));
+    }
+  ReleaseKwHash ();
+  }
+
+DLLExport BOOL _export WINAPI ConvCompiler::TestError ()
+  {
+  if (wError > CVCMPERROR_BASE) {
+    char pattern[64];
+    char errstr[64];
+    LoadString (MyInstance,CVCMPERROR_BASE,pattern,sizeof(pattern));
+    LoadString (MyInstance,wError,errstr,sizeof(errstr));
+    char outtxt[256];
+    wsprintf (outtxt,pattern,fmname,LineNr,column,LPSTR(errstr));
+    if (GetCommandLineFlag())
+      LogMsg (outtxt);
+    else
+      MessageBox (hCvWnd,outtxt,"Resourcefehler",MB_OK | MB_TASKMODAL);
+    return TRUE ;
+    }
+  else
+    return compiler::TestError ();
+  }
+
+static ConvCompiler FAR *CCmp;
+
+// Hilfsfunktionen
+static LPVOID SourceParam[CB_PARAM];    WORD SourceParamPtr;
+static LPVOID DestParam[CB_PARAM];      WORD DestParamPtr;
+static BOOL UseSameNames;
+
+void ClearParamStack(LPVOID FAR *s,WORD FAR *p)
+  {
+  for (WORD i = 0 ; i < *p ; i++)
+    if (s[i] != NULL) FreeGlobMem (s[i]) , s[i] = NULL;
+  *p = 0;
+  }
+
+void ClearParamStacks()
+  {
+  ClearParamStack(SourceParam,&SourceParamPtr);
+  ClearParamStack(DestParam,&DestParamPtr);
+  }
+
+LPVOID PushToParam (LPVOID h,BYTE c)
+  {
+  LPSTR n = LPSTR(GetGlobMem (GetBlockSize(h) + 1));
+  if (h != NULL) lmemcpy (n,h,GetBlockSize(h)) , FreeGlobMem(h);
+  n[GetBlockSize(n)-1] = c;
+  return n;
+  }
+
+char SourceHandler[64],SourceTable[64],SourceAccess[64];
+char DestHandler[64],DestTable[64],DestAccess[64];
+void StoreString (LPSTR str)
+  {
+  LPSTR Name = GlobalLock (CCmp->hPars0) + sizeof(WORD);
+  lstrcpy (str,Name);
+  GlobalUnlock (CCmp->hPars0);
+  }
+
+BYTE HexNibble(char c) 
+  {
+  if ((c >= '0') && (c <= '9')) return      c - '0';
+  else if ((c >= 'A') && (c <= 'F')) return c - 'A' + 10;
+  else CCmp->wError = CVCMPERROR_INVHEXCHAR ;
+  return 0;
+  }
+
+void PushParam (LPVOID FAR *x,WORD FAR *p)
+  {
+  LPWORD lpSize = LPWORD(GlobalLock (CCmp->hPars0));
+  if ((*lpSize) % 2 != 1) { CCmp->wError = CVCMPERROR_EVENSIZE ; return ; }
+  LPSTR h = LPSTR(lpSize+1);
+  for ( ; *h ; ) {
+    BYTE c = (HexNibble(*h++) << 4) + HexNibble(*h++);
+    x[*p] = PushToParam(x[*p],c);
+    }
+  (*p) ++ ;
+  GlobalUnlock (CCmp->hPars0);
+  }
+
+// Codegenerieryng
+DLLExport void _export StoreSourceHandler () { StoreString (SourceHandler); UseSameNames = FALSE ; }
+DLLExport void _export StoreSourceTable   () { StoreString (SourceTable); }
+DLLExport void _export StoreSourceAccess  () { StoreString (SourceAccess); }
+DLLExport void _export StoreSourceParam   () { PushParam   (SourceParam,&SourceParamPtr); }
+DLLExport void _export StoreDestHandler   () { StoreString (DestHandler); }
+DLLExport void _export StoreDestTable     () { StoreString (DestTable); }
+DLLExport void _export StoreDestAccess    () { StoreString (DestAccess); }
+DLLExport void _export StoreDestParam     () { PushParam   (DestParam,&DestParamPtr); }
+DLLExport void _export SetSameName        () { UseSameNames = TRUE ; }
+LPWORD BuildFromTo (LPTABLEDEF Source,LPTABLEDEF Dest,BOOL SameNames)
+  {
+  LPWORD res = LPWORD(GetGlobMem (Dest->GetAnzVars() * sizeof(WORD)));
+  if (SameNames) {
+    for (int i = 0 ; i < Dest->GetAnzVars() ; i++) {
+      LPSTR dName = Dest->GetVarDef(i)->GetName();
+      res[i] = 0xFFFF ;
+      for (int j = 0 ; j < Source->GetAnzVars() ; j++) {
+        LPSTR sName = Source->GetVarDef(j)->GetName();
+        if (lstrcmp(sName,dName) == 0) {
+          res[i] = WORD(j);
+          }
+        }
+      }
+    }
+  else {
+    for (int i = 0 ; i < Dest->GetAnzVars() ; i++) 
+      res[i] = WORD (i);
+    }
+  return res;
+  }
+void FreeFromTo (LPWORD res)
+  {
+  FreeGlobMem (res);
+  }
+LPDBRECORD DestFromSource (LPDBRECORD source,LPWORD FromTo,LPTABLEDEF dt)
+  {
+  DBRecord FAR *r = new DBRecord (dt);
+  for (int i = 0 ; i < dt->GetAnzVars() ; i++) {
+    if (FromTo[i] != 0xFFFF) {
+      LPVOID Data = source->Get(FromTo[i]);
+      if (Data != NULL)
+        r->Set (i,Data,GetBlockSize(Data));
+      }
+    }
+  return r;
+  }
+DLLExport void _export DoIt               () 
+  {
+  // Berechnen der TableID's
+  BOOL Sourcefound,Destfound;
+  WORD SourceTableID  = GetTableAdmin()->GetTableID(SourceTable,&Sourcefound);
+  WORD DestTableID    = GetTableAdmin()->GetTableID(DestTable,&Destfound);
+  if ((!Sourcefound) || (!Destfound)) {
+    CCmp->wError = CVCMPERROR_NOTABLE;
+    return ;
+    }
+
+  // Laden der Tabellendefinitionen
+  LPDLLADMIN dlladmin = GetDLLAdmin();
+  DLLHANDLE ResDLL    = dlladmin->LoadResDLL();
+  DWORD HeaderSize,DataSize;
+  GLOBALHANDLE hGSourcemem  = 
+    dlladmin->GetDLLEntry(ResDLL)->DataRes_GetFullTableDef
+      (SourceHandler,SourceTableID,SourceTable,&HeaderSize,&DataSize);
+  GLOBALHANDLE hGDestmem  = 
+    dlladmin->GetDLLEntry(ResDLL)->DataRes_GetFullTableDef
+      (DestHandler,DestTableID,DestTable,&HeaderSize,&DataSize);
+  if ((hGDestmem == 0) || (hGSourcemem == 0)) {
+    if (hGSourcemem != 0) GlobalFree (hGSourcemem);
+    if (hGDestmem != 0) GlobalFree (hGDestmem);
+    CCmp->wError = CVCMPERROR_NOTABLE;
+    return ;
+    }
+
+  // Aufbauen der Requests
+  LPTABLEDEF source = InitializeTable(hGSourcemem);
+  LPTABLEDEF dest   = InitializeTable(hGDestmem);
+  source->SetDLLHandle (dlladmin->LoadDLL(SourceHandler));
+  dest->SetDLLHandle (dlladmin->LoadDLL(DestHandler));
+  LPDBREQUEST sreq  = InitializeRequest (SourceAccess,-1,DBCALLTYPE_EXTENDED,NULL);
+  LPDBREQUEST dreq  = InitializeRequest (DestAccess,-1,DBCALLTYPE_EXTENDED,NULL);
+  sreq->AddTableDef (source);
+  dreq->AddTableDef (dest);
+
+  // Und los gehts
+  ////////////////////////////
+  LPDLLENTRY se = dlladmin->GetDLLEntry(source->GetDLLHandle());
+  LPDLLENTRY de = dlladmin->GetDLLEntry(dest->GetDLLHandle());
+
+  LPWORD ft = BuildFromTo (source,dest,UseSameNames);
+
+  PrimKey pkold;
+  LPVOID sstmt = NULL;
+  LPVOID dstmt = NULL;
+  RecBuffer rb;
+  for ( BOOL first = TRUE ; ; first = FALSE ) {
+    if (!first) sreq->SetParam(0,&pkold,sizeof(pkold));
+    lmemset (&rb,'\0',sizeof(rb));
+    sreq->SetParam (1,&SourceTableID,sizeof(SourceTableID));
+    for (WORD i = 0 ; i < SourceParamPtr; i++)
+      sreq->SetParam (i+2,SourceParam[i],GetBlockSize(SourceParam[i]));
+    int res = se->DBCall ((first) ? DBOP_GETFIRST : DBOP_GETNEXT,1,sreq,&sstmt,&rb);
+    sreq->ClearParams ();
+    if (res == DBCALL_SUCCESS) {
+      pkold = *(rb.First()->rec[0]->GetPrimKey()) ;
+
+      char pattern[64],outstring[128],hexstring[128];
+      LoadString (MyInstance,IDTRANSFER,pattern,sizeof(pattern));
+      ToHex (hexstring,LPSTR(&pkold),GetBlockSize(pkold.Data));
+      wsprintf (outstring,pattern,LPSTR(hexstring));
+      ShowMsg (outstring);
+      UpdateWindow (hCvWnd);
+
+      dreq->SetParam (1,&DestTableID,sizeof(DestTableID));
+      for (i = 0 ; i < DestParamPtr; i++)
+        dreq->SetParam (i+2,DestParam[i],GetBlockSize(DestParam[i]));
+
+      LPDBRECORD rdest = DestFromSource (rb.First()->rec[0],ft,dest);
+      RecBuffer rbdest;
+      lmemset (&rbdest,'\0',sizeof(rbdest));
+      rbdest.AddLine (WORD(dreq->AnzTables),ADDLINEPOS_START);
+      rbdest.First()->rec[0] = rdest;
+
+      res = de->DBCall (DBOP_INSERT,1,dreq,&dstmt,&rbdest);
+      dreq->ClearParams ();
+      rb.Clear ();
+      rbdest.Clear ();
+      if (res != DBCALL_SUCCESS) {
+        CCmp->wError = CVCMPERROR_INSERROR;
+        break ;
+        }
+      }
+    else
+      break ;
+    }
+  FreeFromTo (ft);
+
+  se->DBCall (DBOP_RESET,0,NULL,&sstmt,NULL);
+  de->DBCall (DBOP_RESET,0,NULL,&dstmt,NULL);
+  
+  // Fertig
+  FreeGlobMem (sreq);
+  FreeGlobMem (dreq);
+  FreeTableDef (source);
+  FreeTableDef (dest);
+
+  ClearParamStacks(); 
+  }
+
+// Syntaxdefinition
+#define INITERM(A,B) ((struct syntax_node *) ((A) + ((B) << 8)))
+
+
+extern syntax_node cvsyntax;
+syntax_node cvend     = { NULL , &cvsyntax , TRUE , INITERM(KEYWORD,IDC_KWXXXX) , NULL } ;
+
+extern syntax_node cvsyntax6,cvsyntax16;
+syntax_node cvsyntax20 = { &cvend     , NULL , TRUE , INITERM(KEYWORD,IDC_KWSEMICOLON) , DoIt } ;
+syntax_node cvsyntax19 = { &cvsyntax20, &cvsyntax20 , TRUE , INITERM(KEYWORD,IDC_KWSAMENAME) , SetSameName } ;
+syntax_node cvsyntax18 = { &cvsyntax19, NULL , TRUE , INITERM(KEYWORD,IDC_KWBRACECLOSE) , NULL } ;
+syntax_node cvsyntax17 = { &cvsyntax16, &cvsyntax18 , TRUE , INITERM(KEYWORD,IDC_KWCOLON) , NULL } ;
+syntax_node cvsyntax16 = { &cvsyntax17, NULL , TRUE , INITERM(STRING,0) , StoreDestParam } ;
+syntax_node cvsyntax15 = { &cvsyntax16, &cvsyntax19 , TRUE , INITERM(KEYWORD,IDC_KWBRACEOPEN) , NULL } ;
+syntax_node cvsyntax14 = { &cvsyntax15, NULL , TRUE , INITERM(UNKNOWNIDENT,0) , StoreDestAccess } ;
+syntax_node cvsyntax13 = { &cvsyntax14, NULL , TRUE , INITERM(KEYWORD,IDC_KWBY) , NULL } ;
+syntax_node cvsyntax12 = { &cvsyntax13, NULL , TRUE , INITERM(KEYWORD,IDC_KWACCESS) , NULL } ;
+syntax_node cvsyntax11 = { &cvsyntax12, NULL , TRUE , INITERM(UNKNOWNIDENT,0) , StoreDestTable } ;
+syntax_node cvsyntax10 = { &cvsyntax11, NULL , TRUE , INITERM(UNKNOWNIDENT,0) , StoreDestHandler } ;
+syntax_node cvsyntax9  = { &cvsyntax10, NULL , TRUE , INITERM(KEYWORD,IDC_KWEQUAL) , NULL } ;
+syntax_node cvsyntax8  = { &cvsyntax9 , NULL , TRUE , INITERM(KEYWORD,IDC_KWBRACECLOSE) , NULL } ;
+syntax_node cvsyntax7  = { &cvsyntax6 , &cvsyntax8  , TRUE , INITERM(KEYWORD,IDC_KWCOLON) , NULL } ;
+syntax_node cvsyntax6  = { &cvsyntax7 , NULL , TRUE , INITERM(STRING,0) , StoreSourceParam } ;
+syntax_node cvsyntax5  = { &cvsyntax6 , &cvsyntax10 , TRUE , INITERM(KEYWORD,IDC_KWBRACEOPEN) , NULL } ;
+syntax_node cvsyntax4  = { &cvsyntax5 , NULL , TRUE , INITERM(UNKNOWNIDENT,0) , StoreSourceAccess } ;
+syntax_node cvsyntax3  = { &cvsyntax4 , NULL , TRUE , INITERM(KEYWORD,IDC_KWBY) , NULL } ;
+syntax_node cvsyntax2  = { &cvsyntax3 , NULL , TRUE , INITERM(KEYWORD,IDC_KWACCESS) , NULL } ;
+syntax_node cvsyntax1  = { &cvsyntax2 , NULL , TRUE , INITERM(UNKNOWNIDENT,0) , StoreSourceTable } ;
+syntax_node cvsyntax   = { &cvsyntax1 , NULL , TRUE , INITERM(UNKNOWNIDENT,0) , StoreSourceHandler } ;
+                                      
+extern HWND hRsWnd;
+BOOL DoDBConv (HWND hWnd,LPSTR fname)
+  {
+  ConvCompiler FAR *c = new ConvCompiler ();
+  CCmp = c;
+  hCvWnd = hRsWnd = hWnd;
+  char pattern[64];
+  char outtxt[128];
+  LoadString (MyInstance,ID_CVCMPHEADLINE,pattern,sizeof(pattern));
+  wsprintf (outtxt,pattern,fname);
+  ShowMsg (outtxt,TRUE);
+  UpdateWindow (hCvWnd);
+  c->DoParse (fname,&cvsyntax,NULL);
+  LoadString (MyInstance,ID_CONVDONE,outtxt,sizeof(outtxt));
+  ShowMsg (outtxt,TRUE);
+  ClearParamStacks();
+  return (c->wError == 0) ;
+  }
+

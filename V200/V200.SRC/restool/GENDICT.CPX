@@ -1,0 +1,759 @@
+////////////////////////////////////////////////////////////////
+//  Generieren des Datadictionarys
+////////////////////////////////////////////////////////////////
+//  $Header:   P:/marille/clinicum/restool/rev/gendict.cpv   1.13   17 Jun 1996 16:53:10   HANNES  $
+//  $Log:   P:/marille/clinicum/restool/rev/gendict.cpv  $
+// 
+//    Rev 1.13   17 Jun 1996 16:53:10   HANNES
+// Eifuehrung von BLOBS
+// 
+//    Rev 1.12   04 Feb 1996 21:49:14   HANNES
+// 
+//    Rev 1.11   04 Feb 1996 17:00:38   HANNES
+// Protyp LogMsg
+// 
+//    Rev 1.10   02 Feb 1996 10:50:38   GERHOLD
+// 1.Umstellung auf 32 Bit
+// 
+//    Rev 1.9   02 Apr 1995 13:33:26   HANNES
+//  
+// 
+//    Rev 1.8   31 Mar 1995 18:23:34   HANNES
+//  
+// 
+//    Rev 1.7   16 Feb 1995 12:33:12   HANNES
+// Erweiterung um verbesserte DB - Tools
+// 
+//    Rev 1.6   29 Jan 1995 11:48:00   HANNES
+// 
+//    Rev 1.5   10 Jan 1995 15:01:04   HANNES
+// 
+//    Rev 1.4   02 Jan 1995 09:30:20   GERHOLD
+// Umstellung auf MDI
+// 
+//    Rev 1.3   16 Nov 1994 18:13:26   HANNES
+// ClearRowDef auch bei normalen Tabellen
+// 
+//    Rev 1.2   09 Aug 1994 10:08:04   HANNES
+// Time eingebaut
+// 
+//    Rev 1.1   04 Jul 1994 20:25:34   HANNES
+// 
+//    Rev 1.0   24 Jun 1994 16:54:46   HANNES
+// Neuuebernahme clinicum
+//
+
+#include <windows.h>
+#include <stdio.h>
+#include "dds32.h"
+
+#include "globmem.h"
+#include "btrieve.hpp"
+#include "hash.hpp"
+#include "compile.hpp"
+#include "restool.hpp"
+#define MODULENUM 36
+#include "winass.hpp"
+
+#include "dlladmin.h"
+#include "dlladmin.hpp"
+#include "tbdef.hpp"
+
+void CreateFullTable (LPSTR DLLName,LPSTR FileName,WORD TableID);
+
+extern HANDLE MyInstance;
+class ResCompiler : public compiler {
+ public :
+  virtual DLLExport void _export WINAPI LoadKwHash (void);
+  virtual DLLExport BOOL _export WINAPI TestError (void);
+
+  ResCompiler () : compiler (NULL) { }
+  };
+
+HWND hRsWnd;
+
+DLLExport void _export WINAPI ResCompiler::LoadKwHash ()
+  {
+  hash *h = FixKwHash ();
+  for (int i = 0 ; ; i++) {
+    char instring[50];
+    LoadString (HINSTANCE(MyInstance),RSKW_BASE+i,instring,sizeof (instring));
+    if (lstrcmp (instring,"END") == 0) break ;
+    else h->SetData (instring,&i,sizeof (WORD));
+    }
+  ReleaseKwHash ();
+  }
+
+DLLExport BOOL _export WINAPI ResCompiler::TestError ()
+  {
+  if (wError > RSCMPERROR_BASE) {
+    char pattern[64];
+    char errstr[64];
+    LoadString (HINSTANCE(MyInstance),RSCMPERROR_BASE,pattern,sizeof(pattern));
+    LoadString (HINSTANCE(MyInstance),wError,errstr,sizeof(errstr));
+    char outtxt[256];
+    wsprintf (outtxt,pattern,fmname,LineNr,column,LPSTR(errstr));
+    if (GetCommandLineFlag())
+      LogMsg (outtxt);
+    else
+      MessageBox (hRsWnd,outtxt,"Resourcefehler",MB_OK | MB_TASKMODAL);
+    return TRUE ;
+    }
+  else
+    return compiler::TestError ();
+  }
+
+static ResCompiler FAR *RCmp;
+
+/////////////////////////////////////////////////////////////////////////
+//  Meldungen
+/////////////////////////////////////////////////////////////////////////
+static int AnzMsgs;
+static LPSTR Message[128];
+BOOL stopOutput = FALSE;
+BOOL doAnalyse;
+
+void ToggleOutputState (HMENU hmenu)
+  {
+  if (stopOutput)
+    CheckMenuItem (hmenu,MI_OUTPUTOPT,MF_CHECKED) , stopOutput = FALSE ;
+  else
+    CheckMenuItem (hmenu,MI_OUTPUTOPT,MF_UNCHECKED) , stopOutput = TRUE ;
+  }
+
+void ShowMsg (LPSTR Text,BOOL priority)
+  {
+  if ((stopOutput) && (!priority)) return ;
+
+  TEXTMETRIC tm;
+  HDC hDC = GetDC (hRsWnd);
+  GetTextMetrics (hDC,&tm);
+  SetTextAlign (hDC,TA_LEFT | TA_TOP);
+  int ystart = 3 + AnzMsgs * tm.tmHeight;
+  RECT r;
+  GetClientRect (hRsWnd,&r);
+  if (ystart + tm.tmHeight < r.bottom) {
+    // Text hat noch platz
+    Message[AnzMsgs] = LPSTR (GetGlobMem (lstrlen(Text)+1));
+    lstrcpy (Message[AnzMsgs],Text);
+    AnzMsgs ++ ;
+    r.top    = ystart;
+    r.bottom = ystart + tm.tmHeight;
+    InvalidateRect (hRsWnd,&r,TRUE);
+    }
+  else {
+    // Es muss gescrollt werden
+    ScrollWindow (hRsWnd,0,-tm.tmHeight,NULL,NULL);
+    FreeGlobMem (Message[0]);
+    for (int i = 1 ; i < AnzMsgs ; i++) {
+      Message[i-1] = Message[i];
+      }
+    Message[AnzMsgs-1] = LPSTR (GetGlobMem (lstrlen(Text)+1));
+    lstrcpy (Message[AnzMsgs-1],Text);
+    int ystart = 3 + (AnzMsgs - 1) * tm.tmHeight;
+    r.top    = ystart;
+    r.bottom = ystart + tm.tmHeight;
+    InvalidateRect (hRsWnd,&r,FALSE);
+    }
+  ReleaseDC (hRsWnd,hDC);
+  }
+
+void PaintMessages (HDC hDC)
+  {
+  TEXTMETRIC tm;
+  GetTextMetrics (hDC,&tm);
+  SetTextAlign (hDC,TA_LEFT | TA_TOP);
+  int y = 3 ;
+  for (int i = 0 ; i < 128 ; i++) {
+    if (Message[i] != NULL) {
+      TextOut (hDC,20,y,Message[i],lstrlen(Message[i]));
+      y += tm.tmHeight;
+      }
+    else
+      break ;
+    }
+  }
+
+void FreeMsgs ()
+  {
+  AnzMsgs = 0;
+  for (int i = 0 ; i < 128 ; i++) {
+    if (Message[i] != NULL) {
+      FreeGlobMem (Message[i]);
+      Message[i] = NULL;
+      }
+    }
+  }
+
+/////////////////////////////////////////////////////////////////////////
+//  Codegenerierung
+/////////////////////////////////////////////////////////////////////////
+#define MAXSIZE     64
+#define MAXDLLSIZE  20
+static char ActName[MAXSIZE];
+static char ActTableName[MAXSIZE];
+static char ActDLLName[MAXDLLSIZE];
+static WORD TableIDMin,TableIDMax;
+static WORD VarType;
+struct TableList { 
+  TableList FAR *Next ; 
+  WORD TableID ; 
+  LPSTR DLLName;
+  LPVOID TableData;
+  char FileName[13];
+  char Name[1] ; 
+  };
+TableList FAR *TBList;
+static void PushToTableList (WORD TableID,LPSTR Name,LPSTR FileName,LPSTR DLLName,LPVOID TableData)
+  {
+  TableList FAR *n = (TableList FAR *)GetGlobMem (sizeof(*n) + lstrlen(Name));
+  n->Next      = TBList;
+  TBList       = n;
+  n->TableID   = TableID;
+  n->DLLName   = LPSTR(GetGlobMem (lstrlen(DLLName)+1));
+  lstrcpy (n->DLLName,DLLName);
+  n->TableData = TableData ;
+  lstrcpy (n->Name,Name);
+  lstrcpy (n->FileName,FileName);
+  }
+static void FreeTableList (BOOL CreateLists)
+  {
+  for ( ; TBList != NULL ; ) {
+    TableList FAR *n = TBList->Next;
+
+    // Freigeben der Tabellendaten
+    LPDLLADMIN dlladmin = GetDLLAdmin();
+    DLLHANDLE dllnmbr = dlladmin->LoadDLL(TBList->DLLName);
+    dlladmin->GetDLLEntry(dllnmbr)->DataDict_FreeTableDef (TBList->TableData);
+
+    // Erzeugen der Gesamtdefinition
+    if (CreateLists)
+      CreateFullTable (TBList->DLLName,TBList->FileName,TBList->TableID);
+
+    // Meldung
+    char pattern[64];
+    char outtxt[128];
+    LoadString (HINSTANCE(MyInstance),ID_CFULLTABLE,pattern,sizeof(pattern));
+    wsprintf (outtxt,pattern,TBList->DLLName,TBList->Name);
+    ShowMsg (outtxt,TRUE);
+    UpdateWindow (hRsWnd);
+
+    // Fertig
+    FreeGlobMem (TBList->DLLName);
+
+    FreeGlobMem (TBList);
+    TBList = n;
+    }
+  if (CreateLists)
+    CreateDataDictContent ();
+  }
+static LPVOID GetTableData (LPSTR Name,LPSTR DLLName,WORD FAR *TableID)
+  {
+  for (TableList FAR *n = TBList ; n != NULL ; n = n->Next) {
+    if ((lstrcmp (n->Name,Name) == 0) && (lstrcmp (n->DLLName,DLLName) == 0)) {
+      *TableID = n->TableID;
+      return n->TableData;
+      }
+    }
+  return NULL;
+  }
+
+DLLExport void _export StoreName ()
+  {
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0));
+  WIN_ASSERT (lstrlen(Name + 2) < MAXSIZE);
+  lstrcpy (ActName,Name+2);
+  GlobalUnlock (RCmp->hPars0);
+  }
+DLLExport void _export StoreDLLName ()
+  {
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0));
+  WIN_ASSERT (lstrlen(Name + 2) < MAXDLLSIZE);
+  lstrcpy (ActDLLName,Name+2);
+  GlobalUnlock (RCmp->hPars0);
+  }
+DLLExport void _export StoreActTable ()
+  {
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0));
+  WIN_ASSERT (lstrlen(Name + 2) < MAXSIZE);
+  lstrcpy (ActTableName,Name+2);
+  GlobalUnlock (RCmp->hPars0);
+  }
+DLLExport void _export StoreMinIdent ()
+  {
+  TableIDMin = WORD (RCmp->scv.v.int_val);
+  }
+DLLExport void _export StoreMaxIdent ()
+  {
+  TableIDMax = WORD (RCmp->scv.v.int_val);
+  }
+static char ActFileName[13];
+static LPSTR GetFName(LPVOID fname)
+  {
+  LPSTR h = LPSTR(fname);
+  LPSTR start = h;
+  for ( ; *h ; h++) {
+    if ((*h == '\\') || (*h == ':')) start = h+1;
+    }
+  WIN_ASSERT (lstrlen(start) < 13);
+  AnsiUpper (start);
+  return start;
+  }
+static void SetActFileName (LPSTR fName)
+  {
+  lstrcpy (ActFileName,GetFName(fName));
+  }
+
+DLLExport void _export GenerateTable ()
+  {
+  LPSTR data = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);
+
+  // Ausgabe
+  char pattern[64];
+  char outtxt[128];
+  LoadString (HINSTANCE(MyInstance),ID_TABLEPATTERN,pattern,sizeof(pattern));
+  wsprintf (outtxt,pattern,LPSTR(ActDLLName),LPSTR(ActName));
+  ShowMsg (outtxt);
+  UpdateWindow (hRsWnd);
+
+  // Aufruf des DLL - spezifischen Compilers
+  LPDLLADMIN dlladmin = GetDLLAdmin();
+  DLLHANDLE dllnmbr = dlladmin->LoadDLL(ActDLLName);
+  DWORD size;
+  BOOL error;
+  char fname[128],_fname[128];
+  GetIncludeFileName (data,fname,_fname);
+  LPVOID Res = dlladmin->GetDLLEntry(dllnmbr)->DataDict_TableDef (NULL,fname,&error,&size);
+  if (error) {
+    RCmp->wError = RSCMPERROR_GENERROR;
+    return;
+    }
+
+  // Speichern der Daten
+  WORD resnmbr = dlladmin->LoadResDLL();
+  BOOL changed;
+  WORD TableID = dlladmin->GetDLLEntry(resnmbr)->DataRes_SetTableDef (ActDLLName,ActName,TableIDMin,TableIDMax,Res,size,&changed);
+  // Die Serverinfo schreiben
+  GLOBALHANDLE hGTxt = dlladmin->GetDLLEntry(dllnmbr)->DataDict_LastServerSource ();
+  LPSTR ServerText = LPSTR(GlobalLock (hGTxt));
+  dlladmin->GetDLLEntry(resnmbr)->DataRes_SetServerSource (ActDLLName,TableID,ActName,ServerText,GlobalSize(hGTxt));
+  GlobalUnlock (hGTxt);
+  GlobalFree (hGTxt);
+
+  // Alle Spaltendefinitionen loeschen
+  dlladmin->GetDLLEntry(resnmbr)->DataRes_ClearRowDefs(ActDLLName,TableID);
+
+  // fertig
+  PushToTableList (TableID,ActName,ActFileName,ActDLLName,Res);
+
+  GlobalUnlock (RCmp->hPars0);
+  }
+DLLExport void _export SetVarType ()
+  {
+  static struct kwToVt { int kw ; WORD vType ; } ktv [] = {
+    { KWVARLONG    , VAR_LONG    } ,
+    { KWVARDEC     , VAR_DEC     } ,
+    { KWVARSTR     , VAR_STR     } ,
+    { KWVARPOINT   , VAR_POINT   } ,
+    { KWVARCONT    , VAR_CONT    } ,
+    { KWVARSTRARR  , VAR_STRARR  } ,
+    { KWVARFLAG    , VAR_FLAG    } ,
+    { KWVARSCALE   , VAR_SCALE   } ,
+    { KWVARDATE    , VAR_DATE    } ,
+    { KWVARTIME    , VAR_TIME    } ,
+    { KWVARDWORD   , VAR_DWORD   } ,
+    { KWVAROBJ     , VAR_OBJ     }
+    };
+  #define ANZKW (sizeof(ktv) / sizeof (kwToVt))
+  VarType = -1;
+  for (int i = 0 ; i < ANZKW ; i++) {
+    if (int (RCmp->scv.v.k_ident) == ktv[i].kw) {
+      VarType = ktv[i].vType ;
+      }
+    }
+  WIN_ASSERT (VarType >= 0);
+  }
+DLLExport void _export GenerateColumn ()
+  {
+  LPSTR data = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);
+
+  // Ausgabe
+  char pattern[64];
+  char outtxt[128];
+  LoadString (HINSTANCE(MyInstance),ID_COLUMNPATTERN,pattern,sizeof(pattern));
+  wsprintf (outtxt,pattern,LPSTR(ActDLLName),LPSTR(ActName),LPSTR(ActTableName));
+  ShowMsg (outtxt);
+  UpdateWindow (hRsWnd);
+
+  // Aufruf des DLL - spezifischen Compilers
+  LPDLLADMIN dlladmin = GetDLLAdmin();
+  DLLHANDLE dllnmbr = dlladmin->LoadDLL(ActDLLName);
+  WORD TableID;
+  LPVOID TableData = GetTableData (ActTableName,ActDLLName,&TableID);
+  if (TableData == NULL) {
+    RCmp->wError = RSCMPERROR_NOTABLE;
+    return;
+    }
+  DWORD size;
+  BOOL error;
+  LPVOID Res = dlladmin->GetDLLEntry(dllnmbr)->DataDict_VarDef (NULL,VarType,TableData,data,&error,&size);
+  if (error) {
+    RCmp->wError = RSCMPERROR_GENERROR;
+    return;
+    }
+
+  // Speichern der Daten
+  int resnmbr = dlladmin->LoadResDLL();
+  BOOL changed;
+  dlladmin->GetDLLEntry(resnmbr)->DataRes_SetRowDef (ActDLLName,TableID,ActName,Res,size,&changed);
+  dlladmin->GetDLLEntry(dllnmbr)->DataDict_FreeVarDef (Res);
+
+  // fertig
+  GlobalUnlock (RCmp->hPars0);
+  }
+
+static char internName[64],internVarName[64],externVarName[64];
+static BOOL doNextNew;
+DLLExport void _export _StoreInternName (int mn,int mx)
+  {
+  // Speichern des Names
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);
+  if (doAnalyse) {
+    AnalyseInternTableName (Name);
+    }
+  else {
+    WIN_ASSERT (lstrlen(Name) < sizeof(internName));
+    lstrcpy (internName,Name);
+
+    // Ermitteln der TableID
+    LPDLLADMIN dlladmin = GetDLLAdmin();
+    WORD resnmbr = dlladmin->LoadResDLL();
+    BOOL changed;
+    WORD dummy = 0;
+    WORD TableID = dlladmin->GetDLLEntry(resnmbr)->DataRes_SetTableDef (GetInternDLLName(),internName,mn,mx,&dummy,sizeof(dummy),&changed);
+
+    // Alle Spaltendefinitionen loeschen
+    dlladmin->GetDLLEntry(resnmbr)->DataRes_ClearRowDefs(GetInternDLLName(),TableID);
+
+    // Ausgabe
+    char pattern[64];
+    char outtxt[128];
+    LoadString (HINSTANCE(MyInstance),ID_INTERNTABLEPATTERN,pattern,sizeof(pattern));
+    wsprintf (outtxt,pattern,Name);
+    ShowMsg (outtxt);
+    UpdateWindow (hRsWnd);
+
+    // fertig
+    PushToTableList (TableID,internName,ActFileName,GetInternDLLName(),&dummy);
+    }
+  GlobalUnlock (RCmp->hPars0);
+  doNextNew = FALSE ;
+  }
+
+DLLExport void _export _StoreInternName_int ()
+  {
+  _StoreInternName (INTERNTBIDMIN,INTERNTBIDMIN);
+  }
+DLLExport void _export _StoreInternName_glob ()
+  {
+  _StoreInternName (GLOBALTBIDMIN,GLOBALTBIDMIN);
+  }
+
+static LPINTTABLE Tb;
+void ClearInternTable () 
+  { 
+  if (Tb != NULL) Clear (Tb) ; 
+  Tb = NULL ; 
+  }
+
+static BOOL VarIsPrimary;
+DLLExport void _export _StoreInternVarName ()
+  {
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);
+  if (doAnalyse) {
+    AnalyseInternVarName (Name);
+    }
+  else {
+    WIN_ASSERT (lstrlen(Name) < sizeof(internVarName));
+    lstrcpy (internVarName,Name);
+    }
+  GlobalUnlock (RCmp->hPars0);
+  VarIsPrimary = FALSE ;
+  }
+
+DLLExport void _export _StoreExternVarName ()
+  {
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);
+  if (doAnalyse)
+    AnalyseExternVarName(Name);
+  else {
+    WIN_ASSERT (lstrlen(Name) < sizeof(externVarName));
+    lstrcpy (externVarName,Name);
+    }
+  GlobalUnlock (RCmp->hPars0);
+  }
+
+DLLExport void _export _SetVarAsPrimary ()
+  {
+  VarIsPrimary = TRUE ;
+  }
+
+DLLExport void _export _NextTable ()
+  {
+  if (doAnalyse)
+    AnalyseNextTable ();
+  else
+    doNextNew = TRUE ;
+  }
+
+DLLExport void _export _AddInternVar ()
+  {
+  LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);  // externe Tabellenname
+  if (doAnalyse) {
+    AnalyseAddInternVar (Name);
+    }
+  else {
+    WIN_ASSERT (lstrlen(Name) < sizeof(externVarName));
+    if ((Tb == NULL) || (doNextNew) || (!Tb->IsTableReferenced(Name))) {
+      switch (AddTablePart (&Tb,Name,doNextNew,TRUE)) {
+        case ATP_TABLENOTFOUND  :
+          RCmp->wError = RSCMPERROR_NOTABLE;
+          break;
+        case ATP_ORDER          :
+          RCmp->wError = RSCMPERROR_ORDER;
+          break;
+        }
+      }
+    if (!RCmp->wError) {
+      switch (Tb->AddVar (externVarName,VarType)) {
+        case ATV_VARNOTFOUND  :
+          RCmp->wError = RSCMPERROR_NOVARINTABLE;
+          break;
+        case ATV_DATATYPE          :
+          RCmp->wError = RSCMPERROR_INCOMPATIBLE;
+          break;
+        }
+      }
+
+    // Ausgabe
+    char pattern[64];
+    char outtxt[128];
+    LoadString (HINSTANCE(MyInstance),ID_ADDJOINVAR,pattern,sizeof(pattern));
+    wsprintf (outtxt,pattern,Name,LPSTR(externVarName),LPSTR(internVarName),LPSTR(internName));
+    ShowMsg (outtxt);
+    UpdateWindow (hRsWnd);
+
+    // Variablendefinition speichern
+    LPDLLADMIN dlladmin = GetDLLAdmin();
+    WORD TableID;
+    GetTableData (internName,GetInternDLLName(),&TableID);
+    int resnmbr = dlladmin->LoadResDLL();
+    BOOL changed;
+    char buffer[512];
+    LPINTVARDESC lpi = LPINTVARDESC(buffer);
+    lpi->mType    = VarType;
+    lpi->IsPrimary = VarIsPrimary;
+    LPSTR h = LPSTR(lpi + 1) ;
+    lstrcpy (h,Name);
+    h += lstrlen(h) + 1;
+    lstrcpy (h,externVarName);
+    h += lstrlen(h) + 1;
+    dlladmin->GetDLLEntry(resnmbr)->DataRes_SetRowDef (GetInternDLLName(),TableID,internVarName,buffer,h-LPSTR(buffer),&changed);
+    }
+
+  GlobalUnlock (RCmp->hPars0);
+  doNextNew = FALSE ;
+  }
+
+DLLExport void _export _AddGlobVar ()
+  {
+  if (Tb == NULL)
+    CreateEmptyInternTable (&Tb);
+
+  // Ausgabe
+  char pattern[64];
+  char outtxt[128];
+  LoadString (HINSTANCE(MyInstance),ID_GLOBVAR,pattern,sizeof(pattern));
+  wsprintf (outtxt,pattern,LPSTR(internVarName),LPSTR(internName));
+  ShowMsg (outtxt);
+  UpdateWindow (hRsWnd);
+
+  // Variablendefinition speichern
+  LPDLLADMIN dlladmin = GetDLLAdmin();
+  WORD TableID;
+  GetTableData (internName,GetInternDLLName(),&TableID);
+  int resnmbr = dlladmin->LoadResDLL();
+  BOOL changed;
+  char buffer[512];
+  LPINTVARDESC lpi = LPINTVARDESC(buffer);
+  lpi->mType     = VarType;
+  lpi->IsPrimary = FALSE;
+  LPSTR h = LPSTR(lpi + 1) ;
+  lstrcpy (h,"");
+  h += lstrlen(h) + 1;
+  lstrcpy (h,"");
+  h += lstrlen(h) + 1;
+  dlladmin->GetDLLEntry(resnmbr)->DataRes_SetRowDef (GetInternDLLName(),TableID,internVarName,buffer,h-LPSTR(buffer),&changed);
+
+  GlobalUnlock (RCmp->hPars0);
+  }
+
+DLLExport void _export _StoreIntTbData ()
+  {
+  if (!doAnalyse) {
+    DWORD gSize;
+    GLOBALHANDLE hGres;
+    LPINTTABLE res = Pack(Tb,&hGres,&gSize);
+
+    LPDLLADMIN dlladmin = GetDLLAdmin();
+    WORD resnmbr = dlladmin->LoadResDLL();
+    BOOL changed;
+    dlladmin->GetDLLEntry(resnmbr)->DataRes_SetTableDef (GetInternDLLName(),internName,INTERNTBIDMIN,INTERNTBIDMAX,res,gSize,&changed);
+    GlobalUnlock (hGres);
+    GlobalFree (hGres);
+
+    Clear (Tb);
+    Tb = NULL;
+    }
+  }
+
+DLLExport void _export _InsertBehind ()
+  {
+  if (doAnalyse) {
+    LPSTR Name = LPSTR(GlobalLock (RCmp->hPars0)) + sizeof(WORD);
+    AnalyseInsertTableBehind (Name);
+    GlobalUnlock (RCmp->hPars0);
+    }
+  }
+/////////////////////////////////////////////////////////////////////////
+//  Syntax des Resourcecompilers
+/////////////////////////////////////////////////////////////////////////
+#define INITERM(A,B) ((struct syntax_node *) ((A) + ((B) << 8)))
+
+syntax_node datatype10   = { NULL , NULL        , TRUE , INITERM(KEYWORD,KWVARLONG  ) , SetVarType } ;
+syntax_node datatype9    = { NULL , &datatype10 , TRUE , INITERM(KEYWORD,KWVARDEC   ) , SetVarType } ;
+syntax_node datatype8    = { NULL , &datatype9  , TRUE , INITERM(KEYWORD,KWVARSTR   ) , SetVarType } ;
+syntax_node datatype7    = { NULL , &datatype8  , TRUE , INITERM(KEYWORD,KWVARPOINT ) , SetVarType } ;
+syntax_node datatype6    = { NULL , &datatype7  , TRUE , INITERM(KEYWORD,KWVARCONT  ) , SetVarType } ;
+syntax_node datatype5    = { NULL , &datatype6  , TRUE , INITERM(KEYWORD,KWVARSTRARR) , SetVarType } ;
+syntax_node datatype4    = { NULL , &datatype5  , TRUE , INITERM(KEYWORD,KWVARFLAG  ) , SetVarType } ;
+syntax_node datatype3    = { NULL , &datatype4  , TRUE , INITERM(KEYWORD,KWVARSCALE ) , SetVarType } ;
+syntax_node datatype2a   = { NULL , &datatype3  , TRUE , INITERM(KEYWORD,KWVARTIME  ) , SetVarType } ;
+syntax_node datatype2    = { NULL , &datatype2a , TRUE , INITERM(KEYWORD,KWVARDATE  ) , SetVarType } ;
+syntax_node datatype1    = { NULL , &datatype2  , TRUE , INITERM(KEYWORD,KWVARDWORD ) , SetVarType } ;
+syntax_node datatype     = { NULL , &datatype1  , TRUE , INITERM(KEYWORD,KWVAROBJ   ) , SetVarType } ;
+
+extern syntax_node columndef5;
+syntax_node columndef10  = { NULL          , NULL        , TRUE  , INITERM(KEYWORD,KWSEMICOLON)   , NULL } ;
+syntax_node columndef9   = { &columndef10  , NULL        , TRUE  , INITERM(KEYWORD,KWBRACECLOSE)  , NULL } ;
+syntax_node columndef8   = { &columndef5   , &columndef9 , TRUE  , INITERM(KEYWORD,KWCOLON)       , NULL } ;
+syntax_node columndef7   = { &columndef8   , NULL        , TRUE  , INITERM(STRING,0)              , GenerateColumn } ;
+syntax_node columndef6   = { &columndef7   , NULL        , TRUE  , INITERM(KEYWORD,KWDOPPELPUNKT) , NULL } ;
+syntax_node columndef5   = { &columndef6   , NULL        , TRUE  , INITERM(UNKNOWNIDENT,0)        , StoreDLLName } ;
+syntax_node columndef4   = { &columndef5   , NULL        , TRUE  , INITERM(KEYWORD,KWBRACEOPEN)   , NULL } ;
+syntax_node columndef3   = { &columndef4   , NULL        , TRUE  , INITERM(KEYWORD,KWEQUAL)       , NULL } ;
+syntax_node columndef2   = { &columndef3   , NULL        , TRUE  , INITERM(UNKNOWNIDENT,0)        , StoreName } ;
+syntax_node columndef1   = { &columndef2   , NULL        , FALSE , &datatype                      , NULL } ;
+syntax_node columndef    = { &columndef1   , NULL        , TRUE  , INITERM(UNKNOWNIDENT,0)        , StoreActTable } ;
+
+extern syntax_node tabledef10;
+syntax_node tabledef15  = { NULL         , NULL        , TRUE  , INITERM(KEYWORD,KWSEMICOLON)     , NULL } ;
+syntax_node tabledef14  = { &tabledef15  , NULL        , TRUE  , INITERM(KEYWORD,KWBRACECLOSE)    , NULL } ;
+syntax_node tabledef13  = { &tabledef10  , &tabledef14 , TRUE  , INITERM(KEYWORD,KWCOLON)         , NULL } ;
+syntax_node tabledef12  = { &tabledef13  , NULL        , TRUE  , INITERM(STRING,0)                , GenerateTable } ;
+syntax_node tabledef11  = { &tabledef12  , NULL        , TRUE  , INITERM(KEYWORD,KWDOPPELPUNKT)   , NULL } ;
+syntax_node tabledef10  = { &tabledef11  , NULL        , TRUE  , INITERM(UNKNOWNIDENT,0)          , StoreDLLName } ;
+syntax_node tabledef9   = { &tabledef10  , NULL        , TRUE  , INITERM(KEYWORD,KWBRACEOPEN)     , NULL } ;
+syntax_node tabledef8   = { &tabledef9   , NULL        , TRUE  , INITERM(KEYWORD,KWEQUAL)         , NULL } ;
+syntax_node tabledef7   = { &tabledef8   , NULL        , TRUE  , INITERM(KEYWORD,KWCURBRACECLOSE) , NULL } ;
+syntax_node tabledef6   = { &tabledef7   , NULL        , TRUE  , INITERM(T_INTEGER,0)             , StoreMaxIdent } ;
+syntax_node tabledef5   = { &tabledef6   , NULL        , TRUE  , INITERM(KEYWORD,KWCOLON)         , NULL } ;
+syntax_node tabledef4   = { &tabledef5   , NULL        , TRUE  , INITERM(T_INTEGER,0)             , StoreMinIdent } ;
+syntax_node tabledef3   = { &tabledef4   , NULL        , TRUE  , INITERM(KEYWORD,KWCURBRACEOPEN)  , NULL } ;
+syntax_node tabledef2   = { &tabledef3   , NULL        , TRUE  , INITERM(KEYWORD,KWIN)            , NULL } ;
+syntax_node tabledef1   = { &tabledef2   , NULL        , TRUE  , INITERM(UNKNOWNIDENT,0)          , StoreName } ;
+syntax_node tabledef    = { &tabledef1   , NULL        , TRUE  , INITERM(KEYWORD,KWTABLE)         , NULL } ;
+
+syntax_node intprim1     = { NULL      , NULL      , TRUE  , INITERM(KEYWORD,KWPRIMKEY) , _SetVarAsPrimary } ;
+syntax_node intprim      = { &intprim1 , NULL      , TRUE  , INITERM(KEYWORD,KWAS) , NULL } ;
+
+extern syntax_node globtbl4;
+syntax_node globtbl8     = { NULL       , NULL      , TRUE  , INITERM(KEYWORD,KWSEMICOLON)      , _StoreIntTbData } ;
+syntax_node globtbl7     = { &globtbl8  , &globtbl4 , TRUE  , INITERM(KEYWORD,KWCURBRACECLOSE) , NULL } ;
+syntax_node globtbl6     = { &globtbl7  , NULL      , TRUE  , INITERM(KEYWORD,KWSEMICOLON)      , _AddGlobVar } ;
+syntax_node globtbl5     = { &globtbl6  , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0)           , _StoreInternVarName } ;
+syntax_node globtbl4     = { &globtbl5  , NULL      , FALSE , &datatype                         , NULL } ;
+syntax_node globtbl3     = { &globtbl4  , NULL      , TRUE  , INITERM(KEYWORD,KWCURBRACEOPEN)   , NULL } ;
+syntax_node globtbl2     = { &globtbl3  , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0)           , _StoreInternName_glob } ;
+syntax_node globtbl1     = { &globtbl2  , NULL      , TRUE  , INITERM(KEYWORD,KWTABLE)          , NULL } ;
+syntax_node globaltable  = { &globtbl1  , NULL      , TRUE  , INITERM(KEYWORD,KWGLOBAL)         , NULL } ;
+
+extern syntax_node inttbl20;
+syntax_node inttbl13     = { NULL      , NULL      , TRUE  , INITERM(KEYWORD,KWSEMICOLON)     , _StoreIntTbData } ;
+syntax_node inttbl12     = { &inttbl13 , &inttbl20 , TRUE  , INITERM(KEYWORD,KWCURBRACECLOSE) , NULL } ;
+syntax_node inttbl11     = { &inttbl12 , NULL      , TRUE  , INITERM(KEYWORD,KWSEMICOLON)     , NULL } ;
+syntax_node inttbl10     = { &inttbl11 , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0)          , _AddInternVar } ;
+syntax_node inttbl9      = { &inttbl10 , NULL      , TRUE  , INITERM(KEYWORD,KWFROM)          , NULL } ;
+syntax_node inttbl8      = { &inttbl9  , &inttbl9  , FALSE , &intprim                         , NULL } ;
+syntax_node inttbl7      = { &inttbl8  , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0)          , _StoreExternVarName } ;
+syntax_node inttbl6      = { &inttbl7  , NULL      , TRUE  , INITERM(KEYWORD,KWEQUAL)         , NULL } ;
+syntax_node inttbl5      = { &inttbl6  , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0)          , _StoreInternVarName } ;
+syntax_node inttbl4      = { &inttbl5  , NULL      , FALSE , &datatype                        , NULL } ;
+
+syntax_node inttbl21      = { &inttbl4  , NULL  , TRUE  , INITERM(KEYWORD,KWSEMICOLON)  , NULL } ;
+syntax_node inttbl20      = { &inttbl21 , &inttbl4  , TRUE  , INITERM(KEYWORD,KWNEXTTABLE)  , _NextTable } ;
+
+extern syntax_node inttbl31;
+syntax_node inttbl33     = { &inttbl20 , NULL      , TRUE  , INITERM(KEYWORD,KWSEMICOLON) , NULL } ;
+syntax_node inttbl32     = { &inttbl31 , &inttbl33 , TRUE  , INITERM(KEYWORD,KWCOLON) , NULL } ;
+syntax_node inttbl31     = { &inttbl32 , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0) , _InsertBehind } ;
+syntax_node inttbl30     = { &inttbl31 , &inttbl20 , TRUE  , INITERM(KEYWORD,KWSORT) , NULL } ;
+
+syntax_node inttbl3      = { &inttbl30 , NULL      , TRUE  , INITERM(KEYWORD,KWCURBRACEOPEN)  , NULL } ;
+syntax_node inttbl2      = { &inttbl3  , NULL      , TRUE  , INITERM(UNKNOWNIDENT,0)          , _StoreInternName_int } ;
+syntax_node inttbl1      = { &inttbl2  , NULL      , TRUE  , INITERM(KEYWORD,KWTABLE)         , NULL } ;
+syntax_node interntable  = { &inttbl1  , NULL      , TRUE  , INITERM(KEYWORD,KWINTERN)        , NULL } ;
+
+extern syntax_node rssyntax;
+syntax_node rssyntax_end = { NULL          , &rssyntax  , TRUE  , INITERM(KEYWORD,KWENDRES) , NULL } ;
+syntax_node rssyntax3    = { &rssyntax_end , NULL       , FALSE , &globaltable              , NULL } ;
+syntax_node rssyntax2    = { &rssyntax_end , &rssyntax3 , FALSE , &interntable              , NULL } ;
+syntax_node rssyntax1    = { &rssyntax_end , &rssyntax2 , FALSE , &columndef                , NULL } ;
+syntax_node rssyntax     = { &rssyntax_end , &rssyntax1 , FALSE , &tabledef                 , NULL } ;
+
+BOOL GenResScript (HWND hWnd,LPSTR fname)
+  {
+  SetActFileName (fname);
+  ResCompiler FAR *r = new ResCompiler ();
+  RCmp = r;
+  hRsWnd = hWnd;
+  char pattern[64];
+  char outtxt[128];
+  LoadString (HINSTANCE(MyInstance),ID_RSCMPHEADLINE,pattern,sizeof(pattern));
+  wsprintf (outtxt,pattern,fname);
+  ShowMsg (outtxt,TRUE);
+  UpdateWindow (hRsWnd);
+  r->DoParse (fname,&rssyntax,NULL);
+  FreeTableList (r->wError == 0);
+  ClearInternTable ();
+  if (r->wError == 0) {
+    GetTableAdmin()->ReInitialize ();
+    }
+  return (r->wError == 0) ;
+  }
+
+void AnalyseIntTable (HWND hWnd,LPSTR fname)
+  {
+  OFSTRUCT Of;
+  int fi = OpenFile (fname,&Of,OF_EXIST);
+  doAnalyse = TRUE ;
+  if (fi >= 0) {
+    // Na versuchen wirs mal
+    SetActFileName (fname);
+    ResCompiler FAR *r = new ResCompiler ();
+    RCmp = r;
+    hRsWnd = hWnd;
+    r->DoParse (fname,&rssyntax,NULL);
+    }
+  doAnalyse = FALSE ;
+  }

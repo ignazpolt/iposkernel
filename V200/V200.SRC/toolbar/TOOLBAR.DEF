@@ -1,0 +1,11 @@
+LIBRARY         TOOLBAR
+DESCRIPTION     'MSDN TOOLBAR'
+EXETYPE         WINDOWS
+CODE            PRELOAD MOVEABLE DISCARDABLE
+DATA            PRELOAD MOVEABLE SINGLE
+HEAPSIZE        8192
+EXPORTS
+        WEP                                           @1  RESIDENTNAME
+        ?ToolbarWndProc@@ZCJIIIJ@Z                    @2
+        ?CreateToolbar@@ZCIPEDIKGHIGPFUTBBUTTON@@H@Z  @7
+        ?CreateToolbarDockWindow@@ZCII@Z              @8

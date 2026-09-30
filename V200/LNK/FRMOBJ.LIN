@@ -1,0 +1,17 @@
+COPY ..\..\%ACTVERS%.SRC\FRMOBJ\FRMO.DEF
+COPY ..\..\%ACTVERS%.SRC\FRMOBJ\FRMO1.DEF
+COPY ..\..\%ACTVERS%.SRC\FRMOBJ\frmobj.LNK
+COPY ..\..\%ACTVERS%.SRC\FRMOBJ\frmobj1.LNK
+
+link /nod /noe /co /li /map @frmobj.lnk
+rc -r -v -z -fofrmobj.res ..\..\%ACTVERS%.SRC\FRMOBJ\frmobj.rc
+rc -T -K frmobj.res frmobj.dll
+copy frmobj.dll ..\*.*
+implib frmobj.lib frmobj.dll
+copy frmobj.lib ..\*.*
+
+link /nod /noe /co /li /map @frmobj1.lnk
+rc -T -K frmobj.res frmobj1.dll
+implib frmobj1.lib frmobj1.dll
+copy frmobj1.lib ..\restool
+copy frmobj1.dll ..\restool

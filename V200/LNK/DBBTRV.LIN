@@ -1,0 +1,19 @@
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\DBBT.DEF
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\DBBT1.DEF
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv.DEF
+
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv.LNK
+COPY ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv1.LNK
+
+link /nod /noe /co /li /map @dbbtrv.lnk
+rc -r -v -z -fodbbtrv.res ..\..\%ACTVERS%.SRC\DBBTRV\dbbtrv.rc
+rc -T -K dbbtrv.res dbbtrv.dll
+copy dbbtrv.dll ..\*.*
+implib dbbtrv.lib dbbtrv.dll
+copy dbbtrv.lib ..\*.*
+
+link /nod /noe /co /li /map @dbbtrv1.lnk
+rc -T -K dbbtrv.res dbbtrv1.dll
+copy dbbtrv1.lib ..\restool
+copy dbbtrv1.dll ..\restool
+implib dbbtrv1.lib dbbtrv1.dll

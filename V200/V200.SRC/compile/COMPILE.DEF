@@ -1,0 +1,203 @@
+;-----------------------------------------------------
+;       $Header:   P:/marille/clinicum/compile/rev/compile.dev   1.16   02 Feb 1996 10:52:50   GERHOLD  $
+;       $Log:   P:/marille/clinicum/compile/rev/compile.dev  $
+;  
+;     Rev 1.16   02 Feb 1996 10:52:50   GERHOLD
+;  1.Umstellung auf 32 Bit
+;  
+;     Rev 1.14   24 Aug 1995 00:12:32   HANNES
+;  
+;     Rev 1.13   14 Jun 1995 13:07:26   HANNES
+;  
+;     Rev 1.12   02 Jun 1995 20:01:26   MARTIN
+;  DenyBusyCursorOnce()
+;  
+;     Rev 1.11   15 May 1995 08:23:20   HANNES
+;  
+;     Rev 1.10   02 Apr 1995 13:26:46   HANNES
+;  
+;     Rev 1.9   24 Mar 1995 18:35:06   GERHOLD
+;  
+;     Rev 1.8   23 Mar 1995 11:48:16   GERHOLD
+;  
+;     Rev 1.7   22 Mar 1995 18:21:58   GERHOLD
+;  
+;     Rev 1.6   19 Dec 1994 08:14:08   GERHOLD
+;  
+;     Rev 1.5   14 Dec 1994 19:07:58   HANNES
+;  
+;     Rev 1.4   05 Dec 1994 17:37:36   HANNES
+;  
+;     Rev 1.3   07 Nov 1994 11:39:38   HANNES
+;  
+;     Rev 1.2   20 Sep 1994 11:21:28   HANNES
+;  
+;     Rev 1.1   07 Jul 1994 22:44:50   HANNES
+;  
+;     Rev 1.0   24 Jun 1994 16:34:46   HANNES
+;  Neuuebernahme clinicum
+;  
+;     Rev 1.15   22 Feb 1994 15:28:28   HANNES
+;  
+;     Rev 1.14   14 Feb 1994 17:58:12   HANNES
+;  
+;     Rev 1.13   09 Feb 1994 12:14:08   HANNES
+;  
+;     Rev 1.12   04 Feb 1994 16:53:40   HANNES
+;  
+;     Rev 1.11   25 Jan 1994 18:11:46   HANNES
+;  
+;     Rev 1.10   18 Jan 1994 11:03:20   HANNES
+;  
+;     Rev 1.9   11 Jan 1994 19:04:34   HANNES
+;  
+;     Rev 1.8   07 Jan 1994 12:07:44   HANNES
+;  
+;     Rev 1.7   04 Jan 1994 17:30:34   HANNES
+;  
+;     Rev 1.6   03 Nov 1993 16:10:10   MARTIN
+;  Sanduhr - Funktionen
+;  
+;     Rev 1.5   11 Oct 1993 11:42:44   HANNES
+;  
+;     Rev 1.4   17 Aug 1993 11:52:56   MARTIN
+;  win_ass_failed
+;  
+;     Rev 1.3   05 Aug 1993 13:10:24   MARTIN
+;  GetCRC
+;  
+;     Rev 1.2   10 Jun 1993 18:51:52   HANNES
+;  GetIniName
+;  
+;     Rev 1.1   01 Jun 1993 11:42:48   HANNES
+;  ??
+;  
+;     Rev 1.0   02 Dec 1992 16:19:00   HANNES
+;  Initial revision.
+;-----------------------------------------------------
+
+EXETYPE WINDOWS
+
+DESCRIPTION 'Treiber fuer Hooks'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   1024
+
+EXPORTS
+  WEP               = ?WEP@@ZCHH@Z @1 	RESIDENTNAME
+  ?GetGlobalMem@@ZCPEXPEIPEGG@Z                                         @2
+  ?FreeGlobalMem@@ZCXPEXPEI@Z                                           @3
+  ?GetBlockSize@@ZCGPEX@Z                                               @4
+  ?lmemcmp@@ZCHPFX0G@Z                                                  @5
+  ?DoCompile@@ZCHIPED@Z                                                 @9
+  ?lstrncpy@@ZCXPEDPFDG@Z                                               @10
+  ?OffsetToGlobMem@@ZCGPEXI@Z                                           @11
+  ?GetGlobMem@@ZCPEXG@Z                                                 @12
+  ?FreeGlobMem@@ZCXPEX@Z                                                @13
+  ?GetFirstSegInfo@@ZCHPEIPEGPEPEX@Z                                    @14
+  ?GetNextSegInfo@@ZCHPEIPEGPEPEX@Z                                     @15
+  ??0hash@@REC@GGI@Z                                                    @16
+  ??1hash@@VEC@XZ                                                       @17
+  ??2hash@@TCPEXI@Z                                                     @18
+  ??3hash@@TCXPEX@Z                                                     @19
+  ??_Ghash@@VECPEXI@Z                                                   @20
+  ?ChangeDataW@hash@@RECXGPEXH@Z                                        @21
+  ?InitializeSpcEle@hash@@RECXG@Z                                       @22
+  ?DelData@hash@@RECHJ@Z                                                @23
+  ?DelData@hash@@RECHPED@Z                                              @24
+  ?DelDataW@hash@@RECHG@Z                                               @25
+  ?GetData@hash@@RECPEXJ@Z                                              @26
+  ?GetData@hash@@RECPEXPED@Z                                            @27
+  ?GetDataW@hash@@RECPEXG@Z                                             @28
+  ?GetHashInfo@hash@@RECXPEHPEM100@Z                                    @29
+  ?GetHash@hash@@RECXI@Z                                                @30
+  ?SetData@hash@@RECHPEDPEXH@Z                                          @31
+  ?SetData@hash@@RECHJPEXH@Z                                            @32
+  ?SetDataW@hash@@RECHGPEXH@Z                                           @33
+  ?compareKeyW@hash@@RECHGPEUhash_entry@@@Z                             @34
+  ?StoreHash@hash@@RECIXZ                                               @35
+  ?GetIniName@@ZCPEDXZ                                                  @36
+  ?GetCRC@@ZCHPEDH@Z                                                    @37
+  ?win_ass_failed@@ZCXHH@Z                                              @38
+  ?win_ass_failed_text@@ZCXHHPED@Z                                      @39
+  ?ToBusyCursor@@ZCXXZ                                                  @40
+  ?IsBusyCursor@@ZCHXZ                                                  @41
+  ?RestoreCursor@@ZCXXZ                                                 @42
+  ?PushDataToHandle@@ZCXPEDPEI@Z                                        @43
+  ?PushDataToHandle@@ZCXPEXHPEI@Z                                       @44
+  ?PushDataToHandle@@ZCXGPEXHPEI@Z                                      @45
+  ?InitializeHandleForPush@@ZCIXZ                                       @46
+  ?GetCRC32@@ZCKPEDHK@Z                                                 @47
+  ?GetTrueName@@ZCHPED0@Z                                               @48
+  ?LogMsg@@ZCXHHPED@Z                                                   @49
+  ?IsHashEmpty@hash@@RECHXZ                                             @50
+  ?WriteSizeStat@@ZCXXZ                                                 @51
+  ??0compiler@@REC@PED@Z                                                @52
+  ??1compiler@@VEC@XZ                                                   @53
+  ?DoParse@compiler@@RECXPEXPEUsyntax_node@@0@Z                         @54
+  ?InstallBuffer@compiler@@VECXPEX@Z                                    @55
+  ?OpenInclude@compiler@@VECXPED@Z                                      @56
+  ?TestError@compiler@@VECHXZ                                           @57
+  ?GetIncludeFileName@@ZCXPED00@Z                                       @58
+  ?FunctionPrototypes@@ZCXPED@Z                                         @59
+  ?LoadKwHash@ScriptCompiler@@VECXXZ                                    @60
+  ?LoadKwHash@compiler@@VECXXZ                                          @61
+  ?PushToVarTable@compiler@@VECXPEDPEUfull_vardef@@@Z                   @62
+  ?TestExternError@compiler@@VECXXZ                                     @63
+  ?TestExternError@ScriptCompiler@@VECXXZ                               @64
+  ?SetExternError@ScriptCompiler@@VECXXZ                                @65
+  ?SetExternError@compiler@@VECXXZ                                      @66
+  ?IsCondBuffer@ScriptCompiler@@VECHH@Z                                 @67
+  ?IsCondBuffer@compiler@@VECHH@Z                                       @68
+  ??1ScriptCompiler@@VEC@XZ                                             @69
+  ?PushToVarTable@ScriptCompiler@@VECXPEDPEUfull_vardef@@@Z             @70
+  ?OnStartCompile@compiler@@VECXXZ                                      @71
+  ?OnStartCompile@ScriptCompiler@@VECXXZ                                @72
+  ?OnStartCompile@FncCompiler@@VECXXZ                                   @73
+  ?GetErrorInfo@@ZCPEDPEH0@Z                                            @74
+  ?InterpreteCString@@ZCHPEDH0PEH@Z                                     @75
+  ?SetDatav@hash@@RECHPEX0HH@Z                                          @76
+  ?DelDatav@hash@@RECHPEXH@Z                                            @77
+  ?GetDatav@hash@@RECPEXPEXH@Z                                          @78
+  ?makeIni@@ZCPEDPED@Z                                                  @79
+  ?IsProcBuffer@compiler@@VECHH@Z                                       @80
+  ?IsProcBuffer@ScriptCompiler@@VECHH@Z                                 @81
+  ?MarkProcBuffer@ScriptCompiler@@RECXXZ                                @82
+  ?DenyBusyCursor@@ZCXXZ                                                @83
+  ?AllowBusyCursor@@ZCXXZ                                               @84
+  ?SetCommandLineFlag@@ZCXH@Z                                           @85
+  ?SetStartDir@@ZCPEDPED0@Z                                             @86
+  ?GetCommandLineFlag@@ZCHXZ                                            @87
+  ?LogMsg@@ZCXPED0@Z                                                    @88
+  ?SetGenStruct@@ZCXP7CHPED0@Z@Z                                        @89
+  ?AnalyseAlias@@ZCXPEVhash@@PED1GPEG@Z                                 @90
+  ?DenyBusyCursorOnce@@ZCXXZ                                            @91
+  ?PushGet@@ZCXPEX@Z                                                    @92
+  ?PushFree@@ZCXPEX@Z                                                   @93
+  ?ToggleWrite@@ZCXXZ                                                   @94
+  ?ModName@@ZCPEDH@Z                                                    @95
+  ?GetLBI@@ZCPEULastBreakInfo@@XZ                                       @96
+  ?GetModuleLine@@ZCHPEDK0@Z                                            @97
+  ?WaitForRestool@@ZCHPEVmdiChild@@PEUBPInfo@@GPEDKG@Z                  @98
+  ?PushToCallStack@@ZCXPEVmdiChild@@PEDK@Z                              @99
+  ?PopFromCallStack@@ZCXXZ                                              @100
+  ?ClearCallStack@@ZCXXZ                                                @101
+  ?GetStackInfo@@ZCJGPEUCallStackInfo@@@Z                               @102
+  ?GetLastStackAddress@@ZCJXZ                                           @103
+  ?Exception@@ZCHPEVmdiChild@@GPED@Z                                    @104
+  ?dbwin_ass_failed@@ZCXHH@Z                                            @105
+  ?dbwin_ass_failed_text@@ZCXHHPED@Z                                    @106
+  ?COMPILE_Setup@@ZCXIP7CXPEUtagMSG@@@Z@Z                               @107
+  ?IsInDebugMode@@ZCHXZ                                                 @108
+  ?DDSGetVarVal@@ZCPEXPEXGG@Z                                           @109
+  ?DDSGetVarValExtended@@ZCPEXPEUVarValExtended@@@Z                     @110
+  ?InquireBreakPoints@@ZCXXZ                                            @111
+  ?GGlobalAlloc@@ZCIIK@Z                                                @112
+  ?GGlobalReAlloc@@ZCIIKI@Z                                             @113
+  ?GGlobalFree@@ZCII@Z                                                  @114
+  ?CheckGlobalAllocs@@ZCXXZ                                             @115
+  ?SetOnWinAssertProc@@ZCXP7CHXZ@Z                                      @116
+  ?SetFromException@@ZCXGGGG@Z                                          @117

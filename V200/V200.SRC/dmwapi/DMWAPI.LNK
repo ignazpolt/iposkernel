@@ -1,0 +1,16 @@
+dmwapi+
+cword+cword1+font+showbem+
+flist+fint+
+wordwin+mlist+
+time+date+
+schiebe+multl+singl+
+printer+prconfig+
+voronoi+reconst+getword+
+polint+coshinte+fldcombo+
+iadvsink+iclisite+oleobj+cntmenu
+dmwapi.dll
+dmwapi.map
+libw.lib+ldllcew.lib+..\ddsmem.lib+
+commdlg.lib+ole2.lib+compobj+storage.lib
+dmwa.def
+

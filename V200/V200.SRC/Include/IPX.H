@@ -1,0 +1,21 @@
+//
+// Funktionsprototype fuer die ipx - Funktionen
+//
+
+extern "C" {
+  
+// WORD FAR PASCAL IpxInitialize ();
+// WORD FAR PASCAL IpxGetInternetworkAddress (LPSTR);
+// WORD FAR PASCAL OpenSemaphore(LPSTR,int,DWORD FAR *,WORD FAR *);
+// WORD FAR PASCAL WaitOnSemaphore(DWORD,WORD);
+// WORD FAR PASCAL CloseSemaphore(DWORD);
+// WORD FAR PASCAL SignalSemaphore(DWORD);
+
+typedef WORD (FAR PASCAL * LPIPXINITIALIZE) (DWORD FAR *,WORD,WORD);
+typedef WORD (FAR PASCAL * LPIPXGETINTERNETWORKADDRESS) (DWORD,LPSTR);
+typedef WORD (FAR PASCAL * LPOPENSEMAPHORE) (LPSTR,int,DWORD FAR *,WORD FAR *);
+typedef WORD (FAR PASCAL * LPWAITONSEMAPHORE) (DWORD,WORD);
+typedef WORD (FAR PASCAL * LPCLOSESEMAPHORE) (DWORD);
+typedef WORD (FAR PASCAL * LPSIGNALSEMAPHORE) (DWORD);
+
+  }

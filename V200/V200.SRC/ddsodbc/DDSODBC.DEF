@@ -1,0 +1,22 @@
+EXETYPE WINDOWS
+
+DESCRIPTION 'Datenbankanbindung Marille - ODBC'
+
+CODE PRELOAD MOVEABLE DISCARDABLE
+
+DATA PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE   4096
+
+EXPORTS
+  WEP                                                                           @1 	RESIDENTNAME
+  DBCALL                   = ?DBCall@@ZCHGHPEUDBRequest@@PEPEXPEURecBuffer@@@Z  @2
+  DBRESET                  = ?DBReset@@ZCXXZ                                    @3
+  DATADICT_NEWTABLEDEF     = ?DataDict_NewTableDef@@ZCPEXPEXPEDPEHPEK@Z         @46
+  DOBEGINTRANSACTION       = ?DoBeginTransaction@@ZCXH@Z                        @41
+  DOENDTRANSACTION         = ?DoEndTransaction@@ZCXXZ                           @42
+  DOABORTTRANSACTION       = ?DoAbortTransaction@@ZCXXZ                         @43
+  DBALTER                  = ?DBAlter@@ZCHPEUTableDef@@0HPEUDefVal@@P7CXK@Z@Z   @44
+  DBPOINT                  = ?GetDBPointer@@ZCPEXXZ                             @45
+  MAKETIMESTAMP            = ?MakeTimeStamp@@ZCXPED@Z
+

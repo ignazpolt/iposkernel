@@ -1,0 +1,18 @@
+COPY ..\..\%ACTVERS%.SRC\DDSORA\DDSOR.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSORA\DDSOR1.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSORA\DDSORA.DEF
+COPY ..\..\%ACTVERS%.SRC\DDSORA\DDSORA.lnk
+COPY ..\..\%ACTVERS%.SRC\DDSORA\DDSORA1.lnk
+
+link /nod /noe /co /li /map @ddsora.lnk
+rc -r -v -z -foddsora.res ..\..\%ACTVERS%.SRC\DDSORA\ddsora.rc
+rc -T -K ddsora.res ddsora.dll
+copy ddsora.dll ..\*.*
+implib ddsora.lib ddsora.dll
+copy ddsora.lib ..\*.*
+
+link /nod /noe /co /li /map @ddsora1.lnk
+rc -T -K ddsora.res ddsora1.dll
+copy ddsora1.dll ..\restool
+implib ddsora1.lib ddsora1.dll
+copy ddsora1.lib ..\restool
