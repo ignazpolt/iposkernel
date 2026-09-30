@@ -1,78 +1,39 @@
+@echo off
+
 if exist supererr del supererr
 
+call :collect_err "ddsmem"
+call :collect_err "dmwapi"
+call :collect_err "dbhelp"
+call :collect_err "compile"
+call :collect_err "ctool"
+call :collect_err "image"
+call :collect_err "frmobj"
+call :collect_err "hook"
+call :collect_err "dbbtrv"
+call :collect_err "dbclean"
+call :collect_err "statbar"
+call :collect_err "toolbar"
+call :collect_err "ddsodbc"
+call :collect_err "ddsora"
+call :collect_err "ddsseq"
+call :collect_err "dnetin"
+call :collect_err "dnetnv"
+call :collect_err "restool"
+call :collect_root
+
+goto :eof
+
+:collect_err
+cd /d "%~1"
+echo -------------------- >> ..\supererr
+echo **** %~1 **** >> ..\supererr
+if exist err type err >> ..\supererr
+cd /d ..
+goto :eof
+
+:collect_root
 echo -------------------- >> supererr
-echo **** compile **** >> supererr
-cd compile
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\ddsmem **** >> ..\supererr
-cd ..\ddsmem
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\ctool **** >> ..\supererr
-cd ..\ctool
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\dmwapi **** >> ..\supererr
-cd ..\dmwapi
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\frmobj **** >> ..\supererr
-cd ..\frmobj
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\hook **** >> ..\supererr
-cd ..\hook
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\image **** >> ..\supererr
-cd ..\image
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\dbbtrv **** >> ..\supererr
-cd ..\dbbtrv
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\dbhelp **** >> ..\supererr
-cd ..\dbhelp
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\dbclean **** >> ..\supererr
-cd ..\dbclean
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\statbar **** >> ..\supererr
-cd ..\statbar
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\restool **** >> ..\supererr
-cd ..\restool
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\toolbar **** >> ..\supererr
-cd ..\toolbar
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\ddsodbc **** >> ..\supererr
-cd ..\ddsodbc
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\ddsora **** >> ..\supererr
-cd ..\ddsora
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\ddsseq **** >> ..\supererr
-cd ..\ddsseq
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\dnetin **** >> ..\supererr
-cd ..\dnetin
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** ..\dnetnv **** >> ..\supererr
-cd ..\dnetnv
-if exist err type err >> ..\supererr
-echo -------------------- >> ..\supererr
-echo **** .. **** >> ..\supererr
-cd ..
+echo **** dds **** >> supererr
 if exist err type err >> supererr
+goto :eof

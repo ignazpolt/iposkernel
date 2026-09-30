@@ -54,24 +54,24 @@ set "TAG=%~2"
 echo.
 echo ===== Building %TAG% tree at %TREE% =====
 
-call :run_module "%TREE%\COMPILE" "COMPILE.BAT"
 call :run_module "%TREE%\DDSMEM" "DDSMEM.BAT"
-call :run_module "%TREE%\CTOOL" "CTOOL.BAT"
 call :run_module "%TREE%\DMWAPI" "DMWAPI.BAT"
+call :run_module "%TREE%\DBHELP" "DBHELP.BAT"
+call :run_module "%TREE%\COMPILE" "COMPILE.BAT"
+call :run_module "%TREE%\CTOOL" "CTOOL.BAT"
+call :run_module "%TREE%\IMAGE" "IMAGE.BAT"
 call :run_module "%TREE%\FRMOBJ" "FRMOBJ.BAT"
 call :run_module "%TREE%\HOOK" "HOOK.BAT"
-call :run_module "%TREE%\IMAGE" "IMAGE.BAT"
 call :run_module "%TREE%\DBBTRV" "DBBTRV.BAT"
-call :run_module "%TREE%\DBHELP" "DBHELP.BAT"
 call :run_module "%TREE%\DBCLEAN" "DBCLEAN.BAT"
 call :run_module "%TREE%\STATBAR" "STATBAR.BAT"
-call :run_module "%TREE%\RESTOOL" "RESTOOL.BAT"
 call :run_module "%TREE%\TOOLBAR" "TOOLBAR.BAT"
 call :run_module "%TREE%\DDSODBC" "DDSODBC.BAT"
 call :run_module "%TREE%\DDSORA" "DDSORA.BAT"
 call :run_module "%TREE%\DDSSEQ" "DDSSEQ.BAT"
 call :run_module "%TREE%\DNETIN" "DNETIN.BAT"
 call :run_module "%TREE%\DNETNV" "DNETNV.BAT"
+call :run_module "%TREE%\RESTOOL" "RESTOOL.BAT"
 
 pushd "%TREE%" >nul
 call CLINICUM.BAT
