@@ -141,7 +141,6 @@ set "TAG=%~2"
 
 echo.
 echo ===== Building %TAG% tree at %TREE% =====
-
 call :run_module "%TREE%\DDSMEM" "DDSMEM.BAT"
 call :run_module "%TREE%\DMWAPI" "DMWAPI.BAT"
 call :run_module "%TREE%\DBHELP" "DBHELP.BAT"

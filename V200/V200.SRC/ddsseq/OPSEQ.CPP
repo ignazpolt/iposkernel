@@ -65,11 +65,173 @@
 #include "dlladmin.hpp"
 #include "tbdef.hpp"
 #include "tbbtrv.hpp"
+#include "rsbtrv.hpp"
+#include "resadmin.hpp"
 #define MODULENUM 167
 #include "winass.hpp"
 #include "dbrecord.hpp"
 #include "hash.hpp"
 #include "compile.hpp"
+
+#define INTERNNAME "-"
+
+static GLOBALHANDLE CopyToHandle (LPVOID Data,DWORD DataSize)
+  {
+  GLOBALHANDLE hG = GlobalAlloc (GMEM_MOVEABLE,DataSize);
+  LPVOID b = GlobalLock (hG);
+  hmemcpy (b,Data,DataSize);
+  GlobalUnlock (hG);
+  return hG;
+  }
+
+static GLOBALHANDLE CopyBlobToHandle (LPBLOBDESC d,DWORD FAR *DataSize)
+  {
+  if ((d == NULL) || (d->hGmem == NULL)) {
+    *DataSize = 0L;
+    return 0;
+    }
+  *DataSize = d->Size;
+  GLOBALHANDLE hG = GlobalAlloc (GMEM_MOVEABLE,d->Size);
+  LPVOID dst = GlobalLock (hG);
+  LPVOID src = GlobalLock (d->hGmem);
+  hmemcpy (dst,src,d->Size);
+  GlobalUnlock (d->hGmem);
+  GlobalUnlock (hG);
+  return hG;
+  }
+
+static BOOL IsSameBlobData (LPBLOBDESC d,LPVOID Data,DWORD DataSize)
+  {
+  if (d == NULL)
+    return FALSE;
+  if (d->Size != DataSize)
+    return FALSE;
+  LPVOID oldData = GlobalLock (d->hGmem);
+  BOOL same = lmemcmp (oldData,Data,DataSize);
+  GlobalUnlock (d->hGmem);
+  return same;
+  }
+
+static BOOL GetDataDictNameByID (short type,WORD TableID,WORD Version,LPSTR TableName)
+  {
+  DBList FAR *lst = GetAllDataDict (type);
+  BOOL found = FALSE;
+  for (LPDBRECORD r = lst->GetFirst(); r != NULL ; r = lst->GetNext(r)) {
+    if ((*(WORD FAR *)r->Get(2) == TableID) && (*(WORD FAR *)r->Get(4) == Version)) {
+      lstrcpy (TableName,LPSTR(r->Get(1)));
+      found = TRUE;
+      break;
+      }
+    }
+  delete lst;
+  return found;
+  }
+
+static WORD FindRowVersionByName (WORD TableIdent,LPSTR VarName)
+  {
+  DBList FAR *lst = GetAllDataDict (RST_VRDATADICT);
+  WORD res = 0;
+  for (LPDBRECORD r = lst->GetFirst(); r != NULL ; r = lst->GetNext(r)) {
+    if ((*(WORD FAR *)r->Get(2) == TableIdent) && (lstrcmp (LPSTR(r->Get(1)),VarName) == 0)) {
+      res = *(WORD FAR *)r->Get(4);
+      break;
+      }
+    }
+  delete lst;
+  return res;
+  }
+
+static WORD FindNextRowVersion (WORD TableIdent,WORD PrevRow,LPSTR RowName)
+  {
+  DBList FAR *lst = GetAllDataDict (RST_VRDATADICT);
+  WORD foundVersion = 0;
+  BOOL found = FALSE;
+  for (LPDBRECORD r = lst->GetFirst(); r != NULL ; r = lst->GetNext(r)) {
+    if (*(WORD FAR *)r->Get(2) == TableIdent) {
+      WORD v = *(WORD FAR *)r->Get(4);
+      if ((v > PrevRow) && ((!found) || (v < foundVersion))) {
+        foundVersion = v;
+        lstrcpy (RowName,LPSTR(r->Get(1)));
+        found = TRUE;
+        }
+      }
+    }
+  delete lst;
+  return (found) ? foundVersion : 0;
+  }
+
+static WORD FindMaxRowVersion (WORD TableIdent)
+  {
+  DBList FAR *lst = GetAllDataDict (RST_VRDATADICT);
+  WORD maxV = 0;
+  for (LPDBRECORD r = lst->GetFirst(); r != NULL ; r = lst->GetNext(r)) {
+    if (*(WORD FAR *)r->Get(2) == TableIdent) {
+      WORD v = *(WORD FAR *)r->Get(4);
+      if (v > maxV) maxV = v;
+      }
+    }
+  delete lst;
+  return maxV;
+  }
+
+static void DeleteDataDictByTypeAndTable (short type,WORD TableIdent)
+  {
+  WORD vers[2048];
+  int cnt = 0;
+  DBList FAR *lst = GetAllDataDict (type);
+  for (LPDBRECORD r = lst->GetFirst(); r != NULL ; r = lst->GetNext(r)) {
+    if (*(WORD FAR *)r->Get(2) == TableIdent) {
+      if (cnt < int(sizeof(vers) / sizeof(vers[0])))
+        vers[cnt++] = *(WORD FAR *)r->Get(4);
+      }
+    }
+  delete lst;
+
+  for (int i = 0 ; i < cnt ; i++)
+    DelDataDict (type,TableIdent,vers[i]);
+  }
+
+static DWORD FindResourceIdByTypeAndName (short type,LPSTR Name)
+  {
+  DBList FAR *lst = GetAllResourceData (type);
+  DWORD id = 0;
+  for (LPDBRECORD r = lst->GetFirst(); r != NULL ; r = lst->GetNext(r)) {
+    if (lstrcmp (LPSTR(r->Get(2)),Name) == 0) {
+      id = *(DWORD FAR *)r->Get(0);
+      break;
+      }
+    }
+  delete lst;
+  return id;
+  }
+
+static DBList FAR *gDocList = NULL;
+static LPDBRECORD gDocRec = NULL;
+static DBList FAR *gResList = NULL;
+static LPDBRECORD gResRec = NULL;
+static DBList FAR *gTblList = NULL;
+static LPDBRECORD gTblRec = NULL;
+
+static void ResetDocEnum ()
+  {
+  if (gDocList != NULL) delete gDocList;
+  gDocList = NULL;
+  gDocRec = NULL;
+  }
+
+static void ResetResEnum ()
+  {
+  if (gResList != NULL) delete gResList;
+  gResList = NULL;
+  gResRec = NULL;
+  }
+
+static void ResetTblEnum ()
+  {
+  if (gTblList != NULL) delete gTblList;
+  gTblList = NULL;
+  gTblRec = NULL;
+  }
 
 BOOL DoLog(void)
   {
@@ -331,6 +493,18 @@ class FAR SeqFile {
     k[kn].keyHash->SetDatav (KeyBuffer,&r,sizeof(r),GetBlockSize(KeyBuffer));
     FreeGlobMem (KeyBuffer);
     }
+  void RemoveFromKey (int kn,LPDBRECORD rec)
+    {
+    WORD varInd;
+    LPTABLEDEF td = rec->GetTableDef (0,&varInd);
+    LPVOID KeyBuffer = NULL;
+    for (int i = 0 ; i < k[kn].AnzKeySegs ; i++)
+      for (int j = 0 ; j < td->GetAnzVars () ; j ++)
+        if (lstrcmp (td->GetVarDef(j)->GetName(),k[kn].KeySeg[i]) == 0)
+          KeyBuffer = PushToKeyBuffer (KeyBuffer,rec->Get(j));
+    k[kn].keyHash->DelDatav (KeyBuffer,GetBlockSize(KeyBuffer));
+    FreeGlobMem (KeyBuffer);
+    }
   void Create ()
     {
     if (hfile == 0) {
@@ -404,6 +578,32 @@ class FAR SeqFile {
       AddToKey (i,rec,Write (GlobalLock (hGBuffer),length),length);
     GlobalUnlock (hGBuffer);
     GlobalFree (hGBuffer);
+    }
+  LPDBRECORD Update (int j,LPVOID FAR *p,LPTABLEDEF td,WORD FAR *pt,LPSTR stmt,
+                     LPDBRECORD rec,RecBuffer FAR *res)
+    {
+    LPDBRECORD oldRec = Get (j,p,td,pt,stmt);
+    if (oldRec == NULL)
+      return NULL;
+
+    for (int i = 0 ; i < AnzHashs ; i++)
+      RemoveFromKey (i,oldRec);
+    delete oldRec;
+
+    Insert (rec,res);
+    return rec;
+    }
+
+  BOOL Delete (int j,LPVOID FAR *p,LPTABLEDEF td,WORD FAR *pt,LPSTR stmt)
+    {
+    LPDBRECORD oldRec = Get (j,p,td,pt,stmt);
+    if (oldRec == NULL)
+      return FALSE;
+
+    for (int i = 0 ; i < AnzHashs ; i++)
+      RemoveFromKey (i,oldRec);
+    delete oldRec;
+    return TRUE;
     }
   int CheckSelection (LPSTR WhereStatement)
     {
@@ -481,27 +681,36 @@ class FAR SeqFile {
   };
 
 
+static LPSTR ScriptSegs0 [] = { "Type" } ;
 static LPSTR ScriptSegs [] = { "Type","fName" } ;
 static LPSTR ResSegs1 [] = { "Nummer" } ;
 static LPSTR ResSegs2 [] = { "Type","fName" } ;
+static LPSTR ResSegs3 [] = { "Type" } ;
 static LPSTR DataDictSegs [] = { "Type","TableID","Version" } ;
+static LPSTR DataDictSegs1 [] = { "Type" } ;
+static LPSTR DataDictSegs2 [] = { "Version" } ;
+static LPSTR DataDictSegs3 [] = { "Type","Name" } ;
+static LPSTR DataDictSegs4 [] = { "Type","TableID" } ;
 static LPSTR RSSegs1 [] = { "Nummer" } ;
 static LPSTR RSSegs2 [] = { "Art","Leistung" } ;
 static LPSTR RSSegs3 [] = { "Art","Makro" } ;
 static LPSTR DictDBSegs [] = { "Type" } ;
 KHDef ScriptKey [] = {
-  { 
-  "Type = %1 AND fName = %2", 
-  2 , 
-  ScriptSegs , 
-  NULL }
+  { "Type = %1", 1 , ScriptSegs0 , NULL } ,
+  { "Type = %1 AND fName = %2", 2 , ScriptSegs , NULL }
   } ;
 KHDef ResKeys [] = {
   { "Nummer = %1", 1 , ResSegs1 , NULL } ,
-  { "Type = %1 AND fName = %2", 2 , ResSegs2 , NULL }
+  { "Type = %1 AND fName = %2", 2 , ResSegs2 , NULL } ,
+  { "Type = %1", 1 , ResSegs3 , NULL }
   } ;
 KHDef DDictKeys [] = {
-  { "Type = %1 AND TableID = %2 AND Version = %3", 3 , DataDictSegs , NULL }
+  { "Type = %1 AND TableID = %2 AND Version = %3", 3 , DataDictSegs , NULL } ,
+  { "Type = %1", 1 , DataDictSegs1 , NULL } ,
+  { "Version = %1", 1 , DataDictSegs2 , NULL } ,
+  { "Type = %1 AND Name = %2", 2 , DataDictSegs3 , NULL } ,
+  { "Type = %1 AND TableID = (SELECT MAX(TableID) FROM DataDict WHERE Type = %1 AND TableID < %2)", 2 , DataDictSegs4 , NULL } ,
+  { "Type = %1 AND TableID = %2 AND Version = (SELECT MAX(Version) FROM DataDict WHERE Type = %1 AND TableID = %2 AND Version < %3)", 3 , DataDictSegs , NULL }
   } ;
 KHDef RSKeys [] = {
   { "Nummer = %1", 1 , RSSegs1 , NULL } ,
@@ -517,9 +726,9 @@ static struct {
   KHDef FAR *k;
   SeqFile FAR *sf;
   } sfDef [] = {
-    { "ScriptDB" , 1, ScriptKey , NULL } ,
-    { "ResDB" , 2 , ResKeys , NULL } ,
-    { "DataDict" , 1 , DDictKeys , NULL } ,
+    { "ScriptDB" , 2, ScriptKey , NULL } ,
+    { "ResDB" , 3 , ResKeys , NULL } ,
+    { "DataDict" , 6 , DDictKeys , NULL } ,
     { "RestriktionsScript" , 3 , RSKeys , NULL } ,
     { "DictDB" , 1 , DictDBKeys , NULL } 
   } ;
@@ -582,6 +791,28 @@ DLLExport int _export WINAPI DBCall (WORD Op,int AnzLines,LPDBREQUEST req,LPVOID
             }
           else
             state = DBCALL_NODATA ;
+          }
+          break ;
+        case DBCALLTYPE_STANDARDUPDATE :
+          {
+          int hn = s->CheckSelection (req->SelectionName);
+          WIN_ASSERT (hn >= 0);
+          rec = s->Update (hn,req->Param,req->TableDef[0],req->ParamType,req->SelectionName,
+                           res->first->rec[0],res);
+          if (rec != NULL)
+            state = DBCALL_SUCCESS;
+          else
+            state = DBCALL_NODATA;
+          }
+          break ;
+        case DBCALLTYPE_STANDARDDELETE :
+          {
+          int hn = s->CheckSelection (req->SelectionName);
+          WIN_ASSERT (hn >= 0);
+          if (s->Delete (hn,req->Param,req->TableDef[0],req->ParamType,req->SelectionName))
+            state = DBCALL_SUCCESS;
+          else
+            state = DBCALL_NODATA;
           }
           break ;
         case DBCALLTYPE_GETLIST :
@@ -651,8 +882,345 @@ DLLExport int _export WINAPI DBCall (WORD Op,int AnzLines,LPDBREQUEST req,LPVOID
   return state ;
   }
 
+DLLExport WORD _export WINAPI DataRes_SetTableDef (LPSTR DLLName,LPSTR TableName,
+             WORD TableIdMin,WORD TableIdMax,LPVOID TableData,DWORD TableSize,
+             BOOL FAR *changed)
+  {
+  WORD TableID = ReadTableID (RST_TBDATADICT,TableName,TableIdMin,TableIdMax);
+  DWORD oldSize = 0L;
+  GLOBALHANDLE hGold = ReadDataDict (RST_TBDATADICT,TableID,0,&oldSize);
+
+  if ((hGold != 0) && (oldSize == TableSize)) {
+    LPVOID oldData = GlobalLock (hGold);
+    *changed = !lmemcmp (oldData,TableData,TableSize);
+    GlobalUnlock (hGold);
+    }
+  else
+    *changed = TRUE;
+
+  if (*changed) {
+    GLOBALHANDLE hG = CopyToHandle (TableData,TableSize);
+    WriteDataDict (RST_TBDATADICT,TableName,TableID,0,0,0,hG,TableSize);
+    GlobalFree (hG);
+    }
+
+  if (hGold != 0)
+    GlobalFree (hGold);
+  return TableID;
+  }
+
+DLLExport WORD _export WINAPI DataRes_SetRowDef (LPSTR DLLName,WORD TableIdent,
+             LPSTR VarName,LPVOID VarData,DWORD VarSize,BOOL FAR *changed)
+  {
+  WORD RowIdent = FindRowVersionByName (TableIdent,VarName);
+  if (RowIdent == 0)
+    RowIdent = WORD(FindMaxRowVersion(TableIdent) + 1);
+
+  DWORD oldSize = 0L;
+  GLOBALHANDLE hGold = ReadDataDict (RST_VRDATADICT,TableIdent,RowIdent,&oldSize);
+  if ((hGold != 0) && (oldSize == VarSize)) {
+    LPVOID oldData = GlobalLock (hGold);
+    *changed = !lmemcmp (oldData,VarData,VarSize);
+    GlobalUnlock (hGold);
+    }
+  else
+    *changed = TRUE;
+
+  if (*changed) {
+    GLOBALHANDLE hG = CopyToHandle (VarData,VarSize);
+    WriteDataDict (RST_VRDATADICT,VarName,TableIdent,RowIdent,0,0,hG,VarSize);
+    GlobalFree (hG);
+    }
+
+  if (hGold != 0)
+    GlobalFree (hGold);
+  return RowIdent;
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetTableDef (LPSTR DLLName,WORD TableId,
+                  LPSTR TableName,DWORD FAR *HeaderSize,DWORD FAR *Size)
+  {
+  *HeaderSize = 0L;
+  if (!GetDataDictNameByID (RST_TBDATADICT,TableId,0,TableName))
+    *TableName = '\0';
+  return ReadDataDict (RST_TBDATADICT,TableId,0,Size);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetFirstRowDef (LPSTR DLLName,
+             WORD TableIdent,LPSTR RowName,WORD FAR *RowIdent,
+             DWORD FAR *HeaderSize,DWORD FAR *RowSize)
+  {
+  *HeaderSize = 0L;
+  *RowName = '\0';
+  *RowSize = 0L;
+  *RowIdent = FindNextRowVersion (TableIdent,0,RowName);
+  if (*RowIdent == 0)
+    return 0;
+  return ReadDataDict (RST_VRDATADICT,TableIdent,*RowIdent,RowSize);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetNextRowDef (LPSTR DLLName,
+             WORD TableIdent,WORD PrevRow,LPSTR RowName,WORD FAR *RowIdent,
+             DWORD FAR *HeaderSize,DWORD FAR *RowSize)
+  {
+  *HeaderSize = 0L;
+  *RowName = '\0';
+  *RowSize = 0L;
+  *RowIdent = FindNextRowVersion (TableIdent,PrevRow,RowName);
+  if (*RowIdent == 0)
+    return 0;
+  return ReadDataDict (RST_VRDATADICT,TableIdent,*RowIdent,RowSize);
+  }
+
+DLLExport void _export WINAPI DataRes_SetFullTableDef (LPSTR DLLName,WORD TableIdent,
+                  LPSTR TableName,LPVOID TableData,DWORD TableSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (TableData,TableSize);
+  WriteDataDict (RST_TBFDATADICT,TableName,TableIdent,0,0,0,hG,TableSize);
+  GlobalFree (hG);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetFullTableDef (LPSTR DLLName,WORD TableIdent,
+                  LPSTR TableName,DWORD FAR *HeaderSize,DWORD FAR *TableSize)
+  {
+  *HeaderSize = 0L;
+  if (!GetDataDictNameByID (RST_TBFDATADICT,TableIdent,0,TableName))
+    *TableName = '\0';
+  return ReadDataDict (RST_TBFDATADICT,TableIdent,0,TableSize);
+  }
+
+DLLExport BOOL _export WINAPI DataRes_GetFirstTableDef (WORD FAR *TableIdent,LPSTR TableName)
+  {
+  ResetTblEnum();
+  gTblList = GetAllDataDict (RST_TBDATADICT);
+  gTblRec = (gTblList != NULL) ? gTblList->GetFirst() : NULL;
+  if (gTblRec == NULL) {
+    *TableName = '\0';
+    *TableIdent = 0;
+    ResetTblEnum();
+    return FALSE;
+    }
+  *TableIdent = *(WORD FAR *)gTblRec->Get(2);
+  lstrcpy (TableName,LPSTR(gTblRec->Get(1)));
+  return TRUE;
+  }
+
+DLLExport BOOL _export WINAPI DataRes_GetNextTableDef (WORD PrevIdent,WORD FAR *TableIdent,LPSTR TableName)
+  {
+  if ((gTblList == NULL) || (gTblRec == NULL)) {
+    *TableName = '\0';
+    *TableIdent = 0;
+    return FALSE;
+    }
+  gTblRec = gTblList->GetNext (gTblRec);
+  if (gTblRec == NULL) {
+    *TableName = '\0';
+    *TableIdent = 0;
+    ResetTblEnum();
+    return FALSE;
+    }
+  *TableIdent = *(WORD FAR *)gTblRec->Get(2);
+  lstrcpy (TableName,LPSTR(gTblRec->Get(1)));
+  return TRUE;
+  }
+
+DLLExport void _export WINAPI DataRes_SetDictCont (LPVOID Data,DWORD DataSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (Data,DataSize);
+  WriteDataDict (RST_DDCONT,"CONT",0,0,0,0,hG,DataSize);
+  GlobalFree (hG);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetDictCont (DWORD FAR *HeaderSize,DWORD FAR *DataSize)
+  {
+  *HeaderSize = 0L;
+  return ReadDataDict (RST_DDCONT,0,0,DataSize);
+  }
+
+DLLExport void _export WINAPI DataRes_SetDocDef (LPSTR DocName,LPVOID DocData,DWORD DataSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (DocData,DataSize);
+  WriteScriptData (RSS_TYPEDOCDEF,DocName,hG,DataSize);
+  GlobalFree (hG);
+  }
+
+DLLExport void _export WINAPI DataRes_SetFuncDef (LPVOID DocData,DWORD DataSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (DocData,DataSize);
+  WriteScriptData (RSS_TYPEFNCPROT,INTERNNAME,hG,DataSize);
+  GlobalFree (hG);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetDocDef (LPSTR DocName,DWORD FAR *HeaderSize,DWORD FAR *DocSize)
+  {
+  *HeaderSize = 0L;
+  return ReadScriptData (RSS_TYPEDOCDEF,DocName,DocSize);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetFuncDef (DWORD FAR *HeaderSize,DWORD FAR *DocSize)
+  {
+  *HeaderSize = 0L;
+  return ReadScriptData (RSS_TYPEFNCPROT,INTERNNAME,DocSize);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetFirstDoc (LPSTR DocName,DWORD FAR *HeaderSize,DWORD FAR *DocSize)
+  {
+  *HeaderSize = 0L;
+  *DocName = '\0';
+  ResetDocEnum();
+  gDocList = GetAllScriptData (RSS_TYPEDOCDEF);
+  gDocRec = (gDocList != NULL) ? gDocList->GetFirst() : NULL;
+  if (gDocRec == NULL)
+    return 0;
+  lstrcpy (DocName,LPSTR(gDocRec->Get(2)));
+  return CopyBlobToHandle (LPBLOBDESC(gDocRec->Get(3)),DocSize);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetNextDoc (LPSTR DocName,DWORD FAR *HeaderSize,DWORD FAR *DocSize)
+  {
+  *HeaderSize = 0L;
+  *DocName = '\0';
+  if ((gDocList == NULL) || (gDocRec == NULL))
+    return 0;
+  gDocRec = gDocList->GetNext (gDocRec);
+  if (gDocRec == NULL) {
+    ResetDocEnum();
+    return 0;
+    }
+  lstrcpy (DocName,LPSTR(gDocRec->Get(2)));
+  return CopyBlobToHandle (LPBLOBDESC(gDocRec->Get(3)),DocSize);
+  }
+
+DLLExport void _export WINAPI DataRes_SetDocCont (LPVOID DocData,DWORD DataSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (DocData,DataSize);
+  WriteScriptData (RSS_TYPEDOCCONT,INTERNNAME,hG,DataSize);
+  GlobalFree (hG);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetDocCont (DWORD FAR *HeaderSize,DWORD FAR *DocSize)
+  {
+  *HeaderSize = 0L;
+  return ReadScriptData (RSS_TYPEDOCCONT,INTERNNAME,DocSize);
+  }
+
+DLLExport DWORD _export WINAPI DataRes_SetResource (WORD Type,LPSTR Name,LPVOID Data,DWORD DataSize)
+  {
+  DWORD ResID = FindResourceIdByTypeAndName (short(Type),Name);
+  BOOL doWrite = TRUE;
+  if (ResID != 0) {
+    DWORD oldSize = 0L;
+    GLOBALHANDLE hOld = ReadResourceData (ResID,&oldSize);
+    if ((hOld != 0) && (oldSize == DataSize)) {
+      LPVOID oldData = GlobalLock (hOld);
+      doWrite = !lmemcmp (oldData,Data,DataSize);
+      GlobalUnlock (hOld);
+      }
+    if (hOld != 0)
+      GlobalFree (hOld);
+    }
+
+  if (doWrite) {
+    GLOBALHANDLE hG = CopyToHandle (Data,DataSize);
+    WriteResourceData (short(Type),Name,hG,DataSize);
+    GlobalFree (hG);
+    }
+
+  if (ResID == 0)
+    ResID = FindResourceIdByTypeAndName (short(Type),Name);
+  return ResID;
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetResource (DWORD ResID,DWORD FAR *HeaderSize,DWORD FAR *DataSize)
+  {
+  *HeaderSize = 0L;
+  return ReadResourceData (ResID,DataSize);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetFirstResource (WORD Type,DWORD FAR *Id,LPSTR ResName,
+             DWORD FAR *HeaderSize,DWORD FAR *DataSize)
+  {
+  *HeaderSize = 0L;
+  *ResName = '\0';
+  *Id = 0;
+  ResetResEnum();
+  gResList = GetAllResourceData (short(Type));
+  gResRec = (gResList != NULL) ? gResList->GetFirst() : NULL;
+  if (gResRec == NULL)
+    return 0;
+  *Id = *(DWORD FAR *)gResRec->Get(0);
+  lstrcpy (ResName,LPSTR(gResRec->Get(2)));
+  return CopyBlobToHandle (LPBLOBDESC(gResRec->Get(3)),DataSize);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetNextResource (WORD Type,DWORD FAR *Id,LPSTR ResName,
+             DWORD FAR *HeaderSize,DWORD FAR *DataSize)
+  {
+  *HeaderSize = 0L;
+  *ResName = '\0';
+  if ((gResList == NULL) || (gResRec == NULL)) {
+    *Id = 0;
+    return 0;
+    }
+  gResRec = gResList->GetNext (gResRec);
+  if (gResRec == NULL) {
+    *Id = 0;
+    ResetResEnum();
+    return 0;
+    }
+  *Id = *(DWORD FAR *)gResRec->Get(0);
+  lstrcpy (ResName,LPSTR(gResRec->Get(2)));
+  return CopyBlobToHandle (LPBLOBDESC(gResRec->Get(3)),DataSize);
+  }
+
+DLLExport void _export WINAPI DataRes_SetResCont (WORD Type,LPVOID Data,DWORD DataSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (Data,DataSize);
+  WriteResourceData (short(Type + 0x8000),INTERNNAME,hG,DataSize);
+  GlobalFree (hG);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetResCont (WORD Type,DWORD FAR *HeaderSize,DWORD FAR *DataSize)
+  {
+  *HeaderSize = 0L;
+  return ReadResourceData (short(Type + 0x8000),INTERNNAME,DataSize);
+  }
+
+DLLExport void _export WINAPI DataRes_ClearRowDefs (LPSTR DLLName,WORD TableIdent)
+  {
+  DeleteDataDictByTypeAndTable (RST_VRDATADICT,TableIdent);
+  }
+
+DLLExport void _export WINAPI DataRes_SetServerSource (LPSTR DLLName,WORD TableIdent,
+                  LPSTR TableName,LPVOID TableData,DWORD TableSize)
+  {
+  GLOBALHANDLE hG = CopyToHandle (TableData,TableSize);
+  WriteDataDict (RST_DSERVSRC,TableName,TableIdent,0,0,0,hG,TableSize);
+  GlobalFree (hG);
+  }
+
+DLLExport GLOBALHANDLE _export WINAPI DataRes_GetServerSource (LPSTR DLLName,WORD TableIdent,
+                  LPSTR TableName,DWORD FAR *HeaderSize,DWORD FAR *TableSize)
+  {
+  *HeaderSize = 0L;
+  if (!GetDataDictNameByID (RST_DSERVSRC,TableIdent,0,TableName))
+    *TableName = '\0';
+  return ReadDataDict (RST_DSERVSRC,TableIdent,0,TableSize);
+  }
+
+DLLExport void _export WINAPI DataRes_DelTableDef (LPSTR DLLName,WORD TableIdent)
+  {
+  DataRes_ClearRowDefs (DLLName,TableIdent);
+  DeleteDataDictByTypeAndTable (RST_TBDATADICT,TableIdent);
+  DeleteDataDictByTypeAndTable (RST_TBFDATADICT,TableIdent);
+  DeleteDataDictByTypeAndTable (RST_DSERVSRC,TableIdent);
+  }
+
 void OnExit ()
   {
+  ResetDocEnum();
+  ResetResEnum();
+  ResetTblEnum();
   for (int i = 0 ; i < sizeof(sfDef) / sizeof(sfDef[0]) ; i++)
     if (sfDef[i].sf != NULL) {
       delete sfDef[i].sf ;
