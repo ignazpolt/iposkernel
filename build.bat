@@ -74,7 +74,7 @@ for %%R in (%REQUESTED%) do (
   if /I "%%~R"=="DDS" set "ROOT_REQ=1"
 )
 
-for %%M in (DDSMEM DMWAPI DBHELP COMPILE CTOOL IMAGE FRMOBJ HOOK DBBTRV DBCLEAN STATBAR TOOLBAR DDSODBC DDSORA DDSSEQ DNETIN DNETNV RESTOOL) do (
+for %%M in (DDSMEM DMWAPI DBHELP COMPILE CTOOL IMAGE FRMOBJ HOOK DBCLEAN STATBAR TOOLBAR DBBTRV DDSODBC DDSSEQ DNETIN DNETNV RESTOOL) do (
   set "MATCH=0"
   for %%R in (%REQUESTED%) do (
     if /I "%%~R"=="%%M" set "MATCH=1"
@@ -141,7 +141,6 @@ set "TAG=%~2"
 
 echo.
 echo ===== Building %TAG% tree at %TREE% =====
-
 call :run_module "%TREE%\DDSMEM" "DDSMEM.BAT"
 call :run_module "%TREE%\DMWAPI" "DMWAPI.BAT"
 call :run_module "%TREE%\DBHELP" "DBHELP.BAT"
@@ -150,12 +149,11 @@ call :run_module "%TREE%\CTOOL" "CTOOL.BAT"
 call :run_module "%TREE%\IMAGE" "IMAGE.BAT"
 call :run_module "%TREE%\FRMOBJ" "FRMOBJ.BAT"
 call :run_module "%TREE%\HOOK" "HOOK.BAT"
-call :run_module "%TREE%\DBBTRV" "DBBTRV.BAT"
 call :run_module "%TREE%\DBCLEAN" "DBCLEAN.BAT"
 call :run_module "%TREE%\STATBAR" "STATBAR.BAT"
 call :run_module "%TREE%\TOOLBAR" "TOOLBAR.BAT"
+call :run_module "%TREE%\DBBTRV" "DBBTRV.BAT"
 call :run_module "%TREE%\DDSODBC" "DDSODBC.BAT"
-call :run_module "%TREE%\DDSORA" "DDSORA.BAT"
 call :run_module "%TREE%\DDSSEQ" "DDSSEQ.BAT"
 call :run_module "%TREE%\DNETIN" "DNETIN.BAT"
 call :run_module "%TREE%\DNETNV" "DNETNV.BAT"

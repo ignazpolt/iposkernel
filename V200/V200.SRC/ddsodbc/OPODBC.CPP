@@ -532,8 +532,8 @@ LPSTR LongString::AnalyseSeq (LPSTR source,int FAR *ParNums,int FAR *AnzPars,BOO
   if (*source) {
     LPSTR h = source ;
     if (*h == '$') {
-      //Wenn das erste Zeichen überhaupt ein $ ist, dann wird das Statement absolut nicht
-      //betrachtet und verändert
+      //Wenn das erste Zeichen ï¿½berhaupt ein $ ist, dann wird das Statement absolut nicht
+      //betrachtet und verï¿½ndert
       h++ ;
       *this = *this + h ;
       }
@@ -956,7 +956,8 @@ LPSTR Section()
   if (*MySection == '\0') {
     char szFileName[256];
     GetModuleFileName (HINSTANCE(hLibInst), szFileName, sizeof(szFileName));
-    for (int i = lstrlen(szFileName); (i > 0) && (szFileName[i] != '\\') && (szFileName[i] != ':'); i--);
+    int i = lstrlen(szFileName);
+    for ( ; (i > 0) && (szFileName[i] != '\\') && (szFileName[i] != ':'); i--);
     if (i > 0)
       i++;
     i += 3;  // dds
@@ -1458,7 +1459,7 @@ BOOL database::TestTable (LPTABLEDEF td)
     if (!d->IsTested) {
       if (!TestTableDef (td)) {
         char outtxt[256];
-        wsprintf (outtxt,"Tabelle %s stimmt nicht mit der Clientdefinition überein!",ODBCGetTableName (td));
+        wsprintf (outtxt,"Tabelle %s stimmt nicht mit der Clientdefinition ï¿½berein!",ODBCGetTableName (td));
         WIN_ASSERT_TEXT(FALSE,outtxt);
         res = FALSE ;
         }
@@ -2399,7 +2400,7 @@ void odbcstmt::StoreExtendedRow (LPTABLEDEF ti,WORD pos)
         else {
           Data = ConvertToMData (v,Data,pcbValue,&doFree);
           lSize = *pcbValue;
-          //Debugausgabe temporär:
+          //Debugausgabe temporï¿½r:
           if (DoLog ("ATTR0LONG")) {
             if ((i == 0) && (v->mType == VAR_LONG)) {
               char lstr[32];

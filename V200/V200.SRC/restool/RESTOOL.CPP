@@ -1496,7 +1496,8 @@ void DoSetExePath (HINSTANCE hInstance)
   {
   char szFileName[256];
   GetModuleFileName (hInstance, szFileName, sizeof(szFileName));
-  for (int i = lstrlen(szFileName); (i > 0) && (szFileName[i] != '\\') && (szFileName[i] != ':'); i--);
+  int i = lstrlen(szFileName);
+  for (; (i > 0) && (szFileName[i] != '\\') && (szFileName[i] != ':'); i--);
   if (i > 0)
     szFileName[i+1] = '\0';
   else
@@ -1608,7 +1609,7 @@ int PASCAL WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
       if ((retCode == ERROR_SEEK_ON_DEVICE) ||
           (retCode == ERROR_FILE_NOT_FOUND)) {
           MessageBox (GetActiveWindow(),
-                      "DEBUG - PIPE nicht gefunden\r\rDDS.EXE muß zuerst gestartet werden",
+                      "DEBUG - PIPE nicht gefunden\r\rDDS.EXE muï¿½ zuerst gestartet werden",
                       "RESTOOL", 
                       MB_OK);
         }

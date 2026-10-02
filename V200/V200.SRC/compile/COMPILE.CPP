@@ -547,8 +547,9 @@ DLLExport _export WINAPI compiler::~compiler ()
     BitArr *b = FixBitArr ();     if (b != NULL) delete (b);
     }
   // Freigabe der Code - Buffer
-  for (i = 0 ; i < MAX_DEPTH ; i++)
-    if (codebuffer[i]) GlobalFree (codebuffer[i]);
+  for (int i = 0; i < MAX_DEPTH; i++) {
+      if (codebuffer[i]) GlobalFree(codebuffer[i]);
+  }
   if (constbuffer) GlobalFree (constbuffer);
 
   if (ww != NULL)
@@ -618,7 +619,8 @@ DLLExport void _export WINAPI AnalyseAlias (hash *h,LPSTR in,LPSTR name,WORD i,W
   {
   *j = i ;
   LPSTR q = name ;
-  for (LPSTR s = in ; ; ) {
+  LPSTR s = in ;
+  for ( ; ; ) {
     if ((*s == '\0') || (*s == ' ')) {
       *q = '\0' ;
       break ;

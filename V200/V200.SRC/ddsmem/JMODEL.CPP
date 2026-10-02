@@ -89,7 +89,7 @@
 //
 
 #include <windows.h>
-// #include <stdlib.h>
+#include <stdlib.h>
 #include "jni.h"
 #include "dds32.h"
 #include "jmodel.h"
@@ -106,11 +106,287 @@ extern __declspec( dllexport ) void WINAPI dbwin_ass_failed_text (int modnum, in
 #define JAVA_ERROR(text) { dbwin_ass_failed_text(MODULENUM, __LINE__, text); }
 
 LONG javaReferences = 0L;
+static TCHAR gLastLoadedJvmPath[1024] = _T("");
+static TCHAR gLastJavaClassPath[4096] = _T("");
 
 BOOL CatchNextException = FALSE;
 LPTSTR LastJavaExceptionText = NULL;
 GLOBALHANDLE LastJavaExceptionCallStack = NULL;
 jobject LastExceptionObject = NULL;
+
+void AppendTextLimited(TCHAR* target, size_t targetCount, const TCHAR* text) {
+    if (!target || targetCount == 0 || !text) {
+        return;
+    }
+
+    size_t currentLen = (size_t)lstrlen(target);
+    if (currentLen >= targetCount - 1) {
+        return;
+    }
+
+    TCHAR* dst = target + currentLen;
+    const TCHAR* src = text;
+    size_t remaining = targetCount - currentLen - 1;
+    while (remaining > 0 && *src) {
+        *dst++ = *src++;
+        remaining--;
+    }
+    *dst = _T('\0');
+}
+
+void RememberLoadedJvmPath(const TCHAR* path) {
+    if (!path) {
+        gLastLoadedJvmPath[0] = _T('\0');
+        return;
+    }
+    lstrcpyn(gLastLoadedJvmPath, path, _countof(gLastLoadedJvmPath));
+}
+
+void RememberJavaClassPath(const TCHAR* classPathOption) {
+    if (!classPathOption) {
+        gLastJavaClassPath[0] = _T('\0');
+        return;
+    }
+    lstrcpyn(gLastJavaClassPath, classPathOption, _countof(gLastJavaClassPath));
+}
+
+void ReportClassNotFoundWithContext(int line, const ACHAR* classDescriptor) {
+    TCHAR msg[4608];
+#ifdef UNICODE
+    LPCPLSTR uniClass = classDescriptor ? AnsiToBomStr((LPASTR)classDescriptor) : NULL;
+    LPCTSTR classText = uniClass ? TO_LPTSTR(uniClass) : _T("<null>");
+#else
+    LPCTSTR classText = classDescriptor ? classDescriptor : _T("<null>");
+#endif
+    _stprintf(msg,
+              _T("CLASS_NOT_FOUND (class %s), JVM=%s, classpath=%s"),
+              classText,
+              gLastLoadedJvmPath[0] ? gLastLoadedJvmPath : _T("<unknown>"),
+              gLastJavaClassPath[0] ? gLastJavaClassPath : _T("<none>"));
+    dbwin_ass_failed_text(MODULENUM, line, msg);
+#ifdef UNICODE
+    if (uniClass) {
+        FreeGlobMem(uniClass);
+    }
+#endif
+}
+
+BOOL TryFindInsensitiveSubPath(const TCHAR* path, const TCHAR* token, int* indexOut) {
+    if (!path || !token || !indexOut) {
+        return FALSE;
+    }
+
+    int pathLen = lstrlen(path);
+    int tokenLen = lstrlen(token);
+    if (tokenLen <= 0 || tokenLen > 127 || pathLen < tokenLen) {
+        return FALSE;
+    }
+
+    TCHAR probe[128];
+    for (int i = 0; i <= pathLen - tokenLen; i++) {
+        lstrcpyn(probe, path + i, tokenLen + 1);
+        if (lstrcmpi(probe, token) == 0) {
+            *indexOut = i;
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+BOOL AppendJarFilesFromDir(const ACHAR* dirPath, ACHAR* classPathOut, size_t classPathOutCount) {
+    if (!dirPath || !*dirPath || !classPathOut || classPathOutCount == 0) {
+        return FALSE;
+    }
+
+    ACHAR searchPattern[MAX_PATH];
+    if (dirPath[strlen(dirPath) - 1] == '\\' || dirPath[strlen(dirPath) - 1] == '/') {
+        sprintf(searchPattern, "%s*.jar", dirPath);
+    } else {
+        sprintf(searchPattern, "%s\\*.jar", dirPath);
+    }
+
+    WIN32_FIND_DATAA fd;
+    HANDLE hFind = FindFirstFileA(searchPattern, &fd);
+    if (hFind == INVALID_HANDLE_VALUE) {
+        return FALSE;
+    }
+
+    BOOL appended = FALSE;
+    do {
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            continue;
+        }
+
+        ACHAR fullJarPath[MAX_PATH];
+        if (dirPath[strlen(dirPath) - 1] == '\\' || dirPath[strlen(dirPath) - 1] == '/') {
+            sprintf(fullJarPath, "%s%s", dirPath, fd.cFileName);
+        } else {
+            sprintf(fullJarPath, "%s\\%s", dirPath, fd.cFileName);
+        }
+
+        if (classPathOut[0] != '\0') {
+            AppendTextLimited(classPathOut, classPathOutCount, ";");
+        }
+        AppendTextLimited(classPathOut, classPathOutCount, fullJarPath);
+        appended = TRUE;
+    } while (FindNextFileA(hFind, &fd));
+
+    FindClose(hFind);
+    return appended;
+}
+
+BOOL BuildClassPathFromExeLocation(ACHAR* classPathOut, size_t classPathOutCount) {
+    if (!classPathOut || classPathOutCount == 0) {
+        return FALSE;
+    }
+    classPathOut[0] = '\0';
+
+    ACHAR exePath[MAX_PATH];
+    DWORD n = GetModuleFileNameA(NULL, exePath, _countof(exePath));
+    if (n == 0 || n >= _countof(exePath)) {
+        return FALSE;
+    }
+
+    ACHAR exeDir[MAX_PATH];
+    strcpy(exeDir, exePath);
+    for (int i = (int)strlen(exeDir) - 1; i >= 0; --i) {
+        if (exeDir[i] == '\\' || exeDir[i] == '/') {
+            exeDir[i] = '\0';
+            break;
+        }
+    }
+
+    BOOL foundAny = FALSE;
+    if (AppendJarFilesFromDir(exeDir, classPathOut, classPathOutCount)) {
+        foundAny = TRUE;
+    }
+
+    ACHAR libDir[MAX_PATH];
+    sprintf(libDir, "%s\\lib", exeDir);
+    if (AppendJarFilesFromDir(libDir, classPathOut, classPathOutCount)) {
+        foundAny = TRUE;
+    }
+
+    return foundAny;
+}
+
+void GetPathDirectory(const TCHAR* path, TCHAR* outDir, size_t outDirCount) {
+    if (!outDir || outDirCount == 0) {
+        return;
+    }
+    outDir[0] = _T('\0');
+    if (!path || !*path) {
+        return;
+    }
+
+    lstrcpyn(outDir, path, (int)outDirCount);
+    int len = lstrlen(outDir);
+    for (int i = len - 1; i >= 0; i--) {
+        if (outDir[i] == _T('\\') || outDir[i] == _T('/')) {
+            outDir[i] = _T('\0');
+            return;
+        }
+    }
+
+    outDir[0] = _T('\0');
+}
+
+void ResolveJvmDependencyDir(const TCHAR* jvmPath, TCHAR* outDir, size_t outDirCount) {
+    if (!outDir || outDirCount == 0) {
+        return;
+    }
+    outDir[0] = _T('\0');
+    if (!jvmPath || !*jvmPath) {
+        return;
+    }
+
+    int idx = -1;
+    if (TryFindInsensitiveSubPath(jvmPath, _T("\\bin\\client\\jvm.dll"), &idx) ||
+        TryFindInsensitiveSubPath(jvmPath, _T("\\bin\\server\\jvm.dll"), &idx)) {
+        int keepLen = idx + 4; // "\bin"
+        if (keepLen > 0) {
+            lstrcpyn(outDir, jvmPath, keepLen + 1);
+            return;
+        }
+    }
+
+    if (TryFindInsensitiveSubPath(jvmPath, _T("\\jre\\bin\\server\\jvm.dll"), &idx) ||
+        TryFindInsensitiveSubPath(jvmPath, _T("\\jre\\bin\\client\\jvm.dll"), &idx)) {
+        int keepLen = idx + 8; // "\jre\bin"
+        if (keepLen > 0) {
+            lstrcpyn(outDir, jvmPath, keepLen + 1);
+            return;
+        }
+    }
+
+    GetPathDirectory(jvmPath, outDir, outDirCount);
+}
+
+HMODULE LoadJvmLibraryCandidate(const TCHAR* candidatePath, DWORD* lastErrorOut) {
+    if (lastErrorOut) {
+        *lastErrorOut = 0;
+    }
+
+    if (!candidatePath || !*candidatePath) {
+        if (lastErrorOut) {
+            *lastErrorOut = ERROR_INVALID_PARAMETER;
+        }
+        return NULL;
+    }
+
+    TCHAR depDir[MAX_PATH];
+    depDir[0] = _T('\0');
+    ResolveJvmDependencyDir(candidatePath, depDir, _countof(depDir));
+
+    HMODULE h = NULL;
+    BOOL hasCustomDllDir = (depDir[0] != _T('\0'));
+    if (hasCustomDllDir) {
+        SetDllDirectory(depDir);
+        h = LoadLibraryEx(candidatePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+        if (!h && lastErrorOut) {
+            *lastErrorOut = GetLastError();
+        }
+        SetDllDirectory(NULL);
+    } else {
+        h = LoadLibraryEx(candidatePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+        if (!h && lastErrorOut) {
+            *lastErrorOut = GetLastError();
+        }
+    }
+
+    if (!h) {
+        h = LoadLibrary(candidatePath);
+        if (!h && lastErrorOut) {
+            *lastErrorOut = GetLastError();
+        }
+    }
+
+    return h;
+}
+
+const TCHAR* GetProcessBitnessText() {
+#if defined(_WIN64)
+    return _T("64-bit");
+#else
+    return _T("32-bit");
+#endif
+}
+
+void AppendLoadAttempt(TCHAR* target, size_t targetCount, const TCHAR* candidatePath, const TCHAR* depDir, DWORD loadError, BOOL* sawBadExeFormat) {
+    TCHAR row[1024];
+
+    if (sawBadExeFormat && loadError == ERROR_BAD_EXE_FORMAT) {
+        *sawBadExeFormat = TRUE;
+    }
+
+    _stprintf(row,
+              _T("%s [dep=%s] (err=%lu); "),
+              (candidatePath && *candidatePath) ? candidatePath : _T("<empty>"),
+              (depDir && *depDir) ? depDir : _T("<default>"),
+              loadError);
+    AppendTextLimited(target, targetCount, row);
+}
 
 #ifdef DEBUG
 // #define LOG_JAVAREFS 1
@@ -776,18 +1052,49 @@ void JavaModel::Start(const TCHAR* vmpath, const ACHAR* classpath, const ACHAR* 
 #endif
 
         ACHAR buffer[65535];
-        if (classpath) {
-            if (classpath[0] == '"') {
-              sprintf(buffer, "-Djava.class.path=%s", classpath + 1);
-              buffer[strlen(buffer)-1] = '\0';
+        ACHAR autoClasspath[65535];
+        const ACHAR* effectiveClasspath = classpath;
+        ACHAR* envClasspath = getenv("CLASSPATH");
+        RememberJavaClassPath(NULL);
+        autoClasspath[0] = '\0';
+
+        if ((!effectiveClasspath || effectiveClasspath[0] == '\0') &&
+            envClasspath && envClasspath[0] != '\0') {
+            effectiveClasspath = envClasspath;
+        }
+
+        if ((!effectiveClasspath || effectiveClasspath[0] == '\0') &&
+            BuildClassPathFromExeLocation(autoClasspath, _countof(autoClasspath))) {
+            effectiveClasspath = autoClasspath;
+            dbwin_ass_failed_text(MODULENUM, __LINE__, _T("JAVA classpath fallback: auto-built from executable location"));
+        }
+
+        if (effectiveClasspath && effectiveClasspath[0] != '\0') {
+            if (effectiveClasspath[0] == '"') {
+              size_t cpLen = strlen(effectiveClasspath);
+              if (cpLen >= 2 && effectiveClasspath[cpLen - 1] == '"') {
+                  ACHAR classpathUnquoted[65535];
+                  size_t copyLen = cpLen - 2;
+                  if (copyLen >= _countof(classpathUnquoted)) {
+                      copyLen = _countof(classpathUnquoted) - 1;
+                  }
+                  strncpy(classpathUnquoted, effectiveClasspath + 1, copyLen);
+                  classpathUnquoted[copyLen] = '\0';
+                  sprintf(buffer, "-Djava.class.path=%s", classpathUnquoted);
+              } else {
+                  sprintf(buffer, "-Djava.class.path=%s", effectiveClasspath + 1);
               }
-            else
-              sprintf(buffer, "-Djava.class.path=%s", classpath);
+            }
+            else {
+              sprintf(buffer, "-Djava.class.path=%s", effectiveClasspath);
+            }
             options[0].optionString = buffer;
             options[0].extraInfo = NULL;
             vm_args.nOptions = 1;
+            RememberJavaClassPath(buffer);
         } else {
             vm_args.nOptions = 0;
+            RememberJavaClassPath(_T("<none>"));
         }
 
         if (debug_param) {
@@ -972,7 +1279,7 @@ void JavaModel::GetStaticFieldValue(const ACHAR* classDescriptor,
             JAVA_ERROR_PARAM(_T("CLASS_NOT_FOUND (class %s)"),TO_LPTSTR(uniClass));
             FreeGlobMem (uniClass);
 #else           
-            JAVA_ERROR_PARAM(_T("CLASS_NOT_FOUND (class %s)"),classDescriptor);
+            ReportClassNotFoundWithContext(__LINE__, classDescriptor);
 #endif            
         }
 
@@ -1086,7 +1393,7 @@ void JavaModel::CallStaticMethodByNameV(jthrowable *ex,
         }
 #else
         if (!(cls = env->FindClass(classDescriptor))) {
-            JAVA_ERROR_PARAM(_T("CLASS_NOT_FOUND (class %s)"),classDescriptor);
+            ReportClassNotFoundWithContext(__LINE__, classDescriptor);
         }
 
         if (!(mid = env->GetStaticMethodID(cls, method, methodDescriptor))) {
@@ -1094,7 +1401,7 @@ void JavaModel::CallStaticMethodByNameV(jthrowable *ex,
         }
 #endif
 
-        // bewege zeiger zum Rückgabetyp
+        // bewege zeiger zum Rï¿½ckgabetyp
         for (;*p != JAVA_JNI_END_ARGS && *p != STRING_TERMINATOR; p++);
         
         if(*p == STRING_TERMINATOR) {
@@ -1238,7 +1545,7 @@ jobject JavaModel :: CallConstructorV(jthrowable *ex,
         }
 #else          
         if (!(cls = env->FindClass(classDescriptor))) {
-            JAVA_ERROR_PARAM(_T("CLASS_NOT_FOUND (class %s)"),classDescriptor);
+            ReportClassNotFoundWithContext(__LINE__, classDescriptor);
         }
         if (!(cid = env->GetMethodID(cls, JAVA_JNI_CONSTRUCTOR, methodDescriptor))) {
             JAVA_ERROR_PARAM3(_T("METHOD_ID_NOT_FOUND (class %s, method %s%s)"),classDescriptor,JAVA_JNI_CONSTRUCTOR,methodDescriptor);
@@ -1451,7 +1758,7 @@ void JavaModel::CallMethodByNameV(jthrowable *ex,
             }
         }
 
-        // setze zeiger auf Rückgabetyp
+        // setze zeiger auf Rï¿½ckgabetyp
         for(; *p != JAVA_JNI_END_ARGS && *p != STRING_TERMINATOR; p++);
         if(*p == STRING_TERMINATOR) {
             JAVA_ERROR(_T("ILLEGAL_ARGUMENT"));
@@ -1568,7 +1875,7 @@ void JavaModel::CallMethodByNameV(jthrowable *ex,
 }
 
 /**
- * Diese Methode löscht das Objekt mit dem Schlüssel ref
+ * Diese Methode lï¿½scht das Objekt mit dem Schlï¿½ssel ref
  * aus dem Objekt cache und die Referenz darauf,
  * damit garbage collection es beseitigen kann.
  * Im Fehlerfall wird eine Fehlerkennung vom Typ long geworfen.
@@ -1592,9 +1899,9 @@ void JavaModel::Delete(jobject ref) {
 }
 
 /**
- * Diese Methode sucht und lädt die angegebene dynamic link library. Dabei ist die Suchreihenfolge 1. Pfad, 2. Registry.
- * Die Registry wird nach global definierten Schlüsseln befragt. Bei Erfolg hat die Membervariable hVM eine
- * Referenz auf die Bibliothek und es wird true zurück gegeben. 
+ * Diese Methode sucht und lï¿½dt die angegebene dynamic link library. Dabei ist die Suchreihenfolge 1. Pfad, 2. Registry.
+ * Die Registry wird nach global definierten Schlï¿½sseln befragt. Bei Erfolg hat die Membervariable hVM eine
+ * Referenz auf die Bibliothek und es wird true zurï¿½ck gegeben. 
  * Sonst false;
  */
 BOOL JavaModel::FindLibrary() {
@@ -1628,91 +1935,158 @@ BOOL JavaModel::FindLibrary() {
 */
 
     HKEY  hKey;
+    DWORD dwBufSize;
+    DWORD dwType;
+    TCHAR vmDllRegistry[1024];
+    TCHAR depDir[1024];
+    DWORD loadErr;
+    TCHAR loadAttempts[4096];
+    BOOL sawBadExeFormat = FALSE;
+    BOOL hasExplicitJvmPath = (jvmdll[0] != _T('\0'));
+    loadAttempts[0] = _T('\0');
+    RememberLoadedJvmPath(NULL);
 
     // suche zuerst im Pfad
-    if(!(hVM = LoadLibrary(jvmdll))) {
-        DWORD dwBufSize;
-        DWORD dwType;
-        TCHAR vmDllRegistry[1024];
+    ResolveJvmDependencyDir(jvmdll, depDir, _countof(depDir));
+    hVM = LoadJvmLibraryCandidate(jvmdll, &loadErr);
+    if (hVM) {
+        RememberLoadedJvmPath(jvmdll);
+        return TRUE;
+    }
+    AppendLoadAttempt(loadAttempts, _countof(loadAttempts), jvmdll, depDir, loadErr, &sawBadExeFormat);
+    if (hasExplicitJvmPath) {
+        if (loadAttempts[0]) {
+            TCHAR logMsg[4608];
+            _stprintf(logMsg, _T("LIBRARY_NOT_FOUND details: searched %s"), loadAttempts);
+            dbwin_ass_failed_text(MODULENUM, __LINE__, logMsg);
+        }
+        return FALSE;
+    }
 
-        if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
-                        JAVA_REGISTRY_STRING_3, 
-                        0, 
-                        KEY_READ, 
-                        &hKey) == ERROR_SUCCESS) {
-            
-            if(RegQueryValueEx(hKey, 
-                               _T("RuntimeLib"), 
-                               NULL, 
-                               &dwType, 
-                               (LPBYTE) vmDllRegistry, 
-                               &dwBufSize) == ERROR_SUCCESS) {
-                hVM = LoadLibrary(vmDllRegistry);
+    if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                    JAVA_REGISTRY_STRING_3, 
+                    0, 
+                    KEY_READ, 
+                    &hKey) == ERROR_SUCCESS) {
+
+        dwBufSize = sizeof(vmDllRegistry);
+        vmDllRegistry[0] = _T('\0');
+        if(RegQueryValueEx(hKey, 
+                           _T("RuntimeLib"), 
+                           NULL, 
+                           &dwType, 
+                           (LPBYTE) vmDllRegistry, 
+                           &dwBufSize) == ERROR_SUCCESS) {
+            ResolveJvmDependencyDir(vmDllRegistry, depDir, _countof(depDir));
+            hVM = LoadJvmLibraryCandidate(vmDllRegistry, &loadErr);
+            if (hVM) {
+                RememberLoadedJvmPath(vmDllRegistry);
+                RegCloseKey(hKey);
+                return TRUE;
             }
+            AppendLoadAttempt(loadAttempts, _countof(loadAttempts), vmDllRegistry, depDir, loadErr, &sawBadExeFormat);
+        }
 
-            RegCloseKey(hKey);
+        RegCloseKey(hKey);
+    }
+    
+    if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                    JAVA_REGISTRY_STRING_4, 
+                    0, 
+                    KEY_READ, 
+                    &hKey) == ERROR_SUCCESS) {
+
+        dwBufSize = sizeof(vmDllRegistry);
+        vmDllRegistry[0] = _T('\0');
+        if(RegQueryValueEx(hKey, 
+                           _T("RuntimeLib"), 
+                           NULL, 
+                           &dwType, 
+                           (LPBYTE) vmDllRegistry, 
+                           &dwBufSize) == ERROR_SUCCESS) {
+            ResolveJvmDependencyDir(vmDllRegistry, depDir, _countof(depDir));
+            hVM = LoadJvmLibraryCandidate(vmDllRegistry, &loadErr);
+            if (hVM) {
+                RememberLoadedJvmPath(vmDllRegistry);
+                RegCloseKey(hKey);
+                return TRUE;
+            }
+            AppendLoadAttempt(loadAttempts, _countof(loadAttempts), vmDllRegistry, depDir, loadErr, &sawBadExeFormat);
         }
         
-        if(!hVM 
-           && RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
-                           JAVA_REGISTRY_STRING_4, 
-                           0, 
-                           KEY_READ, 
-                           &hKey) == ERROR_SUCCESS) {
+        RegCloseKey(hKey);
+    }
 
-            if(RegQueryValueEx(hKey, 
-                               _T("RuntimeLib"), 
-                               NULL, 
-                               &dwType, 
-                               (LPBYTE) vmDllRegistry, 
-                               &dwBufSize) == ERROR_SUCCESS) {
-                hVM = LoadLibrary(vmDllRegistry);
+    if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                    JAVA_REGISTRY_STRING_1, 
+                    0, 
+                    KEY_READ, 
+                    &hKey) == ERROR_SUCCESS) {
+        
+        dwBufSize = sizeof(vmDllRegistry);
+        vmDllRegistry[0] = _T('\0');
+        if(RegQueryValueEx(hKey, 
+                           _T("RuntimeLib"), 
+                           NULL, 
+                           &dwType, 
+                           (LPBYTE) vmDllRegistry, 
+                           &dwBufSize) == ERROR_SUCCESS) {
+            ResolveJvmDependencyDir(vmDllRegistry, depDir, _countof(depDir));
+            hVM = LoadJvmLibraryCandidate(vmDllRegistry, &loadErr);
+            if (hVM) {
+                RememberLoadedJvmPath(vmDllRegistry);
+                RegCloseKey(hKey);
+                return TRUE;
             }
-            
-            RegCloseKey(hKey);
+            AppendLoadAttempt(loadAttempts, _countof(loadAttempts), vmDllRegistry, depDir, loadErr, &sawBadExeFormat);
         }
+        
+        RegCloseKey(hKey);
+    }
 
-        if(!hVM 
-           && RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
-                            JAVA_REGISTRY_STRING_1, 
-                            0, 
-                            KEY_READ, 
-                            &hKey) == ERROR_SUCCESS) {
-            
-            if(RegQueryValueEx(hKey, 
-                               _T("RuntimeLib"), 
-                               NULL, 
-                               &dwType, 
-                               (LPBYTE) vmDllRegistry, 
-                               &dwBufSize) == ERROR_SUCCESS) {
-                hVM = LoadLibrary(vmDllRegistry);
+    if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                    JAVA_REGISTRY_STRING_2, 
+                    0, 
+                    KEY_READ, 
+                    &hKey) == ERROR_SUCCESS) {
+        
+        dwBufSize = sizeof(vmDllRegistry);
+        vmDllRegistry[0] = _T('\0');
+        if(RegQueryValueEx(hKey, 
+                           _T("RuntimeLib"), 
+                           NULL, 
+                           &dwType, 
+                           (LPBYTE) vmDllRegistry, 
+                           &dwBufSize) == ERROR_SUCCESS) {
+
+            ResolveJvmDependencyDir(vmDllRegistry, depDir, _countof(depDir));
+            hVM = LoadJvmLibraryCandidate(vmDllRegistry, &loadErr);
+            if (hVM) {
+                RememberLoadedJvmPath(vmDllRegistry);
+                RegCloseKey(hKey);
+                return TRUE;
             }
-            
-            RegCloseKey(hKey);
+            AppendLoadAttempt(loadAttempts, _countof(loadAttempts), vmDllRegistry, depDir, loadErr, &sawBadExeFormat);
         }
+        
+        RegCloseKey(hKey);
+    }
 
-        if(!hVM 
-           && RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
-                           JAVA_REGISTRY_STRING_2, 
-                           0, 
-                           KEY_READ, 
-                           &hKey) == ERROR_SUCCESS) {
-            
-            if(RegQueryValueEx(hKey, 
-                               _T("RuntimeLib"), 
-                               NULL, 
-                               &dwType, 
-                               (LPBYTE) vmDllRegistry, 
-                               &dwBufSize) == ERROR_SUCCESS) {
+    if (loadAttempts[0]) {
+        TCHAR logMsg[4608];
+        _stprintf(logMsg, _T("LIBRARY_NOT_FOUND details: searched %s"), loadAttempts);
+        dbwin_ass_failed_text(MODULENUM, __LINE__, logMsg);
 
-                hVM = LoadLibrary(vmDllRegistry);
-            }
-            
-            RegCloseKey(hKey);
+        if (sawBadExeFormat) {
+            TCHAR hintMsg[512];
+            _stprintf(hintMsg,
+                      _T("LIBRARY_NOT_FOUND hint: err=193 (ERROR_BAD_EXE_FORMAT), process=%s. Likely x86/x64 mismatch between DDS and jvm.dll."),
+                      GetProcessBitnessText());
+            dbwin_ass_failed_text(MODULENUM, __LINE__, hintMsg);
         }
     }
 
-    return hVM != NULL;
+    return FALSE;
 }
 
 

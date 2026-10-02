@@ -1,7 +1,0 @@
-ddssyb opsyb
-..\ddsmem.lib ..\dmwapi.lib ..\dbhelp.lib 
-ddssyb.res
-/DEF:ddssyb32.def
-/OUT:ddssyb.dll
-/MAP:ddssyb.map
-

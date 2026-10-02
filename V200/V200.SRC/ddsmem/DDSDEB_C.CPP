@@ -340,10 +340,14 @@ DWORD GetRestoolProcAddress ()
   if (InitRes) {
     HANDLE hsnap = (* pCreateToolhelp32Snapshot) (TH32CS_SNAPPROCESS,0L);
     PROCESSENTRY32 pe;
-    DWORD res;
-    for ( (* pProcess32First) (hsnap,&pe) ; (* pProcess32Next) (hsnap,&pe) ; ) {
-      if (FindString (pe.szExeFile,"RESTOOL.EXE"))
-        res = pe.th32ProcessID ;
+    DWORD res = 0L;
+    if ((* pProcess32First) (hsnap,&pe)) {
+      do {
+        if (FindString (pe.szExeFile,"RESTOOL.EXE")) {
+          res = pe.th32ProcessID;
+          break;
+          }
+        } while ((* pProcess32Next) (hsnap,&pe));
       }
     CloseHandle (hsnap);
     return res;
@@ -759,4 +763,3 @@ DLLExport LONG _export WINAPI GetDDSNextContext (ContextBuffer FAR *vc)
     }
   return 0L ;
   }
-
