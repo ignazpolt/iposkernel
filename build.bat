@@ -1,5 +1,5 @@
 @echo off
-setlocal enableextensions
+setlocal enableextensions enabledelayedexpansion
 
 if "%ACTVERS%"=="" set "ACTVERS=V200"
 
@@ -20,12 +20,28 @@ set "PATH=%TOOLS%;%PATH%"
 echo Using ACTVERS=%ACTVERS% in %ROOT%
 echo Using tools from %TOOLS%
 
-if /I "%~1"=="DBG" goto build_dbg
-if /I "%~1"=="OPT" goto build_opt
-if /I "%~1"=="ALL" goto build_all
+if /I "%~1"=="DBG" (
+  if "%~2"=="" goto build_dbg
+  call :build_selected "DBG" "%~2"
+  goto done
+)
+if /I "%~1"=="OPT" (
+  if "%~2"=="" goto build_opt
+  call :build_selected "OPT" "%~2"
+  goto done
+)
+if /I "%~1"=="ALL" (
+  if "%~2"=="" goto build_all
+  call :build_selected "ALL" "%~2"
+  goto done
+)
 if "%~1"=="" goto build_all
 
-echo Usage: build-all.bat [DBG^|OPT^|ALL]
+echo Usage: build.bat [DBG^|OPT^|ALL] [module[,module...]]
+echo Examples:
+  echo   build.bat DBG ddsmem
+  echo   build.bat OPT ddsseq
+  echo   build.bat ALL ddsmem,ddsseq,dds
 exit /b 1
 
 :build_all
@@ -46,6 +62,78 @@ pushd "%ROOT%" >nul
 call :build_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
 popd >nul
 goto done
+
+:build_selected
+set "PROFILE=%~1"
+set "REQUESTED=%~2"
+set "REQUESTED=%REQUESTED:,= %"
+set "SELECTED="
+set "ROOT_REQ=0"
+
+for %%R in (%REQUESTED%) do (
+  if /I "%%~R"=="DDS" set "ROOT_REQ=1"
+)
+
+for %%M in (DDSMEM DMWAPI DBHELP COMPILE CTOOL IMAGE FRMOBJ HOOK DBBTRV DBCLEAN STATBAR TOOLBAR DDSODBC DDSORA DDSSEQ DNETIN DNETNV RESTOOL) do (
+  set "MATCH=0"
+  for %%R in (%REQUESTED%) do (
+    if /I "%%~R"=="%%M" set "MATCH=1"
+  )
+  if "!MATCH!"=="1" (
+    if not "!SELECTED!"=="" set "SELECTED=!SELECTED! "
+    set "SELECTED=!SELECTED!%%M"
+  )
+)
+
+if "%SELECTED%"=="" if "%ROOT_REQ%"=="0" (
+  echo ERROR: no matching module names found for: %REQUESTED%
+  exit /b 1
+)
+
+if /I "%PROFILE%"=="ALL" (
+  call :build_tree_selected "%ROOT%\%ACTVERS%_32.DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%\%ACTVERS%_32.OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  goto :eof
+)
+if /I "%PROFILE%"=="DBG" (
+  call :build_tree_selected "%ROOT%\%ACTVERS%_32.DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  goto :eof
+)
+if /I "%PROFILE%"=="OPT" (
+  call :build_tree_selected "%ROOT%\%ACTVERS%_32.OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  goto :eof
+)
+
+echo ERROR: unsupported profile %PROFILE%
+exit /b 1
+
+:build_tree_selected
+set "TREE=%~1"
+set "TAG=%~2"
+set "SELECTED=%~3"
+set "ROOT_REQ=%~4"
+
+echo.
+echo ===== Building %TAG% tree at %TREE% =====
+if not "%SELECTED%"=="" (
+  echo Selected modules: %SELECTED%
+  for %%M in (%SELECTED%) do call :run_module "%TREE%\%%M" "%%M.BAT"
+)
+if "%ROOT_REQ%"=="1" (
+  pushd "%TREE%" >nul
+  call BUILD_DDS.BAT
+  set "RC=%ERRORLEVEL%"
+  if exist SUPER32.BAT call SUPER32.BAT
+  popd >nul
+
+  if not "%RC%"=="0" (
+    echo ERROR: BUILD_DDS.BAT failed in %TREE% with code %RC%
+    exit /b %RC%
+  )
+)
+
+echo ===== Completed %TAG% tree =====
+exit /b 0
 
 :build_tree
 set "TREE=%~1"
@@ -74,13 +162,13 @@ call :run_module "%TREE%\DNETNV" "DNETNV.BAT"
 call :run_module "%TREE%\RESTOOL" "RESTOOL.BAT"
 
 pushd "%TREE%" >nul
-call CLINICUM.BAT
+call BUILD_DDS.BAT
 set "RC=%ERRORLEVEL%"
 if exist SUPER32.BAT call SUPER32.BAT
 popd >nul
 
 if not "%RC%"=="0" (
-  echo ERROR: CLINICUM.BAT failed in %TREE% with code %RC%
+  echo ERROR: BUILD_DDS.BAT failed in %TREE% with code %RC%
   exit /b %RC%
 )
 
