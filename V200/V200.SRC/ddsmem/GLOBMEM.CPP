@@ -769,8 +769,8 @@ DLLExport LPSTR _export WINAPI SetStartDir (LPSTR dirname, LPSTR IniFile)
     if (f != HFILE_ERROR)
       first_time = FALSE;
     else {
-      char szBuf[256];
-      wsprintf (szBuf, "%s ist kein g�ltiges INI-Verzeichnis", StartPath);
+      char szBuf[1024];
+      wsprintf (szBuf, "INI-Datei nicht gefunden: %s (Startpfad: %s)", IniName, StartPath);
       WIN_ASSERT_TEXT (FALSE, szBuf);
       }
     return StartPath;

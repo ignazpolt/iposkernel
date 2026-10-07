@@ -6,6 +6,7 @@ if "%ACTVERS%"=="" set "ACTVERS=V200"
 set "IPOS_KERNEL_ROOT=%~dp0"
 set "TOOLS=%IPOS_KERNEL_ROOT%tools"
 set "ROOT=%IPOS_KERNEL_ROOT%%ACTVERS%"
+set "BUILD_FAILED=0"
   
 if not exist "%TOOLS%\makec.bat" (
   echo ERROR: makec shim not found at "%TOOLS%\makec.bat"
@@ -13,7 +14,8 @@ if not exist "%TOOLS%\makec.bat" (
 )
 
 where cl >NUL 2>&1
-if errorlevel 1 call :init_vc
+if errorlevel 1 call "%~dp0init_vc.bat"
+if errorlevel 1 exit /b %ERRORLEVEL%
 
 set "PATH=%TOOLS%;%PATH%"
 
@@ -23,16 +25,19 @@ echo Using tools from %TOOLS%
 if /I "%~1"=="DBG" (
   if "%~2"=="" goto build_dbg
   call :build_selected "DBG" "%~2"
+  if errorlevel 1 set "BUILD_FAILED=1"
   goto done
 )
 if /I "%~1"=="OPT" (
   if "%~2"=="" goto build_opt
   call :build_selected "OPT" "%~2"
+  if errorlevel 1 set "BUILD_FAILED=1"
   goto done
 )
 if /I "%~1"=="ALL" (
   if "%~2"=="" goto build_all
   call :build_selected "ALL" "%~2"
+  if errorlevel 1 set "BUILD_FAILED=1"
   goto done
 )
 if "%~1"=="" goto build_all
@@ -47,19 +52,23 @@ exit /b 1
 :build_all
 pushd "%ROOT%" >nul
 call :build_tree "%ROOT%\%ACTVERS%_32.DBG" "DBG"
+if errorlevel 1 set "BUILD_FAILED=1"
 call :build_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
+if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
 :build_dbg
 pushd "%ROOT%" >nul
 call :build_tree "%ROOT%\%ACTVERS%_32.DBG" "DBG"
+if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
 :build_opt
 pushd "%ROOT%" >nul
 call :build_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
+if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
@@ -69,6 +78,7 @@ set "REQUESTED=%~2"
 set "REQUESTED=%REQUESTED:,= %"
 set "SELECTED="
 set "ROOT_REQ=0"
+set "SELECT_FAILED=0"
 
 for %%R in (%REQUESTED%) do (
   if /I "%%~R"=="DDS" set "ROOT_REQ=1"
@@ -92,15 +102,20 @@ if "%SELECTED%"=="" if "%ROOT_REQ%"=="0" (
 
 if /I "%PROFILE%"=="ALL" (
   call :build_tree_selected "%ROOT%\%ACTVERS%_32.DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  if errorlevel 1 set "SELECT_FAILED=1"
   call :build_tree_selected "%ROOT%\%ACTVERS%_32.OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  if errorlevel 1 set "SELECT_FAILED=1"
+  if "!SELECT_FAILED!"=="1" exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="DBG" (
   call :build_tree_selected "%ROOT%\%ACTVERS%_32.DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  if errorlevel 1 exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="OPT" (
   call :build_tree_selected "%ROOT%\%ACTVERS%_32.OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  if errorlevel 1 exit /b 1
   goto :eof
 )
 
@@ -112,12 +127,16 @@ set "TREE=%~1"
 set "TAG=%~2"
 set "SELECTED=%~3"
 set "ROOT_REQ=%~4"
+set "TREE_FAILED=0"
 
 echo.
 echo ===== Building %TAG% tree at %TREE% =====
 if not "%SELECTED%"=="" (
   echo Selected modules: %SELECTED%
-  for %%M in (%SELECTED%) do call :run_module "%TREE%\%%M" "%%M.BAT"
+  for %%M in (%SELECTED%) do (
+    call :run_module "%TREE%\%%M" "%%M.BAT"
+    if errorlevel 1 set "TREE_FAILED=1"
+  )
 )
 if "%ROOT_REQ%"=="1" (
   pushd "%TREE%" >nul
@@ -128,36 +147,58 @@ if "%ROOT_REQ%"=="1" (
 
   if not "%RC%"=="0" (
     echo ERROR: BUILD_DDS.BAT failed in %TREE% with code %RC%
-    exit /b %RC%
+    set "TREE_FAILED=1"
   )
 )
 
+if "%TREE_FAILED%"=="1" (
+  echo ===== Completed %TAG% tree with errors =====
+  exit /b 1
+)
 echo ===== Completed %TAG% tree =====
 exit /b 0
 
 :build_tree
 set "TREE=%~1"
 set "TAG=%~2"
+set "TREE_FAILED=0"
 
 echo.
 echo ===== Building %TAG% tree at %TREE% =====
 call :run_module "%TREE%\DDSMEM" "DDSMEM.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DMWAPI" "DMWAPI.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DBHELP" "DBHELP.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\COMPILE" "COMPILE.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\CTOOL" "CTOOL.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\IMAGE" "IMAGE.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\FRMOBJ" "FRMOBJ.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\HOOK" "HOOK.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DBCLEAN" "DBCLEAN.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\STATBAR" "STATBAR.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\TOOLBAR" "TOOLBAR.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DBBTRV" "DBBTRV.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DDSODBC" "DDSODBC.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DDSSEQ" "DDSSEQ.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DNETIN" "DNETIN.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\DNETNV" "DNETNV.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 call :run_module "%TREE%\RESTOOL" "RESTOOL.BAT"
+if errorlevel 1 set "TREE_FAILED=1"
 
 pushd "%TREE%" >nul
 call BUILD_DDS.BAT
@@ -167,11 +208,15 @@ popd >nul
 
 if not "%RC%"=="0" (
   echo ERROR: BUILD_DDS.BAT failed in %TREE% with code %RC%
-  exit /b %RC%
+  set "TREE_FAILED=1"
 )
 
 :continue_build
 
+if "%TREE_FAILED%"=="1" (
+  echo ===== Completed %TAG% tree with errors =====
+  exit /b 1
+)
 echo ===== Completed %TAG% tree =====
 exit /b 0
 
@@ -191,37 +236,11 @@ if not "%RC%"=="0" (
 )
 exit /b 0
 
-:init_vc
-where vswhere >NUL 2>&1
-if not errorlevel 1 (
-  for /f "usebackq delims=" %%I in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath 2^>nul`) do (
-    if exist "%%I\Common7\Tools\VsDevCmd.bat" (
-      call "%%I\Common7\Tools\VsDevCmd.bat" -arch=x86
-      exit /b 0
-    )
-  )
-)
-
-for %%I in (
-  "C:\Program Files\Microsoft Visual Studio\2022\BuildTools"
-  "C:\Program Files\Microsoft Visual Studio\2022\Community"
-  "C:\Program Files\Microsoft Visual Studio\2022\Professional"
-  "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\Professional"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise"
-) do (
-  if exist "%%~I\Common7\Tools\VsDevCmd.bat" (
-    call "%%~I\Common7\Tools\VsDevCmd.bat" -arch=x86
-    exit /b 0
-  )
-)
-
-echo ERROR: Visual Studio C/C++ toolchain not found. Open a VS developer prompt or install MSVC.
-exit /b 1
-
 :done
 echo.
-echo Build finished.
+if "%BUILD_FAILED%"=="1" (
+  echo Build finished with errors.
+  exit /b 1
+)
+echo Build finished successfully.
 exit /b 0

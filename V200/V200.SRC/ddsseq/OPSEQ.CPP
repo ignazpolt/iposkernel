@@ -174,6 +174,7 @@ struct FAR KHDef {
   hash FAR *keyHash;
   };
 typedef SeqRDesc FAR *LPSEQRDESC ;
+DWORD GetNextSeqAutoId ();
 class FAR SeqFile {
  public :
   HFILE hfile;
@@ -184,9 +185,8 @@ class FAR SeqFile {
 
   void GetInsertRecord (LPDBRECORD old,LPTABLEDEF td,RecBuffer FAR *res)
     {
-    // Da dieser Zweig nur von DBConvert aufgerufen wird, kann auf
-    // die Recordrueckgabe verzichtet werden
-    res->first = res->act = NULL ;
+    // Keine Manipulation am RecBuffer:
+    // der Aufrufer (z.B. Out in RESSQL) verwendet rb.act nach DBCall noch.
     }
   LPDBRECORD CreateRecord (LPVOID Buffer,LPTABLEDEF td)
     {
@@ -266,10 +266,6 @@ class FAR SeqFile {
         }
       }
 
-    RecBufferLine FAR *n = res->first->Next;
-    FreeGlobMem (res->first);
-    res->first = n;
-
     GetInsertRecord (rec,td,res);
 
     return hGRes ;
@@ -315,7 +311,7 @@ class FAR SeqFile {
     else
       return oldBuffer ;
     }
-  void AddToKey (int kn,LPDBRECORD rec,LONG Pos,LONG recSize)
+  LPVOID BuildKeyBuffer (int kn,LPDBRECORD rec)
     {
     WORD varInd;
     LPTABLEDEF td = rec->GetTableDef (0,&varInd);
@@ -324,11 +320,23 @@ class FAR SeqFile {
       for (int j = 0 ; j < td->GetAnzVars () ; j ++)
         if (lstrcmp (td->GetVarDef(j)->GetName(),k[kn].KeySeg[i]) == 0)
           KeyBuffer = PushToKeyBuffer (KeyBuffer,rec->Get(j));
+    return KeyBuffer;
+    }
+  void AddToKey (int kn,LPDBRECORD rec,LONG Pos,LONG recSize)
+    {
+    LPVOID KeyBuffer = BuildKeyBuffer(kn,rec);
     SeqRDesc r;
     r.dbPos = Pos ;
     r.dbLen = recSize ;
     // WIN_ASSERT (k[kn].keyHash->SetDatav (KeyBuffer,&r,sizeof(r),GetBlockSize(KeyBuffer)));
     k[kn].keyHash->SetDatav (KeyBuffer,&r,sizeof(r),GetBlockSize(KeyBuffer));
+    FreeGlobMem (KeyBuffer);
+    }
+  void DeleteKey (int kn,LPDBRECORD rec)
+    {
+    LPVOID KeyBuffer = BuildKeyBuffer(kn,rec);
+    if (KeyBuffer != NULL)
+      k[kn].keyHash->DelDatav (KeyBuffer,GetBlockSize(KeyBuffer));
     FreeGlobMem (KeyBuffer);
     }
   void Create ()
@@ -341,6 +349,8 @@ class FAR SeqFile {
       WIN_ASSERT (hfile > 0);
       LONG dummy[2];    // Platz fuer die Position des KeyBlockes und
                         // die Laenge des KeyBlockes
+      dummy[0] = 0L;
+      dummy[1] = 0L;
       for (int i = 0 ; i < AnzHashs ; i++)
 #ifdef WIN32
         WIN_ASSERT (_lwrite (hfile,LPSTR(dummy),sizeof(dummy)) == sizeof(dummy));
@@ -354,12 +364,27 @@ class FAR SeqFile {
     if (hfile == 0) {
       char path[PATHBUFFERSIZE];
       OFSTRUCT Of;
-      hfile = OpenFile (GetFullPath(path),&Of,OF_READ | OF_SHARE_COMPAT);
+      hfile = OpenFile (GetFullPath(path),&Of,OF_READWRITE | OF_SHARE_COMPAT);
+      if (hfile <= 0)
+        hfile = OpenFile (GetFullPath(path),&Of,OF_READ | OF_SHARE_COMPAT);
+      if (hfile <= 0) {
+        Create();
+        if (hfile > 0) {
+          _lclose (hfile);
+          hfile = 0;
+          hfileCopy = 0;
+        }
+        hfile = OpenFile (GetFullPath(path),&Of,OF_READWRITE | OF_SHARE_COMPAT);
+        if (hfile <= 0)
+          hfile = OpenFile (GetFullPath(path),&Of,OF_READ | OF_SHARE_COMPAT);
+      }
       hfileCopy = hfile;
       WIN_ASSERT (hfile > 0);
       LONG keyInfo[32];
       WIN_ASSERT (_lread (hfile,keyInfo,sizeof(keyInfo[0]) * AnzHashs * 2) == sizeof(keyInfo[0]) * AnzHashs * 2);
       for (int i = 0 ; i < AnzHashs ; i++) {
+        if ((keyInfo[2 * i + 0] <= 0L) || (keyInfo[2 * i + 1] <= 0L))
+          continue;
         WIN_ASSERT (_llseek (hfile,keyInfo[2 * i + 0],SEEK_SET) == keyInfo[2 * i + 0]);
         GLOBALHANDLE hGKeyInfo = GlobalAlloc (GMEM_MOVEABLE,keyInfo[2 * i + 1]);
         WIN_ASSERT (_hread (hfile,GlobalLock (hGKeyInfo),keyInfo[2 * i + 1]) == keyInfo[2 * i + 1]);
@@ -373,7 +398,7 @@ class FAR SeqFile {
     {
     return FileName ;
     }
-  void CloseFileAfterInsert ()
+  void FlushKeyState ()
     {
     for (int i = 0 ; i < AnzHashs ; i++) {
       GLOBALHANDLE hGKeyBuffer = k[i].keyHash->StoreHugeHash ();
@@ -388,6 +413,14 @@ class FAR SeqFile {
       WIN_ASSERT (_lwrite (hfile,&keysize,sizeof(LONG)) == sizeof(LONG));
 #endif
       _llseek (hfile,0L,SEEK_END);
+      GlobalUnlock (hGKeyBuffer);
+      GlobalFree (hGKeyBuffer);
+      }
+    }
+  void CloseFileAfterInsert ()
+    {
+    FlushKeyState ();
+    for (int i = 0 ; i < AnzHashs ; i++) {
       delete k[i].keyHash ;
       k[i].keyHash = NULL ;
       }
@@ -398,12 +431,50 @@ class FAR SeqFile {
   void Insert (LPDBRECORD rec,RecBuffer FAR *res)
     {
     Create ();
+    if (rec->Get(0) == NULL) {
+      DWORD nwNummer = GetNextSeqAutoId();
+      rec->Initialize (0,&nwNummer,sizeof(nwNummer));
+      }
     LONG length ;
     GLOBALHANDLE hGBuffer = CreateBlock (rec,&length,res);
     for (int i = 0 ; i < AnzHashs ; i++)
       AddToKey (i,rec,Write (GlobalLock (hGBuffer),length),length);
     GlobalUnlock (hGBuffer);
     GlobalFree (hGBuffer);
+    }
+  void Update (LPDBRECORD rec,RecBuffer FAR *res)
+    {
+    Create ();
+    LONG length ;
+    GLOBALHANDLE hGBuffer = CreateBlock (rec,&length,res);
+    LONG newPos = Write (GlobalLock (hGBuffer),length);
+    GlobalUnlock (hGBuffer);
+    for (int i = 0 ; i < AnzHashs ; i++) {
+      LPVOID KeyBuffer = BuildKeyBuffer (i,rec);
+      if (KeyBuffer != NULL) {
+        SeqRDesc r;
+        r.dbPos = newPos ;
+        r.dbLen = length ;
+        k[i].keyHash->DelDatav (KeyBuffer,GetBlockSize(KeyBuffer));
+        k[i].keyHash->SetDatav (KeyBuffer,&r,sizeof(r),GetBlockSize(KeyBuffer));
+        FreeGlobMem (KeyBuffer);
+        }
+      }
+    GlobalFree (hGBuffer);
+    }
+  void Delete (LPDBRECORD rec)
+    {
+    for (int i = 0 ; i < AnzHashs ; i++)
+      DeleteKey (i,rec);
+    }
+  void DeleteByParams (int j,LPVOID FAR *p)
+    {
+    LPVOID KeyBuffer = NULL;
+    for (int i = 0 ; i < k[j].AnzKeySegs ; i++)
+      KeyBuffer = PushToKeyBuffer (KeyBuffer,p[i + 2]);
+    if (KeyBuffer != NULL)
+      k[j].keyHash->DelDatav (KeyBuffer,GetBlockSize(KeyBuffer));
+    FreeGlobMem (KeyBuffer);
     }
   int CheckSelection (LPSTR WhereStatement)
     {
@@ -524,6 +595,17 @@ static struct {
     { "DictDB" , 1 , DictDBKeys , NULL } 
   } ;
 
+static DWORD SeqAutoIdCounter = 0;
+DWORD GetNextSeqAutoId ()
+  {
+  if (SeqAutoIdCounter == 0)
+    SeqAutoIdCounter = GetTickCount();
+  SeqAutoIdCounter++;
+  if (SeqAutoIdCounter == 0)
+    SeqAutoIdCounter = 1;
+  return SeqAutoIdCounter;
+  }
+
 static BOOL Initialized ;
 void Initialize ()
   {
@@ -559,6 +641,24 @@ DLLExport int _export WINAPI DBCall (WORD Op,int AnzLines,LPDBREQUEST req,LPVOID
       break ;
     default :
       Initialize ();
+      if (req->Type == DBCALLTYPE_EXECUTE) {
+        if ((req->SelectionName != NULL) &&
+            (lstrcmp (req->SelectionName,"DELETE FROM DataDict WHERE Type = %1 AND TableID = %2 AND Version = %3") == 0)) {
+          s = NULL;
+          for (int si = 0 ; si < sizeof(sfDef) / sizeof(sfDef[0]) ; si++)
+            if (lstrcmp (sfDef[si].fName,"DataDict") == 0)
+              s = sfDef[si].sf ;
+          WIN_ASSERT (s != NULL);
+          s->Open ();
+          int hn = s->CheckSelection ("Type = %1 AND TableID = %2 AND Version = %3");
+          WIN_ASSERT (hn >= 0);
+          s->DeleteByParams (hn,req->Param);
+          state = DBCALL_ENDOFFILE ;
+          }
+        else
+          WIN_ASSERT (FALSE);
+        break ;
+        }
       s = GetSeqFile (req->TableDef[0]);
       WIN_ASSERT (s != NULL) ;
       switch (req->Type) {
@@ -568,6 +668,20 @@ DLLExport int _export WINAPI DBCall (WORD Op,int AnzLines,LPDBREQUEST req,LPVOID
           break ;
         case DBCALLTYPE_STANDARDINSERT :
           s->Insert (res->first->rec[0],res);
+          if ((res != NULL) && (res->first != NULL))
+            res->first->rec[0] = NULL;
+          state = DBCALL_SUCCESS ;
+          break ;
+        case DBCALLTYPE_STANDARDUPDATE :
+          s->Update (res->first->rec[0],res);
+          if ((res != NULL) && (res->first != NULL))
+            res->first->rec[0] = NULL;
+          state = DBCALL_SUCCESS ;
+          break ;
+        case DBCALLTYPE_STANDARDDELETE :
+          s->Delete (res->first->rec[0]);
+          if ((res != NULL) && (res->first != NULL))
+            res->first->rec[0] = NULL;
           state = DBCALL_SUCCESS ;
           break ;
         case DBCALLTYPE_STANDARDGET :
@@ -660,4 +774,3 @@ void OnExit ()
       }
   Initialized = FALSE ;
   }
-

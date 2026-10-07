@@ -49,6 +49,27 @@
       "stopAtEntry": false,
       "justMyCode": false,
       "externalConsole": false
+    },
+    {
+      "name": "DDSSEQ Harness (V200.TEST DBG)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:/ipos_kernel/V200/V200.TEST/DDSSEQ/ddsseq_harness.exe",
+      "args": [
+        "all"
+        "--ini",
+        "DMW.INI"
+      ],
+      "cwd": "C:/ipos_kernel/V200/V200.TEST/DDSSEQ",
+      "env": {
+        "PATH": "C:/ipos_kernel/LIB32;C:/ipos_kernel/V200/V200_32.DBG;${env:PATH}"
+      },
+      "sourceFileMap": {
+        "C:/ipos_kernel/V200/V200.SRC": "C:/ipos_kernel/V200/V200.SRC"
+      },
+      "stopAtEntry": false,
+      "justMyCode": false,
+      "externalConsole": true
     }
   ]
 }
