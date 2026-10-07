@@ -1,0 +1,54 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DDS (Legacy DBG)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:/ipos_kernel/V200/V200_32.DBG/dds.exe",
+      "args": [
+        "C:/Ipos/IPOS_V200/data_krt_client"
+      ],
+      "cwd": "C:/ipos_kernel/V200/V200_32.DBG",
+      "env": {
+        "PATH": "C:/ipos_kernel/LIB32;C:/ipos_kernel/V200/V200_32.DBG;${env:PATH}"
+      },
+      "sourceFileMap": {
+        "C:/ipos_kernel/V200/V200.SRC": "C:/ipos_kernel/V200/V200.SRC"
+      },
+      "stopAtEntry": false,
+      "justMyCode": false,
+      "externalConsole": false
+    },
+    {
+      "name": "DDS (Attach to running dds.exe)",
+      "type": "cppvsdbg",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "program": "C:/ipos_kernel/V200/V200_32.DBG/dds.exe",
+      "sourceFileMap": {
+        "C:/ipos_kernel/V200/V200.SRC": "C:/ipos_kernel/V200/V200.SRC"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "RESTOOL (Legacy DBG)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:/ipos_kernel/V200/V200_32.DBG/restool.exe",
+      "args": [
+        "C:/Ipos/IPOS_V200/data_krt_client"
+      ],
+      "cwd": "C:/ipos_kernel/V200/V200_32.DBG",
+      "env": {
+        "PATH": "C:/ipos_kernel/LIB32;C:/ipos_kernel/V200/V200_32.DBG;${env:PATH}"
+      },
+      "sourceFileMap": {
+        "C:/ipos_kernel/V200/V200.SRC": "C:/ipos_kernel/V200/V200.SRC"
+      },
+      "stopAtEntry": false,
+      "justMyCode": false,
+      "externalConsole": false
+    }
+  ]
+}

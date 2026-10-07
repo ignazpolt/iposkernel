@@ -1403,7 +1403,8 @@ void DoSetExePath (HINSTANCE hInstance)
   {
   char szFileName[256];
   GetModuleFileName (hInstance, szFileName, sizeof(szFileName));
-  for (int i = lstrlen(szFileName); (i > 0) && (szFileName[i] != '\\') && (szFileName[i] != ':'); i--);
+  int i = lstrlen(szFileName);
+  for ( ; (i > 0) && (szFileName[i] != '\\') && (szFileName[i] != ':'); i--);
   if (i > 0)
     szFileName[i+1] = '\0';
   else

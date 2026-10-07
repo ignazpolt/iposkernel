@@ -201,6 +201,13 @@ function Get-ProjectIncludePaths {
 function Get-JavaIncludePaths {
     $roots = @()
 
+    # Prefer the deployed Java used at runtime to keep JNI headers aligned.
+    $roots += "C:\ipos_host\JavaDeploy\JAVA\32Bit\ojdk1.8.0_201"
+
+    if ($env:IPOS_JAVA_HOME) {
+        $roots += $env:IPOS_JAVA_HOME
+    }
+
     if ($env:JAVA_HOME) {
         $roots += $env:JAVA_HOME
     }
@@ -229,6 +236,7 @@ function Get-JavaIncludePaths {
         }
     }
 
+    Write-Host "makec: Java JNI include root not found. Checked: $($roots -join ', ')"
     return @()
 }
 

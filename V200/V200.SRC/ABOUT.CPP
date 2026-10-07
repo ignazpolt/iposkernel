@@ -689,7 +689,8 @@ BOOL GetSystemPath (mdiChild *c,LPVOID param,WORD mode)
       case 1:  // INI-Pfad
         {
         lstrcpy(szFullPath,GetIniName());
-        for (int i = lstrlen(szFullPath); (i > 0) &&
+        int i = lstrlen(szFullPath);
+        for ( ; (i > 0) &&
                (szFullPath[i] != '\\') &&
                (szFullPath[i] != '/') &&
                (szFullPath[i] != ':'); i--);

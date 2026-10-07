@@ -1,3 +1,0 @@
-LIBRARY DDSORA1
-DESCRIPTION 'Datenbankanbindung Berlin - Oracle / Resources, (c) Glance AG, Switzerland'
-INCLUDE DDSORA.DEF

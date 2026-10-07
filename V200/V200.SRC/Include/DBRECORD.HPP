@@ -323,7 +323,8 @@ struct FAR DBRequest {
     }
   void SetOutParam (WORD parNo,LPVOID data,WORD dSize)
     { 
-    for (OutParam FAR *h = op ; h != NULL ; h = h->Next) {
+    OutParam FAR *h = op;
+    for ( ; h != NULL ; h = h->Next) {
       if (h->parNum == parNo) {
         if (h->Data != NULL) FreeGlobMem (h->Data) , h->Data = NULL;
         if (data != NULL)
@@ -356,7 +357,7 @@ struct FAR DBRequest {
   void ClearParams ()
     {
     for (int i = 0 ; i < CB_PARAM ; i++) if (Param[i] != NULL) FreeGlobMem(Param[i]) , Param[i] = NULL ;
-    for (i = 0 ; i < CB_SORTPARAM ; i++) if (SortParam[i] != NULL) FreeGlobMem(SortParam[i]) , SortParam[i] = NULL ;
+    for (int i = 0 ; i < CB_SORTPARAM ; i++) if (SortParam[i] != NULL) FreeGlobMem(SortParam[i]) , SortParam[i] = NULL ;
     }
   void ClearOutParam ()
     {

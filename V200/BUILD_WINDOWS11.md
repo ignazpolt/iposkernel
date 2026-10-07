@@ -39,5 +39,6 @@ build-all.bat ALL
 ## Notes
 
 - The shim currently applies debug-friendly compile flags for all profiles (`MAKEC1`, `COMPDLL`, `COMPDLL1`, default).
+- Java JNI headers and CMake JNI link resolution (`jvm.lib`) are pinned first to `C:\ipos_host\JavaDeploy\JAVA\32Bit\ojdk1.8.0_201` (override with `IPOS_JAVA_HOME`, then `JAVA_HOME`).
 - If a module needs profile-specific flags, adjust mapping in `tools/makec.ps1`.
 - On compile/link failure, check per-module `err` files and `supererr` in the corresponding tree root.
