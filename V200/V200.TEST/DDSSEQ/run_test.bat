@@ -12,7 +12,7 @@ if errorlevel 1 exit /b %ERRORLEVEL%
 
 set "SEQ_SOURCE=%V200_ROOT%\SEQ"
 set "SEQ_TARGET=%V200_TEST_ROOT%SEQ"
-set "INI_SOURCE=%TEST_ROOT%DMW.INI"
+set "INI_SOURCE=%V200_ROOT%\INI\DMW.INI"
 set "INI_RUNTIME=%TEST_ROOT%DMW.INI"
 
 if not exist "%INI_SOURCE%" (
@@ -36,7 +36,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$src = $env:INI_SOURCE; $dst = $env:INI_RUNTIME; $seq = $env:SEQ_TARGET;" ^
   "$seq = $seq.TrimEnd('\') + '\';" ^
   "$txt = Get-Content -LiteralPath $src;" ^
-  "$txt = $txt -replace '^ResourceDLL=.*$', 'ResourceDLL=MV3';" ^
   "$txt = $txt -replace '^SeqPath=.*$', ('SeqPath=' + $seq);" ^
   "Set-Content -LiteralPath $dst -Value $txt -Encoding ascii;"
 if errorlevel 1 (

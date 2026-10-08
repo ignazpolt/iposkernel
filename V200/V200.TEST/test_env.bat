@@ -3,6 +3,8 @@ setlocal
 
 set "V200_TEST_ROOT=%~dp0"
 set "V200_ROOT=%V200_TEST_ROOT%.."
+set "REPO_ROOT=%V200_TEST_ROOT%..\.."
+
 if "%TEST_PROFILE%"=="" set "TEST_PROFILE=DBG"
 
 if /I "%TEST_PROFILE%"=="DBG" (
