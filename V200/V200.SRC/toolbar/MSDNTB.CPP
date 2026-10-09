@@ -597,7 +597,7 @@ void ToolBar::ToolbarPaint ()
   if (!rc.right)
     goto Error1;
 
-  // Zeichnet oben eine weiße Linie und unten eine dunkelgraue Linie
+  // Zeichnet oben eine weiï¿½e Linie und unten eine dunkelgraue Linie
   RECT rcLine;
   COLORREF    OldBack;
 
@@ -1738,10 +1738,13 @@ HBITMAP CreateMappedBitmap(HINSTANCE hInstance, int idBitmap )
   DWORD FAR *p;
   LPSTR     lpBits;
   HANDLE    hRes;
+  HGLOBAL   hCopy = NULL;
+  LPBYTE    pCopy = NULL;
   LPBITMAPINFOHEADER  lpBitmapInfo;
   HBITMAP   hbm = NULL, hbmOld;
-  int       numcolors, i;
+  int       numcolors = 0, i;
   int       wid, hgt;
+  DWORD     cbRes;
   static COLORMAP ColorMap[] = {
     {BGR_BUTTONTEXT,    BGR_BUTTONTEXT,    COLOR_BTNTEXT},     // black
     {BGR_BUTTONSHADOW,  BGR_BUTTONSHADOW,  COLOR_BTNSHADOW},   // dark grey
@@ -1758,29 +1761,64 @@ HBITMAP CreateMappedBitmap(HINSTANCE hInstance, int idBitmap )
     return NULL;
 
   hRes = LoadResource(hInstance, h);
-
-  /* Lock the bitmap and get a pointer to the color table. */
-  lpBitmapInfo = (LPBITMAPINFOHEADER)LockResource(hRes);
-  if (!lpBitmapInfo)
+  if (!hRes)
     return NULL;
 
-  //
-  // So what are the new colors anyway ?
-  //
+  cbRes = SizeofResource(hInstance, h);
+  if (cbRes == 0) {
+    FreeResource(hRes);
+    return NULL;
+  }
+
+  lpBitmapInfo = (LPBITMAPINFOHEADER)LockResource(hRes);
+  if (!lpBitmapInfo || lpBitmapInfo->biSize < sizeof(BITMAPINFOHEADER)) {
+    UnlockResource(hRes);
+    FreeResource(hRes);
+    return NULL;
+  }
+
+  // The resource memory returned by LoadResource is read-only.  The old code
+  // modified the palette in place, which crashes on modern Windows when the
+  // resource is backed by a read-only page.  Make a writable copy first.
+  hCopy = GlobalAlloc(GMEM_FIXED, cbRes);
+  if (!hCopy) {
+    UnlockResource(hRes);
+    FreeResource(hRes);
+    return NULL;
+  }
+
+  pCopy = (LPBYTE)GlobalLock(hCopy);
+  if (!pCopy) {
+    GlobalFree(hCopy);
+    UnlockResource(hRes);
+    FreeResource(hRes);
+    return NULL;
+  }
+
+  CopyMemory(pCopy, lpBitmapInfo, cbRes);
+  lpBitmapInfo = (LPBITMAPINFOHEADER)pCopy;
+
+  // Only bitmaps with a palette need a color-table remap.
+  if (lpBitmapInfo->biBitCount <= 8) {
+    numcolors = lpBitmapInfo->biClrUsed ? (int)lpBitmapInfo->biClrUsed : (1 << lpBitmapInfo->biBitCount);
+    if (numcolors < 0)
+      numcolors = 0;
+    if (numcolors > 256)
+      numcolors = 256;
+  }
+
   for (i=0; i < NUM_MAPS; i++) {
     ColorMap[i].bgrto = FlipColor(GetSysColor((int)ColorMap[i].sysColor));
     }
 
   p = (DWORD FAR *)(((LPSTR)lpBitmapInfo) + lpBitmapInfo->biSize);
 
-  /* Replace button-face and button-shadow colors with the current values
-   */
-  numcolors = 16;
-
-  while (numcolors-- > 0) {
-    for (i = 0; i < NUM_MAPS; i++) {
-      if (*p == ColorMap[i].bgrfrom) {
-        *p = ColorMap[i].bgrto;
+  // Replace only actual palette entries.  A fixed 16-entry loop is unsafe for
+  // newer bitmaps and can walk beyond the valid palette memory.
+  for (i = 0; i < numcolors; i++) {
+    for (int j = 0; j < NUM_MAPS; j++) {
+      if (*p == ColorMap[j].bgrfrom) {
+        *p = ColorMap[j].bgrto;
         break;
         }
       }
@@ -1791,16 +1829,25 @@ HBITMAP CreateMappedBitmap(HINSTANCE hInstance, int idBitmap )
   lpBits = (LPSTR)(lpBitmapInfo + 1);
 
   /* Skip the color table entries, if any */
-  lpBits += (1 << (lpBitmapInfo->biBitCount)) * sizeof(RGBQUAD);
+  if (numcolors > 0)
+    lpBits += numcolors * sizeof(RGBQUAD);
 
   /* Create a color bitmap compatible with the display device */
-  i = wid = (int)lpBitmapInfo->biWidth;
+  wid = (int)lpBitmapInfo->biWidth;
   hgt = (int)lpBitmapInfo->biHeight;
+  if (wid <= 0 || hgt <= 0) {
+    GlobalUnlock(hCopy);
+    GlobalFree(hCopy);
+    UnlockResource(hRes);
+    FreeResource(hRes);
+    return NULL;
+  }
+
   hdc = GetDC(NULL);
 
   hdcMem = CreateCompatibleDC(hdc);
   if (hdcMem) {
-    hbm = CreateDiscardableBitmap(hdc, i, hgt);
+    hbm = CreateDiscardableBitmap(hdc, wid, hgt);
     if (hbm) {
         hbmOld = (HBITMAP)SelectObject(hdcMem, hbm);
 
@@ -1815,6 +1862,9 @@ HBITMAP CreateMappedBitmap(HINSTANCE hInstance, int idBitmap )
   }
 
   ReleaseDC(NULL, hdc);
+
+  GlobalUnlock(hCopy);
+  GlobalFree(hCopy);
 
   UnlockResource(hRes);
   FreeResource(hRes);
@@ -2482,7 +2532,7 @@ DLLExport LONG _export FAR PASCAL PopupDockWndProc(HWND hWnd, UINT msg, WPARAM w
       ((LPPOINT)lParam)[3].x = GetSystemMetrics (SM_CXICON)-10;
       break;
 
-    // Cursor-Form nur am Rahmen ändern
+    // Cursor-Form nur am Rahmen ï¿½ndern
     case WM_SETCURSOR:
       {
       HWND hWndCursor = HWND(wParam);  // Fenster das den Cursor besitzt

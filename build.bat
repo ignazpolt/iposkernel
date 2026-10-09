@@ -24,19 +24,19 @@ echo Using tools from %TOOLS%
 
 if /I "%~1"=="DBG" (
   if "%~2"=="" goto build_dbg
-  call :build_selected "DBG" "%~2"
+  call :build_selected "DBG" "%~2 %~3 %~4 %~5 %~6 %~7 %~8 %~9"
   if errorlevel 1 set "BUILD_FAILED=1"
   goto done
 )
 if /I "%~1"=="OPT" (
   if "%~2"=="" goto build_opt
-  call :build_selected "OPT" "%~2"
+  call :build_selected "OPT" "%~2 %~3 %~4 %~5 %~6 %~7 %~8 %~9"
   if errorlevel 1 set "BUILD_FAILED=1"
   goto done
 )
 if /I "%~1"=="ALL" (
   if "%~2"=="" goto build_all
-  call :build_selected "ALL" "%~2"
+  call :build_selected "ALL" "%~2 %~3 %~4 %~5 %~6 %~7 %~8 %~9"
   if errorlevel 1 set "BUILD_FAILED=1"
   goto done
 )
@@ -78,6 +78,7 @@ set "REQUESTED=%~2"
 set "REQUESTED=%REQUESTED:,= %"
 set "SELECTED="
 set "ROOT_REQ=0"
+set "UNKNOWN="
 set "SELECT_FAILED=0"
 
 for %%R in (%REQUESTED%) do (
@@ -93,6 +94,24 @@ for %%M in (DDSMEM DMWAPI DBHELP COMPILE CTOOL IMAGE FRMOBJ HOOK DBCLEAN STATBAR
     if not "!SELECTED!"=="" set "SELECTED=!SELECTED! "
     set "SELECTED=!SELECTED!%%M"
   )
+)
+
+for %%R in (%REQUESTED%) do (
+  set "KNOWN=0"
+  if /I "%%~R"=="DDS" set "KNOWN=1"
+  for %%M in (DDSMEM DMWAPI DBHELP COMPILE CTOOL IMAGE FRMOBJ HOOK DBCLEAN STATBAR TOOLBAR DBBTRV DDSODBC DDSSEQ DNETIN DNETNV RESTOOL) do (
+    if /I "%%~R"=="%%M" set "KNOWN=1"
+  )
+  if "!KNOWN!"=="0" (
+    if not "!UNKNOWN!"=="" set "UNKNOWN=!UNKNOWN!,"
+    set "UNKNOWN=!UNKNOWN!%%~R"
+  )
+)
+
+if not "!UNKNOWN!"=="" (
+  echo ERROR: unknown module name^(s^): !UNKNOWN!
+  echo Known modules: DDSMEM,DMWAPI,DBHELP,COMPILE,CTOOL,IMAGE,FRMOBJ,HOOK,DBCLEAN,STATBAR,TOOLBAR,DBBTRV,DDSODBC,DDSSEQ,DNETIN,DNETNV,RESTOOL,DDS
+  exit /b 1
 )
 
 if "%SELECTED%"=="" if "%ROOT_REQ%"=="0" (

@@ -1817,30 +1817,94 @@ LPTABLEDEF GetTableDef (LPSTR Name,mdiChild *c,WORD FAR *TableInd,WORD FAR *Anz,
       return res ;
       }
     }
-#ifdef UEBERLEGT
-  else if (UseAlias) {
-    WORD tid ;
-    int tnr = GetTableNr (c->schd,&tid,Name);
-    if (tnr >= 0) {
-      *TableInd = tnr;
-      LPTABLEDEF res = GetTableAdmin()->GetTableDef(tid);
-      DBWIN_ASSERT (res->tRefParent.TableNr == 0);
-      return res ;
+  char debugInfo[2048];
+  char nameBuf[128];
+  if ((Name != NULL) && (*Name != '\0'))
+    lstrcpyn (nameBuf,Name,sizeof(nameBuf));
+  else
+    lstrcpy (nameBuf,"<null>");
+  wsprintf (debugInfo,
+            "GetTableDef failed: Name=%s, TableNrArg=%d, AnzTables=%u",
+            nameBuf,TableNr,c->schd->AnzTables);
+  int foundByName = -1;
+  WORD foundTid = 0;
+  WORD foundVer = 0;
+  if ((Name != NULL) && (*Name != '\0')) {
+    for (int si = 0 ; si < int(c->schd->AnzTables) ; si++) {
+      WORD scanTid = c->schd->TRef[si].TableNr;
+      WORD scanVer = c->schd->TRef[si].Version;
+      if (scanTid <= 0)
+        continue;
+      LPTABLEDEF scanTd = GetTableAdmin()->GetTableDef (scanTid,scanVer);
+      if (scanTd != NULL) {
+        BOOL isMatch = (lstrcmp (scanTd->GetName(),Name) == 0);
+        GetTableAdmin()->FreeTable (scanTid,scanVer);
+        if (isMatch) {
+          foundByName = si;
+          foundTid = scanTid;
+          foundVer = scanVer;
+          break;
+          }
+        }
       }
+    }
+  if (foundByName >= 0) {
+    char matchInfo[96];
+    wsprintf (matchInfo,"; NameMatch=TRef[%d]=%u/%u",foundByName,foundTid,foundVer);
+    if ((lstrlen(debugInfo) + lstrlen(matchInfo)) < int(sizeof(debugInfo) - 1))
+      lstrcat (debugInfo,matchInfo);
     }
   else {
-    for (WORD i = 0 ; i < c->schd->AnzTables ; i++) {
-      LPTABLEDEF td = GetTableAdmin()->GetTableDef(c->schd->TableNr[i]);
-      if (lstrcmp(Name,td->GetName()) == 0) {
-        *TableInd = i + CSYSRECS;
-        DBWIN_ASSERT(td->tRefParetent.TableNr == 0);
-        return td;
-        }
-      GetTableAdmin()->FreeTable(td->GetTableID());
+    if ((lstrlen(debugInfo) + 20) < int(sizeof(debugInfo) - 1))
+      lstrcat (debugInfo,"; NameMatch=<none>");
+    }
+  int found20480 = -1;
+  WORD found20480ver = 0;
+  for (int si = 0 ; si < int(c->schd->AnzTables) ; si++) {
+    if (c->schd->TRef[si].TableNr == 20480) {
+      found20480 = si;
+      found20480ver = c->schd->TRef[si].Version;
+      break;
       }
     }
-#endif
-  DBWIN_ASSERT(FALSE);  // Tabelle nicht deklariert !!
+  if (found20480 >= 0) {
+    char table20480Info[64];
+    wsprintf (table20480Info,"; TRefContains20480=TRef[%d]/%u",found20480,found20480ver);
+    if ((lstrlen(debugInfo) + lstrlen(table20480Info)) < int(sizeof(debugInfo) - 1))
+      lstrcat (debugInfo,table20480Info);
+    }
+  else {
+    if ((lstrlen(debugInfo) + 25) < int(sizeof(debugInfo) - 1))
+      lstrcat (debugInfo,"; TRefContains20480=<none>");
+    }
+  int maxDump = c->schd->AnzTables;
+  if (maxDump > 10)
+    maxDump = 10;
+  if (c->schd->AnzTables > maxDump) {
+    char limInfo[48];
+    wsprintf (limInfo,"; DumpLimit=%d",maxDump);
+    if ((lstrlen(debugInfo) + lstrlen(limInfo)) < int(sizeof(debugInfo) - 1))
+      lstrcat (debugInfo,limInfo);
+    }
+  for (int di = 0 ; di < maxDump ; di++) {
+    char part[180];
+    WORD dumpTid = c->schd->TRef[di].TableNr;
+    WORD dumpVer = c->schd->TRef[di].Version;
+    if (dumpTid > 0) {
+      LPTABLEDEF dumpTd = GetTableAdmin()->GetTableDef (dumpTid,dumpVer);
+      if (dumpTd != NULL) {
+        wsprintf (part,"; TRef[%d]=%u/%u:%s",di,dumpTid,dumpVer,dumpTd->GetName());
+        GetTableAdmin()->FreeTable (dumpTid,dumpVer);
+        }
+      else
+        wsprintf (part,"; TRef[%d]=%u/%u:<missing>",di,dumpTid,dumpVer);
+      }
+    else
+      wsprintf (part,"; TRef[%d]=%u/%u:<temp-or-const>",di,dumpTid,dumpVer);
+    if ((lstrlen(debugInfo) + lstrlen(part)) < int(sizeof(debugInfo) - 1))
+      lstrcat (debugInfo,part);
+    }
+  DBWIN_ASSERT_TEXT (FALSE,debugInfo);  // Tabelle nicht deklariert !!
   return NULL ;
   }
 
@@ -3677,4 +3741,3 @@ void GetListData (LPVOID FAR *lpp,RecordList FAR * &l,LPTABLEDEF &td,LPSTR &Alia
       }
     }
   }
-

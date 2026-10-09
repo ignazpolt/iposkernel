@@ -1,4 +1,4 @@
-# ipos_kernel Architecture
+﻿# ipos_kernel Architecture
 
 ## Scope
 
@@ -106,9 +106,342 @@ RESTOOL artifact mapping:
 
 DDS runtime startup loads and uses this persisted state (for example via `LoadScriptContent()`, `ReadDataDict()` checks for update flags).
 
+### 3.1 SEQ file format specification (`ddsseq`)
+
+This section documents the currently implemented SEQ layout from `V200/V200.SRC/ddsseq/OPSEQ.CPP`.
+
+#### 3.1.1 Global file structure
+
+Each SEQ file (`ScriptDB.seq`, `ResDB.seq`, `DataDict.seq`, `RestriktionsScript.seq`, `DictDB.seq`) has:
+
+1. **Header area** at file start
+2. **Append-only payload area** for record blocks and persisted key-state blobs
+
+Header format:
+
+- For each configured hash key (`AnzHashs`), two `LONG` values are stored:
+  - `keyPos` (offset of persisted hash blob)
+  - `keyLen` (length of persisted hash blob)
+- So header size is `AnzHashs * 2 * sizeof(LONG)`.
+
+On open, DDSSEQ validates each header pair (`keyPos/keyLen`) against file bounds before loading key-state.
+
+#### 3.1.2 Index management
+
+Indexing is managed by in-memory `hash` objects (`KHDef.keyHash`), one per key definition.
+
+- Index key bytes are built by concatenating raw field blocks of configured key segments (`BuildKeyBuffer`).
+  - For `ScriptDB` the key definition is `Type, fName` (in exactly this order).
+  - `BuildKeyBuffer` takes each key field from the record and appends its full in-memory block (`GetBlockSize(...)` bytes), not only logical payload text/number bytes.
+  - Therefore key bytes are effectively:
+    - `[Type-block bytes][fName-block bytes]`
+    - where each block contains the internal typed representation used by `DBRecord` fields.
+- Index value is `SeqRDesc { dbPos, dbLen }` (payload offset + payload length).
+- Inserts/updates rewrite key mapping (`DelDatav` + `SetDatav`).
+- Deletes remove key mapping (`DelDatav`) only.
+
+Persistence of index:
+
+- `FlushKeyState()` serializes each in-memory hash (`StoreHugeHash()`), appends the serialized blob, then updates corresponding header pair.
+- This is append-only as well; older persisted key-state blobs remain in file but are superseded by latest header pointer.
+- Current implementation uses a dirty flag (`KeyStateDirty`) to avoid unnecessary repeated key-state snapshots.
+- For SEQ indexes the hash key type is `VOIDKEY`, and serialized entry format in the key-state blob is:
+  - `WORD keySize`
+  - `keySize bytes keyData` (concatenated key block bytes from `BuildKeyBuffer`)
+  - `WORD dataSize`
+  - `dataSize bytes data` (for DDSSEQ: serialized `SeqRDesc`)
+    - `dataSize` is a length prefix, not `dbPos`/`dbLen`
+    - in current Win32 builds, `dataSize` is expected to be `8` for DDSSEQ index values
+    - those 8 bytes are `LONG dbPos` (4 bytes) + `LONG dbLen` (4 bytes)
+
+
+#### 3.1.2a Type matrix by SEQ table
+
+The `Type` field semantics are table-specific. DDSSEQ keys include `Type`, but meaning is defined by producer/consumer code.
+
+| Table | Type | Typical key/name | Meaning / usage | Evidence |
+|---|---:|---|---|---|
+| ScriptDB | 0 | `fName=<module/script>` | normal script payload | `WriteScriptData(0, ...)` in `compile/CODEGEN.CPP` |
+| ScriptDB | 1 | `fName="_CONT"` | script catalog/content blob | `WriteScriptData(1, "_CONT", ...)` in `dbhelp/SCRIPTHD.CPP` |
+| ScriptDB | 2 | `fName="_FDEF"` | function-definition payload | `WriteScriptData(2, "_FDEF", ...)` in `compile/FNCPROT.CPP` |
+| ScriptDB | 3 | `fName=<update script>` | update script payload | `WriteScriptData(3, ...)` in `compile/CODEGEN.CPP` |
+| ScriptDB | 4 | `fName="_CONT"` | update-script catalog/content blob | `WriteScriptData(4, "_CONT", ...)` in `dbhelp/SCRIPTHD.CPP` |
+| DataDict | 0 | `TableID, Version` | normal table definition entries | `WriteDataDict(0, ...)` in RESTOOL generators |
+| DataDict | 1 | `Name="CONT"` | aggregated dictionary catalog blob | `WriteDataDict(1, "CONT", ...)` in `dbhelp/TBDEF.CPP` |
+| DataDict | 2 | `Name="REPLIKATOR"` | replication metadata blob | `WriteDataDict(2, "REPLIKATOR", ...)` in `restool/GENREP.CPP` |
+| DataDict | 5 | `Name="_UPDATE"` | update marker/metadata blob | `WriteDataDict(5, "_UPDATE", ...)` in `restool/GENRTBL.CPP`; read in `DDS.CPP` |
+| ResDB | 0 | `fName="_CONT"` | resource catalog/content blob | `RESTYPE_CONT=0`, `WriteResourceData(RESTYPE_CONT, "_CONT", ...)` in `dbhelp/RESADMIN.CPP` |
+| ResDB | 1 | `fName/resource name` | bitmap resource payload | `RESTYPE_BITMAP=1` |
+| ResDB | 2 | `fName/resource name` | WMF resource payload | `RESTYPE_WMF=2` |
+| ResDB | 3 | `fName/resource name` | bitmap 8.6 payload variant | `RESTYPE_BITMAP8_6=3` |
+
+Notes:
+
+- ScriptDB key is always `(Type, fName)`; `Type=2` alone does not identify an entry.
+- In this repository, current code usage shows `_FDEF` as the only explicit `Type=2` ScriptDB writer.
+#### 3.1.3 Data entry block format
+
+Record payload blocks are written by `CreateBlock()` and read by `CreateRecord()`.
+
+Binary layout:
+
+1. `WORD` = number of stored variables (`AnzVarsInBlock`)
+2. Repeated `AnzVarsInBlock` times:
+   - `WORD varNr`
+   - If variable type is `VAR_BLOB`:
+     - `DWORD blobSize`
+     - `blobSize` raw bytes
+   - Else:
+     - `WORD valueSize`
+     - `valueSize` raw bytes
+
+Notes:
+
+- Only non-null fields are serialized.
+- Payload blocks are immutable after write (new update writes a new block and repoints index).
+- File is append-only; no in-place rewrite of old payload.
+
+#### 3.1.4 Operation semantics in DDSSEQ
+
+DDSSEQ behavior exposed via `DBCall(...)`:
+
+- `STANDARDINSERT`
+  - serialize record -> append payload -> update all configured key indexes -> flush key-state
+- `STANDARDUPDATE`
+  - serialize new record -> append payload -> repoint key indexes -> flush key-state
+- `STANDARDDELETE`
+  - remove index entries only -> flush key-state
+- `STANDARDGET`
+  - resolve key in in-memory hash -> seek/read payload -> deserialize record
+  - for `DataDict`, DDSSEQ additionally handles compatibility query shapes used by RESTOOL/DBHELP:
+    - `Type = %1 AND Name = %2`
+    - `Type = %1 AND TableID = (SELECT MAX(TableID) FROM DataDict WHERE Type = %1 AND TableID < %2)`
+    - `Type = %1 AND TableID = %2 AND Version = (SELECT MAX(Version) FROM DataDict WHERE Type = %1 AND TableID = %2 AND Version < %3)`
+- `GETLIST`
+  - iterate hash table entries and read referenced payload blocks
+- `EXECUTE` (special-cased delete for DataDict by `Type/TableID/Version`)
+  - remove key by params -> flush key-state
+
+Lifecycle:
+
+- `Open()` loads latest key-state blobs via header pointers.
+- `CloseFileAfterInsert()` and shutdown path flush key-state and close file.
+
+#### 3.1.5 Practical implications
+
+- **Append-only growth**: updates/deletes do not reclaim old payload bytes.
+- **Index authoritative for reachability**: records not referenced by latest key-state are logically unreachable.
+- **Crash sensitivity point**: header/key-state publication order matters; payload writes without consistent key-state/header update can leave stale visibility.
+- **Tracing support**: when `DataBase/LogSeqAccess=yes`, access logs include `GET/WRITE/KEY/KEYSTATE` with origin tags (for example `origin=record update`, `origin=key-state`).
+  - `GET` now logs both **lookup attempt** (`lookup key=... where=... params=...`) and **miss** (`miss key=...`) entries with `pos=-1 len=0`, so failing key lookups are visible even without a payload read.
+    - For keyed lookups, trace now also includes `keyparams=...` in key-segment order (`Type=...,TableID=...,Version=...`) to avoid ambiguity from legacy `params=...` formatting.
+  - `WRITE` logs a **begin** entry before `_hwrite` and the existing append/result entry after write, so the last attempted write is visible even if the write later fails.
+  - Key-state persistence writes are logged as `KEYSTATE` (not generic `WRITE`) when origin is `origin=key-state`, to separate technical index snapshots from table-row payload writes.
+  - `Open()` now logs successful key-state reloads as `KEYSTATE ... loaded key=<n>` with the exact persisted `pos/len` used for the read.
+
+#### 3.1.6 Compact binary examples (offset-oriented)
+
+The following examples are illustrative and show byte layout rules used by `CreateBlock()`/`CreateRecord()`.
+
+##### Example A: ScriptDB payload (`Type=0`, `fName="BENUTZER.TXT"`, `Data=<blob>`)
+
+Assume table variable indices:
+
+- `var 1 = Type` (`WORD`)
+- `var 2 = fName` (`VAR_STR`, zero-terminated bytes)
+- `var 3 = Data` (`VAR_BLOB`)
+
+Assume values:
+
+- `Type = 0x0000`
+- `fName = "BENUTZER.TXT\0"` (13 bytes)
+- `blobSize = 0x00004AB7` (19127 bytes)
+
+Then Index-block entry is:
+
+1. `WORD keySize = K`
+2. `K bytes keyData`
+   - `keyData = [Type-block][fName-block]`
+   - `K = sizeof(Type-block) + sizeof(fName-block)` (as stored by `BuildKeyBuffer`)
+3. `WORD dataSize = 0x0008`
+4. `LONG dbPos` (payload offset of this record)
+5. `LONG dbLen = 19158` (payload block length from above example)
+
+So, the persisted hash mapping for this record is:
+
+`[keyData(Type=0 + "BENUTZER.TXT")] -> [dbPos=<offset>, dbLen=19158]`
+
+and this entry is one element inside the ScriptDB serialized key-state blob referenced by ScriptDB header `(keyPos,keyLen)`.
+
+Then payload block is:
+
+1. `WORD AnzVars = 0x0003`
+2. Entry for var 1:
+   - `WORD varNr = 0x0001`
+   - `WORD valueSize = 0x0002`
+   - `02 bytes value` (type bytes)
+3. Entry for var 2:
+   - `WORD varNr = 0x0002`
+   - `WORD valueSize = 0x000D`
+   - `0D bytes value` (`"BENUTZER.TXT\0"`)
+4. Entry for var 3 (blob):
+   - `WORD varNr = 0x0003`
+   - `DWORD blobSize = 0x00004AB7`
+   - `4AB7 bytes blob payload`
+
+Total block length formula:
+
+`2 + (2+2+2) + (2+2+13) + (2+4+19127) = 19158 bytes`
+
+(`Write` trace `len` can differ from this example because real record composition depends on the actual table definition and present fields.)
+
+##### Example B: DataDict payload (`Type=0`, `TableID=20480`, `Version=0`, `Data=<blob>`)
+
+Responsibility split (important):
+
+- RESTOOL/DBHELP prepare the DataDict row values and pass the `Data` content as a blob field.
+- DDSSEQ does **not** interpret the semantic content of the `Data` blob (table definition internals).
+- DDSSEQ **does** encode/persist the full record container block (`varNr`, sizes, bytes) and the key->position index mapping.
+
+For `DataDict`, key fields used by DDSSEQ index are `Type`, `TableID`, `Version`.
+Assume one payload record contains:
+
+- `Type = 0` (`WORD`)
+- `TableID = 20480` (`WORD`, hex `0x5000`)
+- `Version = 0` (`WORD`)
+- plus Name/Parent/Data fields as defined by the DataDict table schema
+
+Binary entry encoding in DDSSEQ still follows the generic record-container rule:
+
+- each non-blob field: `varNr` + `WORD valueSize` + raw bytes
+- blob field (`Data`): `varNr` + `DWORD blobSize` + raw bytes
+
+So DDSSEQ wraps/persists what it receives, but does not parse the DataDict blob payload format itself.
+
+DataDict index-block entry (for the same row) is:
+
+1. `WORD keySize = K`
+2. `K bytes keyData`
+   - `keyData = [Type-block][TableID-block][Version-block]`
+3. `WORD dataSize = 0x0008`
+4. `LONG dbPos`
+5. `LONG dbLen`
+
+So the persisted mapping is:
+
+`[keyData(Type=0,TableID=20480,Version=0)] -> [dbPos=<offset>, dbLen=<payloadLen>]`
+
+##### Header/index example (global)
+
+For `ScriptDB.seq` (`AnzHashs=1`), header bytes at file start are:
+
+- `LONG keyPos` at offset `0x00`
+- `LONG keyLen` at offset `0x04`
+
+For `ResDB.seq` (`AnzHashs=2`), header is:
+
+- key0: `keyPos0` @ `0x00`, `keyLen0` @ `0x04`
+- key1: `keyPos1` @ `0x08`, `keyLen1` @ `0x0C`
+
+During `FlushKeyState()`, a new serialized hash blob is appended, then the corresponding header pair is rewritten to point to the newest blob.
+
+##### ScriptDB index-block example (`VOIDKEY` hash entry)
+
+`ScriptDB` has one hash (`AnzHashs=1`) with key `(Type, fName)`.
+
+One serialized hash entry inside the key-state blob looks like:
+
+1. `WORD keySize`
+2. `keySize bytes keyData`
+   - keyData is `BuildKeyBuffer(Type,fName)` output:
+     - bytes of `Type` field block
+     - followed by bytes of `fName` field block
+3. `WORD dataSize`
+4. `dataSize bytes data`
+   - for DDSSEQ this is serialized `SeqRDesc`:
+     - `LONG dbPos` (4 bytes)
+     - `LONG dbLen` (4 bytes)
+   - so typically `dataSize = 8` for DDSSEQ index entries
+
+So conceptually, for key `(Type=0, fName="BENUTZER.TXT")`, one persisted hash entry maps:
+
+`[keyData(Type+fName)] -> [dbPos=10008821, dbLen=19127]`
+
+and after `_CONT` update:
+
+`[keyData(Type=1,fName="_CONT")] -> [dbPos=10049348, dbLen=735189]`
+
+Those two mappings are part of the same serialized key-state blob referenced by the ScriptDB header pair `(keyPos,keyLen)`.
+
+##### How index persistence is restored on open
+
+On `Open()`:
+
+1. Read header pair (`keyPos`,`keyLen`) for each hash.
+2. Validate range against file end.
+3. Read serialized key-state blob at `keyPos` with `keyLen`.
+4. Rehydrate in-memory hash with `GetHugeHash(...)`.
+5. All subsequent `STANDARDGET` lookups use this restored in-memory hash (`GetDatav`) to resolve `(Type,fName) -> (dbPos,dbLen)`.
+
+If header range is invalid, DDSSEQ clears that pair and continues with empty hash state for that key, preventing unsafe reads from out-of-range key-state pointers.
+
 ---
 
 ## 4) RESTOOL artifact pipelines
+
+### 4.0 Naming clarification: `CONT` vs `_CONT`
+
+The two names are intentionally different and refer to different tables/pipelines:
+
+- **DataDict `CONT`**
+  - Stored in **DataDict** as a `Type=1` row (`Name="CONT"`, `TableID=0`, `Version=0`).
+  - Contains the aggregated dictionary catalog blob (table name/id/version/parent summary entries).
+
+- **ScriptDB `_CONT`**
+  - Stored in **ScriptDB** as `Type=1`, `fName="_CONT"`.
+  - Contains the aggregated script catalog blob.
+
+- **ResDB `_CONT`**
+  - Stored in **ResDB** as the resource catalog blob.
+
+So, startup lines like
+- `DataDict ... Type=1, TableID=0, Version=0`
+- `ScriptDB ... Type=1, fName=_CONT`
+
+are expected and represent two different catalogs.
+### 4.0.1 Typical startup/catalog GETs
+
+Observed startup reads like
+
+- `DataDict ... Type=1, TableID=0, Version=0`
+- `ScriptDB ... Type=1, fName=_CONT`
+- `ResDB ... Type=0, fName=_CONT`
+
+map to:
+
+- DataDict catalog blob (`CONT` row)
+- Script catalog blob (`_CONT` row in ScriptDB)
+- Resource catalog blob (`_CONT` row in ResDB)
+
+### 4.0.2 ScriptDB keying and type semantics
+
+ScriptDB lookup key is always the pair `(Type, fName)` (not `Type` alone).
+
+- `Type` selects the logical script-content class.
+- `fName` selects the concrete entry within that class.
+
+So `_FDEF` is addressed by both values together: `Type=2` **and** `fName="_FDEF"`.
+
+From current source usage:
+
+- `Type=0` normal script/module payloads
+- `Type=1` script content catalog (`_CONT`)
+- `Type=2` function-definition payload (`_FDEF`)
+- `Type=3` update script payloads
+- `Type=4` update script content catalog (`_CONT`)
+
+Current code search in this repository shows only one writer for `Type=2` in ScriptDB:
+`WriteScriptData(2, "_FDEF", ...)` in `compile/FNCPROT.CPP`.
 
 ### 4.1 Script pipeline
 

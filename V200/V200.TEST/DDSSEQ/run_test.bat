@@ -50,8 +50,30 @@ set "PATH=C:\ipos_kernel\LIB32;%TEST_DLL_ROOT%;%PATH%"
 cd /d "%TEST_ROOT%"
 
 echo Running DDSSEQ harness mode %TEST_MODE% ...
-"%TEST_ROOT%ddsseq_harness.exe" %TEST_MODE% --ini "DMW.INI"
-set "RUN_RC=%ERRORLEVEL%"
+if /I "%TEST_MODE%"=="xproc" (
+  echo Running DDSSEQ harness mode xproc-write ...
+  "%TEST_ROOT%ddsseq_harness.exe" xproc-write --ini "DMW.INI"
+  if errorlevel 1 (
+    echo.
+    echo DDSSEQ harness failed with exit code %ERRORLEVEL%.
+    exit /b %ERRORLEVEL%
+  )
+
+  echo Running DDSSEQ harness mode xproc-read ...
+  "%TEST_ROOT%ddsseq_harness.exe" xproc-read --ini "DMW.INI"
+  set "RUN_RC=%ERRORLEVEL%"
+) else (
+  "%TEST_ROOT%ddsseq_harness.exe" %TEST_MODE% --ini "DMW.INI"
+  if errorlevel 1 (
+    echo.
+    echo DDSSEQ harness failed with exit code %ERRORLEVEL%.
+    exit /b %ERRORLEVEL%
+  )
+
+  echo Running 2nd DDSSEQ harness mode %TEST_MODE% ...
+  "%TEST_ROOT%ddsseq_harness.exe" %TEST_MODE% --ini "DMW.INI"
+  set "RUN_RC=%ERRORLEVEL%"
+)
 
 if not "%RUN_RC%"=="0" (
   echo.

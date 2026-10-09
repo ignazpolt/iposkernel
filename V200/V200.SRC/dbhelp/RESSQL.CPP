@@ -762,6 +762,7 @@ DLLExport void _export WINAPI WriteDataDict (short type,LPSTR Name,short TableID
   // Fertig
   rec->Del(7);    // Handle bitte nicht freigeben
   delete rec ;
+
   }
 
 DLLExport GLOBALHANDLE _export WINAPI ReadDataDict (short type,WORD TableID,WORD Version,DWORD FAR *DataSize)

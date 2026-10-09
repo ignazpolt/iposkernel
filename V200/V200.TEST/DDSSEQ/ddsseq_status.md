@@ -35,6 +35,8 @@ for the following table types:
 - ResDB
 - DataDict
 
+It has also been extended with realistic mutation loops and repeated stress cycles that cover larger and varying payload lengths, not only a minimal smoke test.
+
 The relevant validation flow is the batch command:
 - run_test.bat all
 
@@ -42,6 +44,15 @@ The current known result:
 - script: PASS
 - resource: PASS
 - dict: PASS
+- script realistic: PASS
+- resource realistic: PASS
+- dict realistic: PASS
+- script stress: PASS
+- resource stress: PASS
+- dict stress: PASS
+- mixed workload: PASS
+- same-key reuse: PASS
+- multi-table sequential mix: PASS
 
 ## Core architectural decision
 

@@ -1525,7 +1525,7 @@ static void showAssWindow (LPSTR txt)
       if (AutoAbortTime > 0L) {
         if (long(GetTickCount() - starttime) > AutoAbortTime) {
           if (InOWA || (!FromException) || (!ContinueAllowed))
-            FatalExit (0);
+            FatalExit (1);
           break;
           }
         }
@@ -1540,7 +1540,7 @@ static void showAssWindow (LPSTR txt)
         if (GetAsyncKeyState ('A') < 0) {
           while (GetAsyncKeyState ('A') < 0);
           DeleteObject (0);   // Force Dr. Watson..
-          FatalExit (0);
+          FatalExit (1);
           break ;
           }
         if (GetAsyncKeyState ('D') < 0) {
@@ -1557,7 +1557,7 @@ static void showAssWindow (LPSTR txt)
     }
   else {
     if (InOWA || (!FromException) || (!ContinueAllowed))
-      FatalExit (0);
+      FatalExit (1);
     }
   if (!InOWA)
     FromException = FALSE;
