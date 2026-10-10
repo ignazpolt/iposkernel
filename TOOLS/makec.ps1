@@ -143,6 +143,15 @@ function Resolve-SourceRoot {
     $actVers = $env:ACTVERS
     $candidates = @()
 
+    $repoSourceDirs = @(
+        (Join-Path $Root "SOURCE")
+    )
+    foreach ($dir in $repoSourceDirs) {
+        if (Test-Path -LiteralPath $dir -PathType Container) {
+            $candidates += $dir
+        }
+    }
+
     if (-not [string]::IsNullOrWhiteSpace($actVers)) {
         $candidates += (Join-Path $Root "$actVers\$actVers.SRC")
         $candidates += (Join-Path $Root "$actVers.SRC")
@@ -172,7 +181,7 @@ function Resolve-SourceRoot {
 }
 
 $sourceRoot = Resolve-SourceRoot -Root $repoRoot
-$includeRoot = Join-Path $sourceRoot "Include"
+$includeRoot = Join-Path $sourceRoot "include"
 
 function Get-ProjectIncludePaths {
     param(
@@ -183,8 +192,9 @@ function Get-ProjectIncludePaths {
     $candidates = @(
         $IncludeRoot,
         $SourceRoot,
-        (Join-Path $SourceRoot "Include"),
-        (Join-Path (Split-Path -Path $SourceRoot -Parent) "Include")
+        (Join-Path $SourceRoot "include"),
+        (Join-Path (Split-Path -Path $SourceRoot -Parent) "include"),
+        (Join-Path (Split-Path -Path $SourceRoot -Parent) "SOURCE\include")
     )
 
     $paths = @()
@@ -259,7 +269,7 @@ foreach ($resolvedSource in $sources) {
     )
     if ($m.Success) {
         $sourceRoot = [System.IO.Path]::GetFullPath($m.Groups[1].Value)
-        $includeCandidate = Join-Path $sourceRoot "Include"
+        $includeCandidate = Join-Path $sourceRoot "include"
         if (Test-Path -LiteralPath $includeCandidate -PathType Container) {
             $includeRoot = $includeCandidate
         }

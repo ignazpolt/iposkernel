@@ -45,23 +45,23 @@ exit /b 1
 
 :build_all
 pushd "%ROOT%" >nul
-call :build_tree "%ROOT%\TARGET\DBG" "DBG"
+call :build_tree "%ROOT%TARGET\DBG" "DBG"
 if errorlevel 1 set "BUILD_FAILED=1"
-call :build_tree "%ROOT%\TARGET\OPT" "OPT"
+call :build_tree "%ROOT%TARGET\OPT" "OPT"
 if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
 :build_dbg
 pushd "%ROOT%" >nul
-call :build_tree "%ROOT%\TARGET\DBG" "DBG"
+call :build_tree "%ROOT%TARGET\DBG" "DBG"
 if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
 :build_opt
 pushd "%ROOT%" >nul
-call :build_tree "%ROOT%\TARGET\OPT" "OPT"
+call :build_tree "%ROOT%TARGET\OPT" "OPT"
 if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
@@ -114,20 +114,20 @@ if "%SELECTED%"=="" if "%ROOT_REQ%"=="0" (
 )
 
 if /I "%PROFILE%"=="ALL" (
-  call :build_tree_selected "%ROOT%\TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 set "SELECT_FAILED=1"
-  call :build_tree_selected "%ROOT%\TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 set "SELECT_FAILED=1"
   if "!SELECT_FAILED!"=="1" exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="DBG" (
-  call :build_tree_selected "%ROOT%\TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="OPT" (
-  call :build_tree_selected "%ROOT%\TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 exit /b 1
   goto :eof
 )
