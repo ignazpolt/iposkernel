@@ -1,8 +1,8 @@
-copy ..\%ACTVERS%.SRC\dds.l32
+copy ..\..\SOURCE\dds.l32
 
-rc -r -v -dWIN32 -fodds.res /I..\%ACTVERS%.SRC\Include /I..\%ACTVERS%.SRC ..\%ACTVERS%.SRC\dds.rc
+rc -r -v -dWIN32 -fodds.res /I..\..\SOURCE\include /I..\..\SOURCE ..\..\SOURCE\dds.rc
 
-link /DEBUG /LIBPATH:..\COBJ32 @dds.l32
+link /DEBUG /LIBPATH:..\..\COBJ32 @dds.l32
 if errorlevel 1 goto error
 goto continue
 :error

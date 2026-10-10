@@ -3,11 +3,8 @@
 err
 supererr
 
-# Legacy build trees are generated artifacts; keep the batch-driven build scripts/config files tracked.
-TARGET/DBG/**
-TARGET/OPT/**
-!TARGET/DBG/**/*.BAT
-!TARGET/OPT/**/*.BAT
+TARGET
 
 # Local backup files
 LIB32/FLOYDST.DLL
+LIB32/*.jar

@@ -2,7 +2,7 @@ COPY ..\..\..\SOURCE\FRMOBJ\frmobj.L32
 
 rc -r -v -dWIN32 -fofrmobj.res /I..\..\..\SOURCE\FRMOBJ /I..\..\..\SOURCE\Include /I..\..\..\SOURCE ..\..\..\SOURCE\FRMOBJ\frmobj.rc
 
-link /DLL /DEBUG /LIBPATH:..\..\COBJ32 @frmobj.l32
+link /DLL /DEBUG /LIBPATH:..\..\..\COBJ32 @frmobj.l32
 if errorlevel 1 goto error
 goto continue
 :error

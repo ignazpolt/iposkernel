@@ -44,6 +44,16 @@ echo Examples:
 exit /b 1
 
 :build_all
+call :prepare_target "DBG"
+if errorlevel 1 (
+  set "BUILD_FAILED=1"
+  goto done
+)
+call :prepare_target "OPT"
+if errorlevel 1 (
+  set "BUILD_FAILED=1"
+  goto done
+)
 pushd "%ROOT%" >nul
 call :build_tree "%ROOT%TARGET\DBG" "DBG"
 if errorlevel 1 set "BUILD_FAILED=1"
@@ -53,6 +63,11 @@ popd >nul
 goto done
 
 :build_dbg
+call :prepare_target "DBG"
+if errorlevel 1 (
+  set "BUILD_FAILED=1"
+  goto done
+)
 pushd "%ROOT%" >nul
 call :build_tree "%ROOT%TARGET\DBG" "DBG"
 if errorlevel 1 set "BUILD_FAILED=1"
@@ -60,6 +75,11 @@ popd >nul
 goto done
 
 :build_opt
+call :prepare_target "OPT"
+if errorlevel 1 (
+  set "BUILD_FAILED=1"
+  goto done
+)
 pushd "%ROOT%" >nul
 call :build_tree "%ROOT%TARGET\OPT" "OPT"
 if errorlevel 1 set "BUILD_FAILED=1"
@@ -114,6 +134,10 @@ if "%SELECTED%"=="" if "%ROOT_REQ%"=="0" (
 )
 
 if /I "%PROFILE%"=="ALL" (
+  call :prepare_target "DBG"
+  if errorlevel 1 exit /b 1
+  call :prepare_target "OPT"
+  if errorlevel 1 exit /b 1
   call :build_tree_selected "%ROOT%TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 set "SELECT_FAILED=1"
   call :build_tree_selected "%ROOT%TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
@@ -122,11 +146,15 @@ if /I "%PROFILE%"=="ALL" (
   goto :eof
 )
 if /I "%PROFILE%"=="DBG" (
+  call :prepare_target "DBG"
+  if errorlevel 1 exit /b 1
   call :build_tree_selected "%ROOT%TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="OPT" (
+  call :prepare_target "OPT"
+  if errorlevel 1 exit /b 1
   call :build_tree_selected "%ROOT%TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 exit /b 1
   goto :eof
@@ -134,6 +162,22 @@ if /I "%PROFILE%"=="OPT" (
 
 echo ERROR: unsupported profile %PROFILE%
 exit /b 1
+
+:prepare_target
+set "PMODE=%~1"
+call "%ROOT%init_target.bat" "%PMODE%"
+set "PRC=%ERRORLEVEL%"
+if not "%PRC%"=="0" (
+  echo ERROR: target initialization failed for %PMODE% with code %PRC%
+  exit /b %PRC%
+)
+call "%ROOT%copy_run_dependencies.bat" "%PMODE%"
+set "PRC=%ERRORLEVEL%"
+if not "%PRC%"=="0" (
+  echo ERROR: copying run dependencies failed for %PMODE% with code %PRC%
+  exit /b %PRC%
+)
+exit /b 0
 
 :build_tree_selected
 set "TREE=%~1"
