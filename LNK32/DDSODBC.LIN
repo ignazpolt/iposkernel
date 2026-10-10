@@ -4,6 +4,12 @@ COPY ..\..\%ACTVERS%.SRC\DDSODBC\ddsodb32.def
 rc -r -v -dWIN32 -foddsodbc.res ..\..\%ACTVERS%.SRC\DDSODBC\ddsodbc.rc
 
 link /DLL /DEBUG @ddsodbc.l32
+if errorlevel 1 goto error
+goto continue
+:error
+pause
+:continue
+
 copy ddsodbc.dll ..\*.*
 copy ddsodbc.lib ..\*.*
 copy ddsodbc.exp ..\*.*

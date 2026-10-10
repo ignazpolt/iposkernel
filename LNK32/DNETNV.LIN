@@ -4,6 +4,12 @@ COPY ..\..\%ACTVERS%.SRC\DNETNV\dnetnv32.def
 rc -r -v -dWIN32 -fodnetnv.res ..\..\%ACTVERS%.SRC\DNETNV\dnetnv.rc
 
 link /DLL /DEBUG @dnetnv.l32
+if errorlevel 1 goto error
+goto continue
+:error
+pause
+:continue
+
 copy dnetnv.dll ..\*.*
 copy dnetnv.lib ..\*.*
 copy dnetnv.exp ..\*.*

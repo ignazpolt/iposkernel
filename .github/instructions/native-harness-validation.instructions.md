@@ -35,7 +35,7 @@ This project’s legacy assert machinery can trigger a fatal abort path in the r
 - A process exit code of `0` means success from the OS perspective.
 - A process exit code of `1` means the runtime hit a fatal condition, including the autoabort path.
 - In this codebase, the assert window reads `[ErrorHandling] -> AutoAbortTime` from the active INI and can abort the process automatically after the configured timeout.
-- The fatal path is implemented in [../../V200/V200.SRC/ddsmem/GLOBMEM.CPP](../../V200/V200.SRC/ddsmem/GLOBMEM.CPP), and the autoabort logic may call `FatalExit(1)`.
+- The fatal path is implemented in [../../V200/V200.SRC/ddsmem/GLOBMEM.CPP](../../V200.SRC/ddsmem/GLOBMEM.CPP), and the autoabort logic may call `FatalExit(1)`.
 
 This is intentional: a failed in-process assert must be visible to automation as an error, not as a clean success.
 
@@ -44,7 +44,7 @@ This is intentional: a failed in-process assert must be visible to automation as
 When the harness or app exits with code 1:
 
 1. Treat the run as failed.
-2. Check whether a new entry was written to [../../V200/V200.TEST/DDSSEQ/faults.log](../../V200/V200.TEST/DDSSEQ/faults.log).
+2. Check whether a new entry was written to [../../V200/V200.TEST/DDSSEQ/faults.log](../../V200.TEST/DDSSEQ/faults.log).
 3. If a new faults.log entry exists, inspect it first.
 4. Use the fault entry to identify the module, function/method, and assert path that triggered the fatal condition.
 5. Follow the stack, source line, and module reported in the log to the runtime source that produced the failure.

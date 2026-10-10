@@ -19,14 +19,10 @@ if not errorlevel 1 (
 )
 
 for %%I in (
-  "C:\Program Files\Microsoft Visual Studio\2022\BuildTools"
-  "C:\Program Files\Microsoft Visual Studio\2022\Community"
-  "C:\Program Files\Microsoft Visual Studio\2022\Professional"
-  "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\Professional"
-  "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise"
+  "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
+  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community"
+  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional"
+  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise"
 ) do (
   if exist "%%~I\Common7\Tools\VsDevCmd.bat" (
     call "%%~I\Common7\Tools\VsDevCmd.bat" -arch=x86

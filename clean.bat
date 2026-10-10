@@ -1,10 +1,7 @@
 @echo off
 setlocal enableextensions
 
-if "%ACTVERS%"=="" set "ACTVERS=V200"
-
-set "IPOS_KERNEL_ROOT=%~dp0"
-set "ROOT=%IPOS_KERNEL_ROOT%%ACTVERS%"
+set "ROOT=%~dp0"
 
 if /I "%~1"=="DBG" goto clean_dbg
 if /I "%~1"=="OPT" goto clean_opt
@@ -15,16 +12,16 @@ echo Usage: clean.bat [DBG^|OPT^|ALL]
 exit /b 1
 
 :clean_all
-call :clean_tree "%ROOT%\%ACTVERS%_32.DBG" "DBG"
-call :clean_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
+call :clean_tree "%ROOT%\TARGET\DBG" "DBG"
+call :clean_tree "%ROOT%\TARGET\OPT" "OPT"
 goto done
 
 :clean_dbg
-call :clean_tree "%ROOT%\%ACTVERS%_32.DBG" "DBG"
+call :clean_tree "%ROOT%\TARGET\DBG" "DBG"
 goto done
 
 :clean_opt
-call :clean_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
+call :clean_tree "%ROOT%\TARGET\OPT" "OPT"
 goto done
 
 :clean_tree
@@ -43,7 +40,7 @@ for /r "%TREE%" %%F in (*.obj *.dll *.lib *.exp *.res *.map *.exe *.pdb *.ilk *.
   call :delete_if_safe "%%~F"
 )
 
-for %%F in ("err" "supererr" "none" "RCa29528") do (
+for %%F in ("err" "supererr") do (
   if exist "%TREE%\%%~F" del /q /f "%TREE%\%%~F"
 )
 

@@ -1,11 +1,8 @@
 @echo off
 setlocal enableextensions enabledelayedexpansion
 
-if "%ACTVERS%"=="" set "ACTVERS=V200"
-
-set "IPOS_KERNEL_ROOT=%~dp0"
-set "TOOLS=%IPOS_KERNEL_ROOT%tools"
-set "ROOT=%IPOS_KERNEL_ROOT%%ACTVERS%"
+set "ROOT=%~dp0"
+set "TOOLS=%ROOT%tools"
 set "BUILD_FAILED=0"
   
 if not exist "%TOOLS%\makec.bat" (
@@ -18,9 +15,6 @@ if errorlevel 1 call "%~dp0init_vc.bat"
 if errorlevel 1 exit /b %ERRORLEVEL%
 
 set "PATH=%TOOLS%;%PATH%"
-
-echo Using ACTVERS=%ACTVERS% in %ROOT%
-echo Using tools from %TOOLS%
 
 if /I "%~1"=="DBG" (
   if "%~2"=="" goto build_dbg
@@ -51,23 +45,23 @@ exit /b 1
 
 :build_all
 pushd "%ROOT%" >nul
-call :build_tree "%ROOT%\%ACTVERS%_32.DBG" "DBG"
+call :build_tree "%ROOT%\TARGET\DBG" "DBG"
 if errorlevel 1 set "BUILD_FAILED=1"
-call :build_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
+call :build_tree "%ROOT%\TARGET\OPT" "OPT"
 if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
 :build_dbg
 pushd "%ROOT%" >nul
-call :build_tree "%ROOT%\%ACTVERS%_32.DBG" "DBG"
+call :build_tree "%ROOT%\TARGET\DBG" "DBG"
 if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
 
 :build_opt
 pushd "%ROOT%" >nul
-call :build_tree "%ROOT%\%ACTVERS%_32.OPT" "OPT"
+call :build_tree "%ROOT%\TARGET\OPT" "OPT"
 if errorlevel 1 set "BUILD_FAILED=1"
 popd >nul
 goto done
@@ -120,20 +114,20 @@ if "%SELECTED%"=="" if "%ROOT_REQ%"=="0" (
 )
 
 if /I "%PROFILE%"=="ALL" (
-  call :build_tree_selected "%ROOT%\%ACTVERS%_32.DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%\TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 set "SELECT_FAILED=1"
-  call :build_tree_selected "%ROOT%\%ACTVERS%_32.OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%\TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 set "SELECT_FAILED=1"
   if "!SELECT_FAILED!"=="1" exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="DBG" (
-  call :build_tree_selected "%ROOT%\%ACTVERS%_32.DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%\TARGET\DBG" "DBG" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 exit /b 1
   goto :eof
 )
 if /I "%PROFILE%"=="OPT" (
-  call :build_tree_selected "%ROOT%\%ACTVERS%_32.OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
+  call :build_tree_selected "%ROOT%\TARGET\OPT" "OPT" "%SELECTED%" "%ROOT_REQ%"
   if errorlevel 1 exit /b 1
   goto :eof
 )

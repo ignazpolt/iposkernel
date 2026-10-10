@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="iposclient-fat">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/V200/V200_32.DBG/iposclient-fat.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
