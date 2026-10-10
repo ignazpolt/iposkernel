@@ -475,10 +475,12 @@ DLLExport BOOL _export WINAPI Out (LPDBRECORD rec,int hGresID,WORD op,DWORD FAR 
   LPVOID hstmt = NULL;
   int res = GetDLLAdmin()->GetDLLEntry(req->GetDLLHandle())->DBCall (DBOP_GET,1,req,&hstmt,&rb);
   GetDLLAdmin()->GetDLLEntry(req->GetDLLHandle())->DBCall (DBOP_RESET,0,NULL,&hstmt,NULL);
-  if ((op == DBCALLTYPE_STANDARDINSERT) && (hGresID >= 0)) {
+  if ((op == DBCALLTYPE_STANDARDINSERT) && (hGresID >= 0) &&
+      (rb.act != NULL) && (rb.act->rec[0] != NULL)) {
     rb.act->rec[0]->Del(hGresID);
     }
-  if ((op == DBCALLTYPE_STANDARDINSERT) && (res == DBCALL_SUCCESS) && (Id0 != NULL)) {
+  if ((op == DBCALLTYPE_STANDARDINSERT) && (res == DBCALL_SUCCESS) && (Id0 != NULL) &&
+      (rb.act != NULL) && (rb.act->rec[0] != NULL)) {
     LPVOID nData = rb.act->rec[0]->Get(0);
     if (GetBlockSize (nData) == 4)
       *Id0 = *((DWORD FAR *) nData);
@@ -533,18 +535,22 @@ DLLExport void _export WINAPI WriteScriptData (short type,LPSTR fName,GLOBALHAND
   static LPSTR q1n [] = { "Nummer" } ;
   static LPSTR q1t [] = { "ScriptDB" } ;
   LPTABLEDEF q1 = GetTableAdmin()->GetTemporaryTable (sizeof(q1n) / sizeof(*q1n),q1n,1,q1t) ;
+  WIN_ASSERT (q1 != NULL);
 
   LPDBRECORD h = Ask (q1,"Type = %1 AND fName = %2",&type,sizeof(type),VAR_STRARR,fName,lstrlen(fName)+1,VAR_STR);
   if (h != NULL) {
     // Update ist erforderlich
-    DWORD Nummer = *(DWORD FAR *) h->Get(0);
+    LPVOID pNummer = h->Get(0);
+    WIN_ASSERT (pNummer != NULL);
+    DWORD Nummer = *(DWORD FAR *) pNummer;
     ASSIGN(0,Nummer);
     delete h ;
     WIN_ASSERT (Out (rec,3,DBCALLTYPE_STANDARDUPDATE,NULL,"Nummer = %1",&Nummer,4,VAR_LONG));
     }
-  else
+  else {
     // Neues Script -> Insert
     WIN_ASSERT (Out (rec,3,DBCALLTYPE_STANDARDINSERT,NULL,""));
+    }
   GetTableAdmin()->FreeTable (q1->GetTableID(),q1->GetVersion());
 
   // Fertig
@@ -735,23 +741,28 @@ DLLExport void _export WINAPI WriteDataDict (short type,LPSTR Name,short TableID
   static LPSTR q1n [] = { "Nummer" } ;
   static LPSTR q1t [] = { "DataDict" } ;
   LPTABLEDEF q1 = GetTableAdmin()->GetTemporaryTable (sizeof(q1n) / sizeof(*q1n),q1n,1,q1t) ;
+  WIN_ASSERT (q1 != NULL);
 
   LPDBRECORD h = Ask (q1,"Type = %1 AND TableID = %2 AND Version = %3",&type,sizeof(type),VAR_STRARR,&TableID,sizeof(TableID),VAR_STRARR,&Version,sizeof(Version),VAR_STRARR);
   if (h != NULL) {
     // Update ist erforderlich
-    DWORD Nummer = *(DWORD FAR *) h->Get(0);
+    LPVOID pNummer = h->Get(0);
+    WIN_ASSERT (pNummer != NULL);
+    DWORD Nummer = *(DWORD FAR *) pNummer;
     ASSIGN(0,Nummer);
     delete h ;
     WIN_ASSERT (Out (rec,7,DBCALLTYPE_STANDARDUPDATE,NULL,"Nummer = %1",&Nummer,4,VAR_LONG));
     }
-  else
+  else {
     // Neue Tabelle -> Insert
     WIN_ASSERT (Out (rec,7,DBCALLTYPE_STANDARDINSERT,NULL,""));
+    }
   GetTableAdmin()->FreeTable (q1->GetTableID(),q1->GetVersion());
 
   // Fertig
   rec->Del(7);    // Handle bitte nicht freigeben
   delete rec ;
+
   }
 
 DLLExport GLOBALHANDLE _export WINAPI ReadDataDict (short type,WORD TableID,WORD Version,DWORD FAR *DataSize)
@@ -893,4 +904,3 @@ DLLExport DBList FAR *_export WINAPI GetDBVersionList ()
   }
 
 #undef ASSIGN
-

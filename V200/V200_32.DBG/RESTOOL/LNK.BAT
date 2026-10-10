@@ -8,3 +8,4 @@ goto continue
 :error
 pause
 :continue
+if exist restool.exe copy /Y restool.exe ..\restool.exe

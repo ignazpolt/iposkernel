@@ -769,8 +769,8 @@ DLLExport LPSTR _export WINAPI SetStartDir (LPSTR dirname, LPSTR IniFile)
     if (f != HFILE_ERROR)
       first_time = FALSE;
     else {
-      char szBuf[256];
-      wsprintf (szBuf, "%s ist kein g�ltiges INI-Verzeichnis", StartPath);
+      char szBuf[1024];
+      wsprintf (szBuf, "INI-Datei nicht gefunden: %s (Startpfad: %s)", IniName, StartPath);
       WIN_ASSERT_TEXT (FALSE, szBuf);
       }
     return StartPath;
@@ -1525,7 +1525,7 @@ static void showAssWindow (LPSTR txt)
       if (AutoAbortTime > 0L) {
         if (long(GetTickCount() - starttime) > AutoAbortTime) {
           if (InOWA || (!FromException) || (!ContinueAllowed))
-            FatalExit (0);
+            FatalExit (1);
           break;
           }
         }
@@ -1540,7 +1540,7 @@ static void showAssWindow (LPSTR txt)
         if (GetAsyncKeyState ('A') < 0) {
           while (GetAsyncKeyState ('A') < 0);
           DeleteObject (0);   // Force Dr. Watson..
-          FatalExit (0);
+          FatalExit (1);
           break ;
           }
         if (GetAsyncKeyState ('D') < 0) {
@@ -1557,7 +1557,7 @@ static void showAssWindow (LPSTR txt)
     }
   else {
     if (InOWA || (!FromException) || (!ContinueAllowed))
-      FatalExit (0);
+      FatalExit (1);
     }
   if (!InOWA)
     FromException = FALSE;

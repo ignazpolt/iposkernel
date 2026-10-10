@@ -841,16 +841,26 @@ DLLExport LPTABLEADMIN _export WINAPI GetTableAdmin ()
 hash FAR *IdHash,FAR *HoldBlobHash,FAR *NameHash;
 void TableAdmin::LoadDataDictContent ()
   {
+  printf("[tbdef] LoadDataDictContent entry hGContMem=%p Content=%p NameHash=%p\n",hGContMem,Content,NameHash);
   if (hGContMem) {
     GlobalUnlock (hGContMem);
     GlobalFree (hGContMem);
+    hGContMem = NULL;
+    Content = NULL;
     delete NameHash ;
     NameHash = new hash (237,STRKEY);
     }
   DWORD ContSize;
   hGContMem = ReadDataDict (1,0,0,&ContSize);
+  printf("[tbdef] after ReadDataDict hGContMem=%p ContSize=%lu\n",hGContMem,ContSize);
+  if (hGContMem == NULL) {
+    Content = NULL;
+    printf("[tbdef] LoadDataDictContent returning because no data\n");
+    return;
+    }
 
   Content = LPDDCONT (GlobalLock (hGContMem));
+  printf("[tbdef] Content locked=%p\n",Content);
   if (Content != NULL) {
     for (LPCONTENTRY h = Content->First() ; h != NULL ; h = Content->Next(h)) {
       NameHash->SetData (h->TableName,&h->tRef,sizeof(&h->tRef));
@@ -972,17 +982,21 @@ extern void InitializeRecAdmin ();
 extern void ExitRecAdmin ();
 DLLExport void _export WINAPI TableAdmin::Initialize (BOOL doTest)
   {
+  printf("[tbdef] Initialize start\n");
   MaxTables = GetPrivateProfileInt ("Tables","AnzTableDefs",500,GetIniName());
   IdHash = new hash (111,LONGKEY);
   HoldBlobHash = new hash (47,LONGKEY);
   NameHash = new hash (247,STRKEY);
   AnzUsedTables = 0 ;
-
+  printf("[tbdef] before DefineResourceDBs\n");
   DefineResourceDBs();
+  printf("[tbdef] before LoadDataDictContent\n");
   LoadDataDictContent ();
+  printf("[tbdef] after LoadDataDictContent hGContMem=%p Content=%p\n",hGContMem,Content);
   InitializeRecAdmin ();
-
+  printf("[tbdef] before LoadTableIdents\n");
   LoadTableIdents (doTest);
+  printf("[tbdef] Initialize ok\n");
   }
 
 // Freigeben der Tabellen, wenn Counter >= 0 dann Error
@@ -1042,14 +1056,19 @@ DLLExport void _export WINAPI TableAdmin::OnExit ()
   if (hGContMem) {
     GlobalUnlock (hGContMem);
     GlobalFree (hGContMem);
+    hGContMem = NULL;
     }
+  Content = NULL;
   delete IdHash ;
+  IdHash = NULL;
   delete NameHash ;
+  NameHash = NULL;
   AnzUsedTables = 0 ;
   RemoveMDIHandleList();
   ExitRecAdmin ();
   ShowStatistics ();
   delete HoldBlobHash ;
+  HoldBlobHash = NULL;
   ResetCmdFifo ();
   DelResHash ();
   if (Id2hash != NULL) {
